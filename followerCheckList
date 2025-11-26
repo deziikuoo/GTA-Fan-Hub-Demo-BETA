@@ -1,0 +1,33 @@
+✅ Basic Functionality
+[ ] Can follow a user
+[ ] Can unfollow a user
+[ ] Follow button shows correct state (Follow/Following)
+[ ] Follower count updates correctly
+[ ] Following count updates correctly
+✅ Profile Page
+[ ] FollowButton appears on other users' profiles
+[ ] FollowButton hidden on own profile
+[ ] Followers tab shows correct list
+[ ] Following tab shows correct list
+[ ] Stats display correct numbers
+✅ Lists & Pagination
+[ ] Followers list loads
+[ ] Following list loads
+[ ] "Load More" button appears when > 20 users
+[ ] Pagination works correctly
+[ ] Empty states show when no followers/following
+✅ Persistence
+[ ] Follow state persists after page refresh
+[ ] Follow state persists after logout/login
+[ ] Counts remain accurate
+✅ Edge Cases
+[ ] Cannot follow yourself
+[ ] Cannot follow same user twice
+[ ] Error messages display properly
+[ ] Loading states work correctly
+[ ] Invalid user IDs handled gracefully
+✅ Performance
+[ ] Follow action completes < 500ms
+[ ] Lists load < 1000ms
+[ ] No console errors
+[ ] Network tab shows correct API calls
