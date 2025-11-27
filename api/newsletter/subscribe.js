@@ -347,17 +347,30 @@ async function subscribeHandler(req, res) {
 
 // Export handler with top-level error catching
 export default async function handler(req, res) {
+  // Log that the function was called
+  console.log('[Subscribe] Handler called');
+  console.log('[Subscribe] Method:', req.method);
+  console.log('[Subscribe] URL:', req.url);
+  
   try {
-    return await subscribeHandler(req, res);
+    const result = await subscribeHandler(req, res);
+    console.log('[Subscribe] Handler completed successfully');
+    return result;
   } catch (error) {
-    // Catch any errors that occur before our handler runs
-    console.error('[Subscribe] Top-level error:', error);
+    // Catch any errors that occur before our handler runs (like import errors)
+    console.error('[Subscribe] ========== TOP-LEVEL ERROR ==========');
+    console.error('[Subscribe] Error name:', error.name);
+    console.error('[Subscribe] Error message:', error.message);
     console.error('[Subscribe] Error stack:', error.stack);
+    console.error('[Subscribe] Error code:', error.code);
+    console.error('[Subscribe] ========== END TOP-LEVEL ERROR ==========');
+    
     return res.status(500).json({
       success: false,
       message: 'An unexpected error occurred. Please try again later.',
-      ...(process.env.VERCEL_ENV === 'preview' && {
-        error: error.message
+      ...(process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'development' && {
+        error: error.message,
+        errorName: error.name
       })
     });
   }
