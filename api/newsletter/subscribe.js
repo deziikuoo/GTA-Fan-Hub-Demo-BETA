@@ -52,22 +52,28 @@ function cleanupRateLimits() {
   }
 }
 
-// Run cleanup every 10 minutes
-setInterval(cleanupRateLimits, 10 * 60 * 1000);
-
 // Helper function to parse JSON body
-async function getJsonBody(req) {
-  // Vercel automatically parses JSON bodies, but handle both cases
-  if (req.body) {
-    if (typeof req.body === 'string') {
-      return JSON.parse(req.body);
-    }
+// Vercel automatically parses JSON bodies, but we handle both cases
+function getJsonBody(req) {
+  // Vercel parses JSON automatically, so req.body should be an object
+  if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
     return req.body;
+  }
+  // If it's a string, try to parse it
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body);
+    } catch (e) {
+      return {};
+    }
   }
   return {};
 }
 
-export default async function handler(req, res) {
+async function subscribeHandler(req, res) {
+  // Clean up rate limits on each request (instead of setInterval)
+  cleanupRateLimits();
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ 
@@ -110,16 +116,8 @@ export default async function handler(req, res) {
     }
 
     // Parse request body
-    let body;
-    try {
-      body = await getJsonBody(req);
-    } catch (parseError) {
-      console.error('[Subscribe] Error parsing request body:', parseError);
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid request format.'
-      });
-    }
+    // Vercel automatically parses JSON bodies when Content-Type is application/json
+    const body = getJsonBody(req);
     
     const { email, source = 'website' } = body;
     
@@ -342,6 +340,24 @@ export default async function handler(req, res) {
         error: error.message,
         errorName: error.name,
         errorCode: error.code
+      })
+    });
+  }
+}
+
+// Export handler with top-level error catching
+export default async function handler(req, res) {
+  try {
+    return await subscribeHandler(req, res);
+  } catch (error) {
+    // Catch any errors that occur before our handler runs
+    console.error('[Subscribe] Top-level error:', error);
+    console.error('[Subscribe] Error stack:', error.stack);
+    return res.status(500).json({
+      success: false,
+      message: 'An unexpected error occurred. Please try again later.',
+      ...(process.env.VERCEL_ENV === 'preview' && {
+        error: error.message
       })
     });
   }
