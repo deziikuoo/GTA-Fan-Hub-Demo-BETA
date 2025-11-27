@@ -1,4 +1,5 @@
 // Email validation utilities for server-side validation
+import { randomBytes } from 'crypto';
 
 /**
  * Basic email format validation using regex
@@ -166,10 +167,8 @@ export function validateEmail(email) {
  * @returns {string} - Hex-encoded token
  */
 export function generateToken(bytes = 32) {
-  // Use Web Crypto API for serverless environment
-  const array = new Uint8Array(bytes);
-  crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  // Use Node.js crypto module for serverless environment
+  return randomBytes(bytes).toString('hex');
 }
 
 /**

@@ -64,6 +64,23 @@ export default async function handler(req, res) {
     });
   }
 
+  // Check environment variables early
+  if (!process.env.CONNECTION_STRING) {
+    console.error('[Subscribe] CONNECTION_STRING environment variable is missing');
+    return res.status(500).json({
+      success: false,
+      message: 'Server configuration error. Please contact support.'
+    });
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error('[Subscribe] RESEND_API_KEY environment variable is missing');
+    return res.status(500).json({
+      success: false,
+      message: 'Server configuration error. Please contact support.'
+    });
+  }
+
   try {
     // Get client IP for rate limiting
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
@@ -81,7 +98,30 @@ export default async function handler(req, res) {
     }
 
     // Parse request body
-    const { email, source = 'website' } = req.body;
+    let body;
+    try {
+      // Handle both parsed and unparsed body
+      if (typeof req.body === 'string') {
+        body = JSON.parse(req.body);
+      } else {
+        body = req.body || {};
+      }
+    } catch (parseError) {
+      console.error('[Subscribe] Error parsing request body:', parseError);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request format.'
+      });
+    }
+    
+    const { email, source = 'website' } = body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.'
+      });
+    }
 
     // Validate email
     const validation = validateEmail(email);
@@ -220,6 +260,25 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('[Subscribe] Error:', error);
+    console.error('[Subscribe] Error stack:', error.stack);
+    console.error('[Subscribe] Error message:', error.message);
+    
+    // Check for missing environment variables
+    if (!process.env.CONNECTION_STRING) {
+      console.error('[Subscribe] CONNECTION_STRING is not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Server configuration error. Please contact support.'
+      });
+    }
+    
+    if (!process.env.RESEND_API_KEY) {
+      console.error('[Subscribe] RESEND_API_KEY is not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Server configuration error. Please contact support.'
+      });
+    }
     
     // Handle duplicate key error
     if (error.code === 11000) {
@@ -229,9 +288,23 @@ export default async function handler(req, res) {
       });
     }
     
+    // Handle MongoDB connection errors
+    if (error.message && error.message.includes('MongoServerError')) {
+      console.error('[Subscribe] MongoDB error:', error.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection error. Please try again later.'
+      });
+    }
+    
     return res.status(500).json({
       success: false,
-      message: 'An error occurred. Please try again later.'
+      message: 'An error occurred. Please try again later.',
+      // Include error details in development
+      ...(process.env.NODE_ENV === 'development' && { 
+        error: error.message,
+        details: error.stack 
+      })
     });
   }
 }
