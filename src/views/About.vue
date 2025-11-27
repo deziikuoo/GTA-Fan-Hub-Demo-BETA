@@ -31,7 +31,9 @@ export default {
       newsletterMessageType.value = "";
 
       try {
-        const response = await fetch("/api/newsletter/subscribe", {
+        // Use Railway backend URL
+        const apiUrl = import.meta.env.VITE_API_URL || "https://gta-fan-hub-demo-production.up.railway.app";
+        const response = await fetch(`${apiUrl}/api/newsletter/subscribe`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
