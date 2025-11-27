@@ -1,7 +1,7 @@
 <!-- src/views/News.vue -->
 <template>
   <div class="news-wrapper">
-    <div class="news-container">
+    <div class="news-container main-backdrop-filter">
       <div v-if="showNewArticlesNotification" class="new-articles-notification">
         New articles available!
         <button @click="refreshPage">Refresh to view</button>
@@ -27,30 +27,6 @@
           <span v-if="loading">🔄</span>
           <span v-else>🔄</span>
           Refresh News
-        </button>
-        <button
-          class="refresh-btn"
-          @click="testCache"
-          style="background-color: rgba(255, 165, 0, 1)"
-        >
-          Test Cache
-        </button>
-        <button
-          class="refresh-btn"
-          @click="clearCache"
-          style="background-color: rgba(255, 0, 0, 1)"
-        >
-          Clear Cache
-        </button>
-        <button
-          class="refresh-btn"
-          @click="manualRssFetch"
-          :disabled="rssFetching"
-          style="background-color: rgba(0, 128, 255, 1)"
-        >
-          <span v-if="rssFetching">🔄</span>
-          <span v-else>📡</span>
-          {{ rssFetching ? "Fetching RSS..." : "Fetch RSS Now" }}
         </button>
       </div>
       <div class="search-container">
@@ -174,103 +150,128 @@
           </button>
         </div>
       </div>
-      <div v-if="showDetailsModal" class="article-details-modal">
-        <div class="modal-overlay" @click="showDetailsModal = false"></div>
-        <div class="modal-content-wrapper">
-          <div class="modal-content-card">
-            <button class="modal-close-btn" @click="showDetailsModal = false">
-              <font-awesome-icon :icon="['fas', 'times']" />
-            </button>
-            
-            <!-- Article Header -->
-            <div class="modal-header">
-              <h1 class="modal-title">{{ selectedArticle.title }}</h1>
-              <div class="modal-meta">
-                <span class="meta-date">
-                  <font-awesome-icon :icon="['fas', 'calendar']" />
-                  {{ formatDate(selectedArticle.pubDate) }}
-                </span>
-                <span class="meta-time">
-                  <font-awesome-icon :icon="['fas', 'clock']" />
-                  {{ getRelativeTime(selectedArticle.pubDate) }}
-                </span>
-                <span class="meta-author">
-                  <font-awesome-icon :icon="['fas', 'user']" />
-                  {{ selectedArticle.author || "Unknown" }}
-                </span>
+    </div>
+
+    <!-- Article Details Modal - Outside news-container to cover full viewport -->
+    <div v-if="showDetailsModal" class="article-details-modal">
+      <div class="modal-overlay" @click="showDetailsModal = false"></div>
+      <div class="modal-content-wrapper">
+        <div class="modal-content-card">
+          <button class="modal-close-btn" @click="showDetailsModal = false">
+            <font-awesome-icon :icon="['fas', 'times']" />
+          </button>
+
+          <!-- Article Header -->
+          <div class="modal-header">
+            <h1 class="modal-title">{{ selectedArticle.title }}</h1>
+            <div class="modal-meta">
+              <span class="meta-date">
+                <font-awesome-icon :icon="['fas', 'calendar']" />
+                {{ formatDate(selectedArticle.pubDate) }}
+              </span>
+              <span class="meta-time">
+                <font-awesome-icon :icon="['fas', 'clock']" />
+                {{ getRelativeTime(selectedArticle.pubDate) }}
+              </span>
+              <span class="meta-author">
+                <font-awesome-icon :icon="['fas', 'user']" />
+                {{ selectedArticle.author || "Unknown" }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Article Media -->
+          <div v-if="selectedArticle.enclosure" class="modal-media">
+            <img
+              v-if="
+                selectedArticle.enclosure.url &&
+                selectedArticle.enclosure.type.startsWith('image/')
+              "
+              :src="selectedArticle.enclosure.url"
+              alt="Article Image"
+              class="modal-image"
+            />
+            <video
+              v-else-if="
+                selectedArticle.enclosure.url &&
+                selectedArticle.enclosure.type.startsWith('video/') &&
+                !selectedArticle.enclosure.url.includes('youtube') &&
+                !selectedArticle.enclosure.url.includes('vimeo')
+              "
+              :src="selectedArticle.enclosure.url"
+              controls
+              class="modal-video"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <iframe
+              v-else-if="
+                selectedArticle.enclosure.url &&
+                selectedArticle.enclosure.type.startsWith('video/') &&
+                (selectedArticle.enclosure.url.includes('youtube') ||
+                  selectedArticle.enclosure.url.includes('vimeo'))
+              "
+              :src="selectedArticle.enclosure.url"
+              class="modal-video"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <!-- Article Content -->
+          <div class="modal-body">
+            <div v-if="selectedArticle.description" class="content-section">
+              <h3 class="section-label">Summary</h3>
+              <div class="modal-description">
+                {{ selectedArticle.description }}
               </div>
             </div>
 
-            <!-- Article Media -->
-            <div v-if="selectedArticle.enclosure" class="modal-media">
-              <img
-                v-if="
-                  selectedArticle.enclosure.url &&
-                  selectedArticle.enclosure.type.startsWith('image/')
-                "
-                :src="selectedArticle.enclosure.url"
-                alt="Article Image"
-                class="modal-image"
+            <div
+              v-if="
+                selectedArticle.content &&
+                stripHtml(selectedArticle.content) !==
+                  selectedArticle.description
+              "
+              class="content-section"
+            >
+              <h3 class="section-label">Article Content</h3>
+              <div
+                class="modal-content"
+                :class="{ expanded: isDescriptionExpanded }"
+              >
+                {{ stripHtml(selectedArticle.content) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Article Footer -->
+          <div class="modal-footer">
+            <button
+              v-if="
+                selectedArticle.content &&
+                stripHtml(selectedArticle.content).length > 600
+              "
+              @click="isDescriptionExpanded = !isDescriptionExpanded"
+              class="expand-btn"
+            >
+              {{ isDescriptionExpanded ? "Show Less" : "Show More" }}
+              <font-awesome-icon
+                :icon="[
+                  'fas',
+                  isDescriptionExpanded ? 'chevron-up' : 'chevron-down',
+                ]"
               />
-              <iframe
-                v-else-if="
-                  selectedArticle.enclosure.url &&
-                  selectedArticle.enclosure.type.startsWith('video/') &&
-                  (selectedArticle.enclosure.url.includes('youtube') ||
-                    selectedArticle.enclosure.url.includes('vimeo'))
-                "
-                :src="selectedArticle.enclosure.url"
-                class="modal-video"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-
-            <!-- Article Content -->
-            <div class="modal-body">
-              <div v-if="selectedArticle.description" class="content-section">
-                <h3 class="section-label">Summary</h3>
-                <div class="modal-description">
-                  {{ selectedArticle.description }}
-                </div>
-              </div>
-              
-              <div 
-                v-if="selectedArticle.content && stripHtml(selectedArticle.content) !== selectedArticle.description" 
-                class="content-section"
-              >
-                <h3 class="section-label">Article Content</h3>
-                <div 
-                  class="modal-content"
-                  :class="{ 'expanded': isDescriptionExpanded }"
-                >
-                  {{ stripHtml(selectedArticle.content) }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Article Footer -->
-            <div class="modal-footer">
-              <button 
-                v-if="selectedArticle.content && stripHtml(selectedArticle.content).length > 600"
-                @click="isDescriptionExpanded = !isDescriptionExpanded"
-                class="expand-btn"
-              >
-                {{ isDescriptionExpanded ? 'Show Less' : 'Show More' }}
-                <font-awesome-icon 
-                  :icon="['fas', isDescriptionExpanded ? 'chevron-up' : 'chevron-down']" 
-                />
-              </button>
-              <a 
-                :href="selectedArticle.link" 
-                target="_blank" 
-                class="modal-read-full-btn"
-              >
-                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                Read Full Article
-              </a>
-            </div>
+            </button>
+            <a
+              :href="selectedArticle.link"
+              target="_blank"
+              class="modal-read-full-btn"
+            >
+              <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+              Read Full Article
+            </a>
           </div>
         </div>
       </div>
@@ -299,22 +300,21 @@ export default {
     const totalPages = ref(0);
     const sentinel = ref(null);
     const loadedCount = ref(0);
-    const rssFetching = ref(false);
     const standardLimit = 12;
     const searchQuery = ref("");
     const isSearch = ref(false);
     const showNewArticlesNotification = ref(false);
     const articleCount = ref(0);
-    const baseURL = "http://localhost:3003";
+    // Removed baseURL - using mockApi for demo
     let pollInterval = null;
 
-    // Block-based computed property to group articles into blocks of 3 for grid layout
+    // Block-based computed property to group articles into blocks of 2 for grid layout
     const articleBlocks = computed(() => {
       const blocks = [];
 
-      // Group articles into blocks of 3 for RVV the grid layout
-      for (let i = 0; i < articles.value.length; i += 3) {
-        const block = articles.value.slice(i, i + 3);
+      // Group articles into blocks of 2 for 2-column grid layout
+      for (let i = 0; i < articles.value.length; i += 2) {
+        const block = articles.value.slice(i, i + 2);
         if (block.length > 0) {
           blocks.push(block);
         }
@@ -336,7 +336,7 @@ export default {
           (isSortChange || isSearch.value) && loadedCount.value > standardLimit
             ? loadedCount.value
             : standardLimit;
-        const url = `${baseURL}/api/news?page=${pageNum}&limit=${fetchLimit}&sortField=${
+        const url = `/api/news?page=${pageNum}&limit=${fetchLimit}&sortField=${
           sortField.value
         }&sortOrder=${sortOrder.value}&sourceType=rss${
           searchQuery.value
@@ -414,7 +414,7 @@ export default {
 
     const checkForNewArticles = async () => {
       try {
-        const response = await axios.get(`${baseURL}/api/news/count`);
+        const response = await axios.get(`/api/news/count`);
         const newCount = response.data.count || 0;
         if (newCount > articleCount.value && articleCount.value > 0) {
           showNewArticlesNotification.value = true;
@@ -461,57 +461,6 @@ export default {
       fetchArticles(1, true);
     };
 
-    const testCache = async () => {
-      if ("caches" in window) {
-        const cache = await caches.open("news-cache-v3");
-        const keys = await cache.keys();
-        console.log(
-          "Cache keys:",
-          keys.map((req) => req.url)
-        );
-        console.log("Cache size:", keys.length);
-      } else {
-        console.log("Cache API not supported");
-      }
-    };
-
-    const clearCache = async () => {
-      if ("caches" in window) {
-        const cacheNames = await caches.keys();
-        for (const cacheName of cacheNames) {
-          if (cacheName.includes("news-cache")) {
-            await caches.delete(cacheName);
-            console.log(`Cleared cache: ${cacheName}`);
-          }
-        }
-        console.log("All news caches cleared");
-      }
-    };
-
-    const manualRssFetch = async () => {
-      rssFetching.value = true;
-      try {
-        const response = await axios.post(
-          "http://localhost:3004/manual-fetch",
-          {},
-          {
-            withCredentials: false, // RSS endpoint doesn't require authentication
-          }
-        );
-        console.log("Manual RSS fetch result:", response.data);
-        alert(
-          `RSS Fetch Complete!\nArticles found: ${response.data.articlesFound}\nExecution time: ${response.data.executionTime}`
-        );
-        // Refresh the news after successful fetch
-        await fetchArticles(1, true);
-      } catch (error) {
-        console.error("Error triggering manual RSS fetch:", error);
-        alert("Failed to fetch RSS feeds. Check console for details.");
-      } finally {
-        rssFetching.value = false;
-      }
-    };
-
     const handleAvatarError = (event) => {
       event.target.src =
         "https://www.redditstatic.com/desktop2x/img/favicon/android-icon-192x192.png";
@@ -519,8 +468,11 @@ export default {
 
     const openArticleDetails = async (id) => {
       try {
-        const response = await axios.get(`${baseURL}/api/news/${id}`);
-        selectedArticle.value = response.data;
+        const response = await axios.get(`/api/news/${id}`);
+        // The API returns { data: { article } } or { data: article }
+        const article = response.data?.article || response.data || {};
+        selectedArticle.value = article;
+        console.log("[News] Selected article:", article);
         isDescriptionExpanded.value = false; // Reset expansion state
         showDetailsModal.value = true;
       } catch (error) {
@@ -534,17 +486,21 @@ export default {
       }
     };
 
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
+    const formatDate = (dateInput) => {
+      if (!dateInput) return "N/A";
+      const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+      if (isNaN(date.getTime())) return "N/A";
       const month = date.getMonth() + 1;
       const day = date.getDate();
       const year = date.getFullYear().toString().slice(-2);
       return `${month}/${day}/${year}`;
     };
 
-    const getRelativeTime = (dateString) => {
+    const getRelativeTime = (dateInput) => {
+      if (!dateInput) return "Unknown";
       const now = new Date();
-      const date = new Date(dateString);
+      const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+      if (isNaN(date.getTime())) return "Unknown";
       const diffMs = now - date;
 
       const seconds = Math.floor(diffMs / 1000);
@@ -641,10 +597,6 @@ export default {
       searchArticles,
       clearSearch,
       refreshNews,
-      testCache,
-      clearCache,
-      manualRssFetch,
-      rssFetching,
       handleAvatarError,
       openArticleDetails,
       formatDate,
@@ -662,26 +614,6 @@ export default {
 </script>
 
 <style scoped>
-:root {
-  --deep-black: rgb(0, 0, 0);
-  --deep-black2: rgb(60, 60, 60);
-  --vibrant-purple: rgb(128, 0, 128);
-  --soft-lavender: rgb(230, 230, 250);
-  --lavender: rgb(175, 175, 215);
-  --bright-white: rgb(255, 255, 255);
-  --neon-pink: rgb(255, 20, 147);
-  --neon-pink2: rgb(231, 22, 225);
-  --electric-blue: rgb(0, 191, 255);
-  --sunset-orange: rgb(255, 99, 71);
-  --mint-green: rgb(152, 255, 152);
-  --steel-gray: rgb(119, 136, 153);
-  --coral-red: rgb(255, 64, 64);
-  --skyPurp: #454383;
-  --skyBlue: #547b98;
-  --skyPink: #c56aa8;
-  --skyOrange: #fbbd59;
-}
-
 .new-articles-notification {
   position: absolute;
   top: 10px;
@@ -887,12 +819,10 @@ export default {
 
 .news-wrapper {
   height: auto;
-  width: auto;
   position: relative;
   display: flex;
   justify-content: center;
   height: 100vh;
-  width: 100vw;
 }
 
 .news-container {
@@ -900,17 +830,14 @@ export default {
   position: relative;
   top: 15%;
   height: 82%;
-  width: 95%;
-  min-width: min(500px, 95vw);
   padding: 0.625rem;
   border-radius: 0.5rem;
-  background-color: rgba(230, 230, 250, 0.77);
 }
 
 .news-container ul {
   list-style-type: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   padding: 0;
   justify-content: center;
@@ -952,7 +879,7 @@ export default {
 .article-item h2:hover {
   color: var(--mint-green);
   text-shadow: 0 0 10px rgba(152, 255, 152, 0.8),
-               0 0 20px rgba(152, 255, 152, 0.6);
+    0 0 20px rgba(152, 255, 152, 0.6);
 }
 
 .article-item p,
@@ -1067,7 +994,7 @@ export default {
 .article-block .article-list {
   list-style-type: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   padding: 0;
   justify-content: center;
@@ -1077,7 +1004,7 @@ export default {
 @media (max-width: 1200px) {
   .news-container ul,
   .article-block .article-list {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1290,12 +1217,15 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 1000;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 .modal-overlay {
@@ -1313,7 +1243,7 @@ export default {
   z-index: 1001;
   width: 90%;
   max-width: min(900px, 95vw);
-  max-height: 90vh;
+  max-height: 80vh;
   animation: modalSlideIn 0.3s ease-out;
   overflow-y: auto;
 }
@@ -1348,7 +1278,11 @@ export default {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(50, 50, 50, 0.95), rgba(30, 30, 30, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(50, 50, 50, 0.95),
+    rgba(30, 30, 30, 0.95)
+  );
   border: 2px solid var(--mint-green);
   color: var(--mint-green);
   font-size: 1.4em;
@@ -1360,8 +1294,7 @@ export default {
   justify-content: center;
   transition: all 0.3s ease;
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.5),
-              0 0 15px rgba(152, 255, 152, 0.4),
-              inset 0 0 10px rgba(152, 255, 152, 0.1);
+    0 0 15px rgba(152, 255, 152, 0.4), inset 0 0 10px rgba(152, 255, 152, 0.1);
 }
 
 .modal-close-btn svg {
@@ -1374,14 +1307,13 @@ export default {
   color: var(--bright-white);
   border-color: var(--mint-green);
   box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.6),
-              0 0 25px rgba(152, 255, 152, 0.8),
-              0 0 35px rgba(152, 255, 152, 0.6),
-              inset 0 0 20px rgba(152, 255, 152, 0.2);
+    0 0 25px rgba(152, 255, 152, 0.8), 0 0 35px rgba(152, 255, 152, 0.6),
+    inset 0 0 20px rgba(152, 255, 152, 0.2);
 }
 
 .modal-close-btn:hover svg {
   filter: drop-shadow(0 0 15px rgba(152, 255, 152, 1))
-          drop-shadow(0 0 25px rgba(152, 255, 152, 0.8));
+    drop-shadow(0 0 25px rgba(152, 255, 152, 0.8));
 }
 
 .modal-header {
@@ -1528,7 +1460,7 @@ export default {
   background: linear-gradient(
     135deg,
     var(--vibrant-purple) 0%,
-    var(--neon-pink) 100%
+    var(--neon-pink2) 100%
   );
   color: var(--bright-white);
   text-decoration: none;
@@ -1547,7 +1479,7 @@ export default {
   box-shadow: 0 8px 25px rgba(128, 0, 128, 0.5);
   background: linear-gradient(
     135deg,
-    var(--neon-pink) 0%,
+    var(--neon-pink2) 0%,
     var(--vibrant-purple) 100%
   );
 }
@@ -1571,21 +1503,21 @@ export default {
   .modal-body {
     padding: 1.25rem;
   }
-  
+
   .section-label {
     font-size: 1em;
   }
-  
+
   .modal-content {
     max-height: 18.75rem;
   }
-  
+
   .modal-footer {
     flex-wrap: wrap;
     gap: 0.625rem;
     padding: 0.9375rem 1.25rem 1.25rem 1.25rem;
   }
-  
+
   .expand-btn {
     margin-right: 0;
     margin-bottom: 0.625rem;
@@ -1600,11 +1532,11 @@ export default {
     height: 13.75rem;
     max-height: 13.75rem;
   }
-  
+
   .modal-media {
     max-height: 15.625rem;
   }
-  
+
   .modal-image {
     max-height: 15.625rem;
   }
@@ -1633,6 +1565,6 @@ export default {
 }
 
 .modal-content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
 }
 </style>

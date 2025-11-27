@@ -70,20 +70,22 @@
           @deleted="handlePostDeleted"
         />
 
-        <!-- Load More -->
-        <div v-if="hasMore" class="load-more-container">
-          <button
-            @click="loadMore"
-            :disabled="loadingMore"
-            class="load-more-btn"
-          >
-            <span v-if="loadingMore">Loading...</span>
-            <span v-else>Load More</span>
-          </button>
+        <!-- Infinite Scroll Sentinel -->
+        <div
+          v-if="hasMore"
+          ref="infiniteScrollSentinel"
+          class="infinite-scroll-sentinel"
+          aria-hidden="true"
+        ></div>
+
+        <!-- Loading More Indicator -->
+        <div v-if="loadingMore" class="loading-more-indicator">
+          <div class="loading-spinner loading-spinner--sm"></div>
+          <span>Loading more posts...</span>
         </div>
 
         <!-- End of Feed -->
-        <div v-else-if="posts.length > 0" class="end-of-feed">
+        <div v-if="!hasMore && posts.length > 0" class="end-of-feed">
           <p>You're all caught up!</p>
         </div>
       </div>
@@ -92,7 +94,14 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+  nextTick,
+} from "vue";
 import { useStore } from "vuex";
 import axios from "@/utils/axios";
 import CreatePost from "@/components/social/CreatePost.vue";
@@ -107,14 +116,59 @@ export default {
   setup() {
     const store = useStore();
     const posts = ref([]);
+    const infiniteScrollSentinel = ref(null);
     const loading = ref(true);
     const loadingMore = ref(false);
     const error = ref(null);
     const page = ref(1);
     const hasMore = ref(true);
+    let intersectionObserver = null;
 
     const isLoggedIn = computed(() => store.getters.isLoggedIn);
     const activeTab = ref(isLoggedIn.value ? "following" : "trending");
+
+    const cleanupObserver = () => {
+      if (intersectionObserver) {
+        intersectionObserver.disconnect();
+        intersectionObserver = null;
+      }
+    };
+
+    const initObserver = () => {
+      nextTick(() => {
+        cleanupObserver();
+
+        if (
+          !hasMore.value ||
+          loading.value ||
+          loadingMore.value ||
+          !infiniteScrollSentinel.value
+        ) {
+          return;
+        }
+
+        intersectionObserver = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            if (
+              entry?.isIntersecting &&
+              !loading.value &&
+              !loadingMore.value &&
+              hasMore.value
+            ) {
+              loadMore();
+            }
+          },
+          {
+            root: null,
+            threshold: 0.1,
+            rootMargin: "0px 0px 200px 0px",
+          }
+        );
+
+        intersectionObserver.observe(infiniteScrollSentinel.value);
+      });
+    };
 
     const loadFeed = async (append = false) => {
       try {
@@ -156,19 +210,36 @@ export default {
           },
         });
 
-        if (append) {
-          posts.value = [...posts.value, ...response.data.posts];
-        } else {
-          posts.value = response.data.posts;
-        }
+        const fetchedPosts = Array.isArray(response.data.posts)
+          ? response.data.posts
+          : [];
 
-        hasMore.value = response.data.hasMore;
+        if (append) {
+          const existingIds = new Set(posts.value.map((post) => post._id));
+          const uniquePosts = fetchedPosts.filter(
+            (post) => !existingIds.has(post._id)
+          );
+
+          if (uniquePosts.length > 0) {
+            posts.value = [...posts.value, ...uniquePosts];
+          }
+
+          hasMore.value = response.data.hasMore && uniquePosts.length > 0;
+
+          if (uniquePosts.length === 0) {
+            page.value = Math.max(1, page.value - 1);
+          }
+        } else {
+          posts.value = fetchedPosts;
+          hasMore.value = response.data.hasMore && fetchedPosts.length > 0;
+        }
       } catch (err) {
         console.error("Error loading feed:", err);
         error.value = err.response?.data?.error || "Failed to load feed";
       } finally {
         loading.value = false;
         loadingMore.value = false;
+        initObserver();
       }
     };
 
@@ -204,6 +275,10 @@ export default {
       loadFeed();
     });
 
+    onBeforeUnmount(() => {
+      cleanupObserver();
+    });
+
     // Reload feed when tab changes
     watch(activeTab, () => {
       loadFeed();
@@ -217,6 +292,7 @@ export default {
       error,
       hasMore,
       isLoggedIn,
+      infiniteScrollSentinel,
       switchTab,
       loadFeed,
       loadMore,
@@ -229,10 +305,11 @@ export default {
 
 <style scoped>
 .social-page {
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 0;
   padding: var(--space-lg);
-  padding-top: 180px; /* Account for header */
+  padding-top: calc(
+    64px + var(--space-lg)
+  ); /* Top nav + Space between Header */
   min-height: 100vh;
 }
 
@@ -292,6 +369,7 @@ export default {
 .social-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .loading-container,
@@ -344,7 +422,7 @@ export default {
 }
 
 .retry-btn:hover {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
   transform: translateY(-2px);
 }
 
@@ -370,33 +448,30 @@ export default {
   flex-direction: column;
 }
 
-.load-more-container {
+.infinite-scroll-sentinel {
+  width: 100%;
+  height: 1px;
+}
+
+.loading-more-indicator {
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: var(--space-xl);
+  gap: var(--space-sm);
+  padding: var(--space-xl) 0;
+  color: var(--steel-gray);
 }
 
-.load-more-btn {
-  padding: var(--space-md) var(--space-2xl);
-  background: var(--glass-morphism-bg);
-  color: var(--bright-white);
-  border: 1px solid var(--steel-gray);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: var(--text-base);
-  font-weight: 500;
-  transition: all 0.3s ease;
+.loading-more-indicator span {
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
 }
 
-.load-more-btn:hover:not(:disabled) {
-  background: var(--skyOrange);
-  border-color: var(--skyOrange);
-  transform: translateY(-2px);
-}
-
-.load-more-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.loading-spinner--sm {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+  margin: 0;
 }
 
 .end-of-feed {

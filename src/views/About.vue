@@ -1,14 +1,106 @@
 <script>
 import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   name: "About",
   setup() {
+    const route = useRoute();
+    const router = useRouter();
+
+    // Newsletter subscription state
+    const newsletterFormEmail = ref("");
+    const newsletterLoading = ref(false);
+    const newsletterMessage = ref("");
+    const newsletterMessageType = ref(""); // 'success' or 'error'
+
+    // Handle newsletter subscription
+    const handleSubscribe = async () => {
+      if (!newsletterFormEmail.value || newsletterLoading.value) return;
+
+      // Basic client-side validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newsletterFormEmail.value)) {
+        newsletterMessage.value = "Please enter a valid email address.";
+        newsletterMessageType.value = "error";
+        return;
+      }
+
+      newsletterLoading.value = true;
+      newsletterMessage.value = "";
+      newsletterMessageType.value = "";
+
+      try {
+        const response = await fetch("/api/newsletter/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: newsletterFormEmail.value,
+            source: "about-page",
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          newsletterMessage.value = data.message;
+          newsletterMessageType.value = "success";
+          newsletterFormEmail.value = ""; // Clear form
+        } else {
+          newsletterMessage.value =
+            data.message || "Something went wrong. Please try again.";
+          newsletterMessageType.value = "error";
+        }
+      } catch (error) {
+        console.error("Subscription error:", error);
+        newsletterMessage.value =
+          "Network error. Please check your connection and try again.";
+        newsletterMessageType.value = "error";
+      } finally {
+        newsletterLoading.value = false;
+      }
+    };
+
+    // Check for confirmation/unsubscribe query parameters
+    const checkQueryParams = () => {
+      const { subscribed, unsubscribed, error } = route.query;
+
+      if (subscribed === "true") {
+        newsletterMessage.value =
+          "🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.";
+        newsletterMessageType.value = "success";
+        // Clean up URL
+        router.replace({ path: route.path, query: {} });
+      } else if (unsubscribed === "true") {
+        newsletterMessage.value =
+          "You have been unsubscribed. We're sorry to see you go!";
+        newsletterMessageType.value = "success";
+        router.replace({ path: route.path, query: {} });
+      } else if (error) {
+        const errorMessages = {
+          invalid_token:
+            "Invalid or expired confirmation link. Please subscribe again.",
+          token_expired:
+            "This confirmation link has expired. Please subscribe again.",
+          already_confirmed: "Your email is already confirmed!",
+          confirmation_failed: "Confirmation failed. Please try again.",
+          invalid_email: "Invalid email address.",
+          not_subscribed: "Email not found in our subscription list.",
+          unsubscribe_failed: "Failed to unsubscribe. Please try again.",
+        };
+        newsletterMessage.value =
+          errorMessages[error] || "An error occurred. Please try again.";
+        newsletterMessageType.value = "error";
+        router.replace({ path: route.path, query: {} });
+      }
+    };
     const stats = ref([
       { number: "50K+", label: "Active Users" },
       { number: "1M+", label: "Page Views" },
       { number: "24/7", label: "Live Updates" },
-      { number: "100%", label: "GTA 6 Focused" },
+      { number: "Beta", label: "Preview Mode" },
     ]);
 
     const features = ref([
@@ -38,35 +130,113 @@ export default {
       },
     ]);
 
-    const team = ref([
+    // Developer/GitHub info
+    const githubUrl = ref("https://github.com/deziikuoo");
+    const githubRepoUrl = ref("https://github.com/deziikuoo/GTA-Fan-Hub-Demo");
+    const githubUsername = ref("deziikuoo");
+
+    // Social links (coming soon)
+    const socialLinks = ref([
+      { name: "Discord", icon: ["fab", "discord"], url: "#", comingSoon: true },
+      { name: "Twitter", icon: ["fab", "twitter"], url: "#", comingSoon: true },
       {
-        name: "Development Team",
-        role: "Core Development",
+        name: "Instagram",
+        icon: ["fab", "instagram"],
+        url: "#",
+        comingSoon: true,
+      },
+      { name: "Reddit", icon: ["fab", "reddit"], url: "#", comingSoon: true },
+    ]);
+
+    // Roadmap items
+    const roadmapItems = ref([
+      {
+        feature: "Reputation & Leveling System",
+        status: "in-progress",
+        progress: 45,
         description:
-          "Passionate developers dedicated to creating the ultimate GTA 6 fan experience.",
+          "Level up from Street Thug to Legend with reputation points",
       },
       {
-        name: "Community Managers",
-        role: "User Experience",
-        description:
-          "Ensuring our community stays engaged and informed with the latest GTA 6 updates.",
+        feature: "Virtual Events & Tournaments",
+        status: "planned",
+        progress: 0,
+        description: "Weekly gaming tournaments and community challenges",
       },
       {
-        name: "Content Creators",
-        role: "News & Media",
-        description:
-          "Curating and creating high-quality content to keep fans informed and entertained.",
+        feature: "Real-time Chat",
+        status: "planned",
+        progress: 0,
+        description: "Live messaging between users",
+      },
+      {
+        feature: "Enhanced Profiles",
+        status: "in-progress",
+        progress: 75,
+        description: "Customizable user profiles",
+      },
+      {
+        feature: "Mobile Optimization",
+        status: "in-progress",
+        progress: 60,
+        description: "Responsive mobile experience",
+      },
+      {
+        feature: "GTA 6 Release Integration",
+        status: "planned",
+        progress: 0,
+        description: "Post-launch content updates",
       },
     ]);
 
+    // Version info
+    const versionInfo = ref({
+      version: "Beta v0.9.2",
+      lastUpdated: "November 2025",
+      status: "Frontend Preview",
+    });
+
+    // Support links
+    const supportLinks = ref([
+      {
+        name: "Buy Me a Coffee",
+        icon: ["fas", "mug-hot"],
+        url: "#",
+        comingSoon: true,
+      },
+      {
+        name: "GitHub Sponsors",
+        icon: ["fab", "github"],
+        url: "#",
+        comingSoon: true,
+      },
+    ]);
+
+    // Newsletter email (for display purposes)
+    const newsletterEmail = ref("ifdawanprintqualified14@gmail.com");
+
     onMounted(() => {
-      // Any initialization logic
+      // Check for query params from confirmation/unsubscribe redirects
+      checkQueryParams();
     });
 
     return {
       stats,
       features,
-      team,
+      githubUrl,
+      githubRepoUrl,
+      githubUsername,
+      socialLinks,
+      roadmapItems,
+      versionInfo,
+      supportLinks,
+      newsletterEmail,
+      // Newsletter form
+      newsletterFormEmail,
+      newsletterLoading,
+      newsletterMessage,
+      newsletterMessageType,
+      handleSubscribe,
     };
   },
 };
@@ -77,10 +247,11 @@ export default {
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
+        <div class="beta-badge">🚧 Beta Preview</div>
         <h1 class="hero-title">Welcome to GtaFanHub</h1>
         <p class="hero-subtitle">
-          The ultimate destination for Grand Theft Auto 6 news, community, and
-          everything Vice City.
+          The ultimate destination for Rockstar Games news, community, and
+          everything GTA!
         </p>
       </div>
     </section>
@@ -100,11 +271,10 @@ export default {
       <div class="mission-container">
         <h2 class="section-title">Our Mission</h2>
         <p class="mission-text">
-          GtaFanHub was created by passionate GTA fans, for passionate GTA fans.
-          We're dedicated to providing the most comprehensive, up-to-date
-          information about Grand Theft Auto 6, building a vibrant community of
-          players, and celebrating everything that makes the GTA series
-          legendary.
+          GtaFanHub was created for passionate GTA fans. We're dedicated to
+          providing the most comprehensive, up-to-date information about the
+          Grand Theft Auto series, building a vibrant community of players, and
+          celebrating everything that makes GTA legendary.
         </p>
         <div class="mission-highlights">
           <div class="highlight-item">
@@ -143,15 +313,274 @@ export default {
       </div>
     </section>
 
-    <!-- Team Section -->
-    <section class="team-section">
-      <div class="team-container">
-        <h2 class="section-title">Our Team</h2>
-        <div class="team-grid">
-          <div v-for="member in team" :key="member.name" class="team-card">
-            <h3 class="team-name">{{ member.name }}</h3>
-            <p class="team-role">{{ member.role }}</p>
-            <p class="team-description">{{ member.description }}</p>
+    <!-- Developer/GitHub Section -->
+    <section class="developer-section">
+      <div class="developer-container">
+        <h2 class="section-title">Developer & Source Code</h2>
+        <div class="developer-content">
+          <a :href="githubRepoUrl" target="_blank" class="github-link">
+            <font-awesome-icon :icon="['fab', 'github']" class="github-icon" />
+            <span>View on GitHub</span>
+            <font-awesome-icon
+              icon="fas fa-external-link-alt"
+              class="external-icon"
+            />
+          </a>
+          <p class="developer-text">
+            This is an open-source frontend demo built by
+            <a :href="githubUrl" target="_blank" class="dev-link"
+              >@{{ githubUsername }}</a
+            >. Star the repository to show your support!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social/Community Links Section -->
+    <section class="social-section">
+      <div class="social-container">
+        <h2 class="section-title">Join Our Community</h2>
+        <p class="section-subtitle">
+          Connect with fellow GTA fans across platforms
+        </p>
+        <div class="social-grid">
+          <div
+            v-for="social in socialLinks"
+            :key="social.name"
+            class="social-card"
+            :class="{ 'coming-soon': social.comingSoon }"
+          >
+            <font-awesome-icon :icon="social.icon" class="social-icon" />
+            <h3>{{ social.name }}</h3>
+            <span v-if="social.comingSoon" class="coming-soon-badge"
+              >Coming Soon</span
+            >
+            <a v-else :href="social.url" target="_blank" class="social-link">
+              Join {{ social.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Beta Feedback Section -->
+    <section class="feedback-section">
+      <div class="feedback-container">
+        <h2 class="section-title">Beta Feedback</h2>
+        <p class="feedback-text">
+          Help us improve! Report bugs, suggest features, or share your
+          thoughts. Your feedback shapes the future of GtaFanHub.
+        </p>
+        <div class="feedback-links">
+          <a
+            :href="`${githubRepoUrl}/issues`"
+            target="_blank"
+            class="feedback-btn bug"
+          >
+            <font-awesome-icon icon="fas fa-bug" />
+            Report a Bug
+          </a>
+          <a
+            :href="`${githubRepoUrl}/issues/new`"
+            target="_blank"
+            class="feedback-btn feature"
+          >
+            <font-awesome-icon icon="fas fa-lightbulb" />
+            Suggest a Feature
+          </a>
+          <a
+            :href="`mailto:${newsletterEmail}?subject=GtaFanHub Beta Feedback`"
+            class="feedback-btn email"
+          >
+            <font-awesome-icon icon="fas fa-envelope" />
+            Send Feedback
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="roadmap-section">
+      <div class="roadmap-container">
+        <h2 class="section-title">Roadmap & Coming Soon</h2>
+        <p class="section-subtitle">
+          What we're working on for the full release
+        </p>
+        <div class="roadmap-list">
+          <div
+            v-for="(item, index) in roadmapItems"
+            :key="index"
+            class="roadmap-item"
+          >
+            <div class="roadmap-header">
+              <div class="roadmap-info">
+                <h3>{{ item.feature }}</h3>
+                <p class="roadmap-description">{{ item.description }}</p>
+              </div>
+              <span class="roadmap-status" :class="item.status">
+                {{ item.status === "in-progress" ? "In Progress" : "Planned" }}
+              </span>
+            </div>
+            <div v-if="item.progress > 0" class="progress-container">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  :style="{ width: item.progress + '%' }"
+                ></div>
+                <span class="progress-text">{{ item.progress }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Version & Update Info Section -->
+    <section class="version-section">
+      <div class="version-container">
+        <h2 class="section-title">Version Information</h2>
+        <div class="version-info">
+          <div class="version-badge">{{ versionInfo.version }}</div>
+          <div class="version-details">
+            <p class="version-text">
+              <strong>Status:</strong> {{ versionInfo.status }}
+            </p>
+            <p class="version-text">
+              <strong>Last Updated:</strong> {{ versionInfo.lastUpdated }}
+            </p>
+          </div>
+          <a
+            :href="`${githubRepoUrl}/releases`"
+            target="_blank"
+            class="changelog-link"
+          >
+            <font-awesome-icon icon="fas fa-code-branch" />
+            View Changelog on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+      <div class="newsletter-container">
+        <h2 class="section-title">Stay Updated</h2>
+        <p class="newsletter-text">
+          Get notified when we launch new features or go live with the full
+          release!
+        </p>
+
+        <!-- Subscription Form -->
+        <form @submit.prevent="handleSubscribe" class="newsletter-form">
+          <div class="newsletter-input-group">
+            <input
+              v-model="newsletterFormEmail"
+              type="email"
+              placeholder="Enter your email address"
+              class="newsletter-input"
+              :disabled="newsletterLoading"
+              required
+            />
+            <button
+              type="submit"
+              class="newsletter-submit-btn"
+              :disabled="newsletterLoading || !newsletterFormEmail"
+            >
+              <font-awesome-icon
+                v-if="newsletterLoading"
+                icon="fas fa-circle-notch"
+                spin
+              />
+              <font-awesome-icon v-else icon="fas fa-envelope" />
+              <span>{{
+                newsletterLoading ? "Subscribing..." : "Subscribe"
+              }}</span>
+            </button>
+          </div>
+
+          <!-- Success/Error Message -->
+          <div
+            v-if="newsletterMessage"
+            class="newsletter-message"
+            :class="newsletterMessageType"
+          >
+            <font-awesome-icon
+              :icon="
+                newsletterMessageType === 'success'
+                  ? 'fas fa-check-circle'
+                  : 'fas fa-exclamation-circle'
+              "
+            />
+            <span>{{ newsletterMessage }}</span>
+          </div>
+        </form>
+
+        <div class="newsletter-actions">
+          <a
+            :href="githubRepoUrl"
+            target="_blank"
+            class="newsletter-btn secondary"
+          >
+            <font-awesome-icon :icon="['fab', 'github']" />
+            Watch on GitHub
+          </a>
+        </div>
+        <p class="newsletter-note">
+          Watch the
+          <a :href="githubRepoUrl" target="_blank">GitHub repository</a> to get
+          notified of all updates
+        </p>
+      </div>
+    </section>
+
+    <!-- Support the Project Section -->
+    <section class="support-section">
+      <div class="support-container">
+        <h2 class="section-title">Support the Project</h2>
+        <p class="support-text">
+          Love what we're building? Consider supporting the project to help us
+          grow!
+        </p>
+        <div class="support-links">
+          <div
+            v-for="support in supportLinks"
+            :key="support.name"
+            class="support-card"
+            :class="{ 'coming-soon': support.comingSoon }"
+          >
+            <font-awesome-icon :icon="support.icon" class="support-icon" />
+            <h3>{{ support.name }}</h3>
+            <span v-if="support.comingSoon" class="coming-soon-badge"
+              >Coming Soon</span
+            >
+            <a v-else :href="support.url" target="_blank" class="support-link">
+              Support via {{ support.name }}
+            </a>
+          </div>
+        </div>
+        <p class="support-note">
+          For now, the best way to support us is to
+          <a :href="githubRepoUrl" target="_blank">⭐ star the repo</a> on
+          GitHub!
+        </p>
+      </div>
+    </section>
+
+    <!-- Credits Section -->
+    <section class="credits-section">
+      <div class="credits-container">
+        <h2 class="section-title">Credits & Acknowledgments</h2>
+        <div class="credits-content">
+          <p class="credits-text">
+            <!-- Credits will be added as the project grows -->
+            Special thanks to the GTA community for the inspiration and support.
+          </p>
+          <div class="credits-disclaimer">
+            <p>
+              <strong>Disclaimer:</strong> GtaFanHub is a fan-made project and
+              is not affiliated with, endorsed by, or connected to Rockstar
+              Games or Take-Two Interactive.
+            </p>
           </div>
         </div>
       </div>
@@ -160,10 +589,10 @@ export default {
     <!-- CTA Section -->
     <section class="cta-section">
       <div class="cta-container">
-        <h2 class="cta-title">Join the GTA 6 Community</h2>
+        <h2 class="cta-title">Ready to Explore?</h2>
         <p class="cta-subtitle">
-          Be part of the most dedicated GTA 6 fan community. Share your
-          excitement, theories, and connect with fellow players.
+          Dive into the GTA 6 community. Share your excitement, theories, and
+          connect with fellow players.
         </p>
         <div class="cta-buttons">
           <router-link to="/social" class="cta-button primary">
@@ -186,26 +615,54 @@ export default {
   color: var(--bright-white);
   font-family: "Montserrat", sans-serif;
   overflow-x: hidden;
+  margin-top: 4%;
+  width: 80% !important;
+  margin-left: 15%;
+  backdrop-filter: blur(50px);
+}
+
+/* Beta Badge */
+.beta-badge {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: var(--space-lg);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 /* Hero Section */
 .hero-section {
   position: relative;
-  height: 60vh;
-  width: 100vw;
+  height: 50vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(2.2px);
   margin-top: var(--space-xl);
-  border-bottom: 1px solid var(--bright-white);
+  border-radius: var(--radius-2xl);
 }
 
 .hero-content {
   text-align: center;
   max-width: 800px;
   padding: var(--space-xl);
-  width: 100vw;
+  width: 100%;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -213,11 +670,14 @@ export default {
 }
 
 .hero-title {
-  width: 100vw;
   font-size: var(--text-6xl);
   font-weight: 700;
   margin-bottom: var(--space-lg);
-  background: linear-gradient(135deg, var(--bright-white), var(--bright-white));
+  background: linear-gradient(
+    135deg,
+    var(--bright-white),
+    var(--soft-lavender)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -230,16 +690,25 @@ export default {
   opacity: 0.9;
 }
 
+/* Section Subtitle */
+.section-subtitle {
+  font-size: var(--text-lg);
+  color: var(--soft-lavender);
+  opacity: 0.8;
+  margin-top: calc(-1 * var(--space-md));
+  margin-bottom: var(--space-2xl);
+}
+
 /* Stats Section */
 .stats-section {
   padding: var(--space-3xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
+  width: 100%;
+  border-radius: var(--radius-2xl);
 }
 
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-lg);
   max-width: 1200px;
   margin: 0 auto;
@@ -247,7 +716,6 @@ export default {
 
 .stat-card {
   background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
   border: 1px solid var(--bright-white);
   border-radius: var(--radius-2xl);
   padding: var(--space-xl);
@@ -259,13 +727,12 @@ export default {
 .stat-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(4.2px);
 }
 
 .stat-number {
   font-size: var(--text-4xl);
   font-weight: 700;
-  color: var(--neon-pink);
+  color: var(--neon-pink2);
   margin-bottom: var(--space-sm);
 }
 
@@ -283,6 +750,7 @@ export default {
     rgba(255, 20, 147, 0.05),
     rgba(0, 191, 255, 0.05)
   );
+  border-radius: var(--radius-2xl);
 }
 
 .mission-container {
@@ -319,7 +787,6 @@ export default {
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
   background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
   border: 1px solid var(--bright-white);
   border-radius: var(--radius-full);
   color: var(--bright-white);
@@ -327,15 +794,14 @@ export default {
 }
 
 .highlight-icon {
-  color: var(--neon-pink);
+  color: var(--neon-pink2);
   font-size: var(--text-lg);
 }
 
 /* Features Section */
 .features-section {
   padding: var(--space-4xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
+  border-radius: var(--radius-2xl);
 }
 
 .features-container {
@@ -353,7 +819,6 @@ export default {
 
 .feature-card {
   background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
   border: 1px solid var(--bright-white);
   border-radius: var(--radius-2xl);
   padding: var(--space-xl);
@@ -365,7 +830,6 @@ export default {
 .feature-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(4.2px);
 }
 
 .feature-icon {
@@ -375,7 +839,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--neon-pink), var(--electric-blue));
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
   border-radius: var(--radius-full);
   font-size: var(--text-2xl);
   color: var(--bright-white);
@@ -394,32 +858,99 @@ export default {
   opacity: 0.9;
 }
 
-/* Team Section */
-.team-section {
-  padding: var(--space-4xl) var(--space-lg);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 191, 255, 0.05),
-    rgba(255, 99, 71, 0.05)
-  );
+/* Developer/GitHub Section */
+.developer-section {
+  padding: var(--space-2xl) var(--space-lg);
+  background-color: var(--glass-morphism-bg);
+  border-radius: var(--radius-2xl);
 }
 
-.team-container {
+.developer-container {
+  max-width: 950px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.developer-content {
+  margin-top: var(--space-xl);
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-2xl);
+  background: linear-gradient(135deg, #24292e, #1a1e22);
+  color: var(--bright-white);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-lg);
+  transition: var(--transition-normal);
+  border: 2px solid var(--bright-white);
+  margin-bottom: var(--space-lg);
+}
+
+.github-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #2d333b, #22272e);
+}
+
+.github-icon {
+  font-size: var(--text-2xl);
+}
+
+.external-icon {
+  font-size: var(--text-sm);
+  opacity: 0.7;
+}
+
+.developer-text {
+  color: var(--soft-lavender);
+  opacity: 0.9;
+  margin-bottom: var(--space-xl);
+  font-size: var(--text-md);
+}
+
+.dev-link {
+  color: var(--electric-blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dev-link:hover {
+  text-decoration: underline;
+}
+
+/* Social/Community Section */
+.social-section {
+  padding: var(--space-4xl) var(--space-lg);
+  border-radius: var(--radius-2xl);
+}
+
+.social-container {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.social-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
   gap: var(--space-xl);
   margin-top: var(--space-2xl);
+  width: 100%;
 }
 
-.team-card {
+@media (max-width: 768px) {
+  .social-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.social-card {
   background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
   border: 1px solid var(--bright-white);
   border-radius: var(--radius-2xl);
   padding: var(--space-xl);
@@ -428,41 +959,555 @@ export default {
   transition: var(--transition-normal);
 }
 
-.team-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(4.2px);
+.social-card.coming-soon {
+  opacity: 0.6;
 }
 
-.team-name {
+.social-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.social-icon {
+  font-size: var(--text-4xl);
+  color: var(--neon-pink2);
+  margin-bottom: var(--space-md);
+}
+
+.social-card h3 {
   font-size: var(--text-xl);
   font-weight: 600;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
   color: var(--bright-white);
 }
 
-.team-role {
-  font-size: var(--text-lg);
-  color: var(--neon-pink);
-  margin-bottom: var(--space-md);
-  font-weight: 500;
+.coming-soon-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  background: linear-gradient(135deg, var(--mint-green), var(--electric-blue));
+  color: var(--deep-black);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.team-description {
+/* Feedback Section */
+.feedback-section {
+  padding: var(--space-4xl) var(--space-lg);
+  background-color: var(--glass-morphism-bg);
+  border-radius: var(--radius-2xl);
+}
+
+.feedback-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.feedback-text {
   color: var(--soft-lavender);
-  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-2xl);
   opacity: 0.9;
+  font-size: var(--text-lg);
+}
+
+.feedback-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+.feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-full);
+  color: var(--bright-white);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-normal);
+  border: 2px solid transparent;
+}
+
+.feedback-btn.bug {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.feedback-btn.feature {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+  color: var(--deep-black);
+}
+
+.feedback-btn.email {
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+}
+
+.feedback-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Roadmap Section */
+.roadmap-section {
+  padding: var(--space-4xl) var(--space-lg);
+  border-radius: var(--radius-2xl);
+}
+
+.roadmap-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.roadmap-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+  text-align: left;
+}
+
+.roadmap-item {
+  background-color: var(--glass-morphism-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  transition: var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 200px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .roadmap-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .roadmap-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roadmap-item:hover {
+  border-color: var(--neon-pink2);
+}
+
+.roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.progress-container {
+  margin-top: var(--space-md);
+  width: 100%;
+}
+
+.roadmap-info h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--bright-white);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.roadmap-description {
+  font-size: var(--text-sm);
+  color: var(--soft-lavender);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.roadmap-status {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.roadmap-status.planned {
+  background-color: rgba(152, 255, 152, 0.15);
+  color: var(--mint-green);
+  border: 1px solid var(--mint-green);
+}
+
+.roadmap-status.in-progress {
+  background-color: rgba(0, 191, 255, 0.15);
+  color: var(--electric-blue);
+  border: 1px solid var(--electric-blue);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-pink2), var(--electric-blue));
+  transition: width 0.5s ease;
+  border-radius: var(--radius-full);
+}
+
+.progress-text {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  font-size: var(--text-xs);
+  color: var(--electric-blue);
+  font-weight: 600;
+}
+
+/* Version Section */
+.version-section {
+  padding: var(--space-4xl) var(--space-lg);
+  background-color: var(--glass-morphism-bg);
+  border-radius: var(--radius-2xl);
+}
+
+.version-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.version-info {
+  margin-top: var(--space-xl);
+}
+
+.version-badge {
+  display: inline-block;
+  padding: var(--space-md) var(--space-2xl);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+}
+
+.version-details {
+  margin-bottom: var(--space-lg);
+}
+
+.version-text {
+  color: var(--soft-lavender);
+  margin: var(--space-sm) 0;
+  font-size: var(--text-lg);
+}
+
+.version-text strong {
+  color: var(--bright-white);
+}
+
+.changelog-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--electric-blue);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-normal);
+}
+
+.changelog-link:hover {
+  text-decoration: underline;
+}
+
+/* Newsletter Section */
+.newsletter-section {
+  padding: var(--space-4xl) var(--space-lg);
+  border-radius: var(--radius-2xl);
+}
+
+.newsletter-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.newsletter-text {
+  color: var(--soft-lavender);
+  margin-bottom: var(--space-2xl);
+  opacity: 0.9;
+  font-size: var(--text-lg);
+}
+
+.newsletter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.newsletter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-normal);
+}
+
+.newsletter-btn.secondary {
+  background: transparent;
+  border: 2px solid var(--bright-white);
+}
+
+.newsletter-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.newsletter-note {
+  color: var(--soft-lavender);
+  font-size: var(--text-sm);
+  opacity: 0.7;
+}
+
+.newsletter-note a {
+  color: var(--electric-blue);
+  text-decoration: none;
+}
+
+.newsletter-note a:hover {
+  text-decoration: underline;
+}
+
+/* Newsletter Form */
+.newsletter-form {
+  margin-bottom: var(--space-xl);
+}
+
+.newsletter-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  max-width: 500px;
+  margin: 0 auto var(--space-lg) auto;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  color: var(--bright-white);
+  font-size: var(--text-base);
+  outline: none;
+  transition: var(--transition-normal);
+}
+
+.newsletter-input::placeholder {
+  color: var(--soft-lavender);
+  opacity: 0.7;
+}
+
+.newsletter-input:focus {
+  border-color: var(--neon-pink2);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.newsletter-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.newsletter-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  white-space: nowrap;
+}
+
+.newsletter-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.newsletter-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.newsletter-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+  font-size: var(--text-sm);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.newsletter-message.success {
+  background-color: rgba(152, 255, 152, 0.15);
+  color: var(--mint-green);
+  border: 1px solid var(--mint-green);
+}
+
+.newsletter-message.error {
+  background-color: rgba(255, 107, 157, 0.15);
+  color: var(--neon-pink2);
+  border: 1px solid var(--neon-pink2);
+}
+
+/* Support Section */
+.support-section {
+  padding: var(--space-4xl) var(--space-lg);
+  background-color: var(--glass-morphism-bg);
+  border-radius: var(--radius-2xl);
+}
+
+.support-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.support-text {
+  color: var(--soft-lavender);
+  margin-bottom: var(--space-2xl);
+  opacity: 0.9;
+  font-size: var(--text-lg);
+}
+
+.support-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.support-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bright-white);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-xl);
+  text-align: center;
+  min-width: 200px;
+  transition: var(--transition-normal);
+}
+
+.support-card.coming-soon {
+  opacity: 0.6;
+}
+
+.support-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.support-icon {
+  font-size: var(--text-4xl);
+  color: var(--neon-pink2);
+  margin-bottom: var(--space-md);
+}
+
+.support-card h3 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  color: var(--bright-white);
+}
+
+.support-note {
+  color: var(--soft-lavender);
+  font-size: var(--text-sm);
+}
+
+.support-note a {
+  color: var(--mint-green);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.support-note a:hover {
+  text-decoration: underline;
+}
+
+/* Credits Section */
+.credits-section {
+  padding: var(--space-4xl) var(--space-lg);
+  border-radius: var(--radius-2xl);
+}
+
+.credits-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.credits-content {
+  margin-top: var(--space-xl);
+}
+
+.credits-text {
+  color: var(--soft-lavender);
+  opacity: 0.9;
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.credits-disclaimer {
+  padding: var(--space-lg);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+  border-left: 4px solid var(--neon-pink2);
+}
+
+.credits-disclaimer p {
+  color: var(--soft-lavender);
+  font-size: var(--text-sm);
+  margin: 0;
+  text-align: left;
+}
+
+.credits-disclaimer strong {
+  color: var(--bright-white);
 }
 
 /* CTA Section */
 .cta-section {
   padding: var(--space-4xl) var(--space-lg);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 20, 147, 0.1),
-    rgba(0, 191, 255, 0.1)
-  );
-  backdrop-filter: blur(2.2px);
+  background: var(--glass-morphism-bg);
+  border-radius: var(--radius-2xl);
 }
 
 .cta-container {
@@ -506,7 +1551,7 @@ export default {
 }
 
 .cta-button.primary {
-  background: linear-gradient(135deg, var(--neon-pink), var(--electric-blue));
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
   color: var(--bright-white);
   border: 2px solid transparent;
 }
@@ -518,7 +1563,6 @@ export default {
 
 .cta-button.secondary {
   background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
   border: 2px solid var(--bright-white);
   color: var(--bright-white);
 }
@@ -531,6 +1575,11 @@ export default {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .about-page {
+    width: 95% !important;
+    margin-left: 2.5%;
+  }
+
   .hero-title {
     font-size: var(--text-4xl);
   }
@@ -547,13 +1596,67 @@ export default {
     grid-template-columns: 1fr;
   }
 
-  .team-grid {
+  .social-grid {
     grid-template-columns: 1fr;
   }
 
   .mission-highlights {
     flex-direction: column;
     align-items: center;
+  }
+
+  .feedback-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feedback-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .roadmap-header {
+    flex-direction: column;
+  }
+
+  .roadmap-status {
+    align-self: flex-start;
+  }
+
+  .newsletter-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .newsletter-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .newsletter-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .newsletter-submit-btn {
+    justify-content: center;
+  }
+
+  .newsletter-message {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .support-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .support-card {
+    width: 100%;
+    max-width: 300px;
   }
 
   .cta-buttons {
@@ -573,12 +1676,20 @@ export default {
     grid-template-columns: 1fr;
   }
 
+  .social-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero-content {
     padding: var(--space-lg);
   }
 
   .hero-title {
     font-size: var(--text-3xl);
+  }
+
+  .section-title {
+    font-size: var(--text-2xl);
   }
 }
 </style>

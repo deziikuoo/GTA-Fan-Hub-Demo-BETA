@@ -1,7 +1,7 @@
 <template>
-  <div class="profile-header">
+  <div class="profile-header main-backdrop-filter">
     <!-- Header Background -->
-    <div class="header-background">
+    <div class="header-background main-backdrop-filter">
       <img
         :src="headerImageUrl"
         :alt="`${user.username} header`"
@@ -44,7 +44,28 @@
           </h1>
           <span class="username">@{{ user.username }}</span>
           <VerifiedBadge v-if="user.profile.verified" />
-          <LevelBadge v-if="user.socialStats?.level" :level="user.socialStats.level" />
+          <LevelBadge
+            v-if="user.socialStats?.level"
+            :level="user.socialStats.level"
+          />
+        </div>
+
+        <!-- Instagram-style Stats above Bio -->
+        <div class="profile-stats-inline">
+          <span class="inline-stat">
+            <span class="inline-stat-number">{{
+              user.socialStats?.totalPosts || user.stats?.postsCount || 0
+            }}</span>
+            <span class="inline-stat-label"> posts</span>
+          </span>
+          <span class="inline-stat">
+            <span class="inline-stat-number">{{ displayFollowerCount }}</span>
+            <span class="inline-stat-label"> followers</span>
+          </span>
+          <span class="inline-stat">
+            <span class="inline-stat-number">{{ displayFollowingCount }}</span>
+            <span class="inline-stat-label"> following</span>
+          </span>
         </div>
 
         <p v-if="user.profile.bio" class="bio">{{ user.profile.bio }}</p>
@@ -72,15 +93,14 @@
 
         <div class="gaming-status">
           <div
-            v-if="user.gamingProfile?.currentGame && user.gamingProfile.currentGame !== 'Offline'"
+            v-if="
+              user.gamingProfile?.currentGame &&
+              user.gamingProfile.currentGame !== 'Offline'
+            "
             class="current-game"
           >
             <font-awesome-icon icon="gamepad" />
             <span>Playing {{ user.gamingProfile.currentGame }}</span>
-          </div>
-          <div v-if="user.gamingProfile?.skillLevel" class="skill-level">
-            <span class="skill-label">Skill Level:</span>
-            <SkillBadge :level="user.gamingProfile.skillLevel" />
           </div>
         </div>
       </div>
@@ -104,36 +124,37 @@
             <font-awesome-icon icon="edit" />
             Edit Profile
           </button>
-          <button
-            @click="$emit('openSettings')"
-            class="btn btn-outline settings-btn"
-          >
-            <font-awesome-icon icon="cog" />
-            Settings
-          </button>
         </div>
       </div>
     </div>
 
-    <!-- Profile Stats -->
-    <div class="profile-stats">
-      <div class="stat-item posts-stat">
-        <span class="stat-number posts-count">{{
-          user.socialStats?.totalPosts || user.stats?.postsCount || 0
-        }}</span>
-        <span class="stat-label posts-label">Posts</span>
-      </div>
-      <div class="stat-item followers-stat">
-        <span class="stat-number followers-count">{{ displayFollowerCount }}</span>
-        <span class="stat-label followers-label">Followers</span>
-      </div>
-      <div class="stat-item following-stat">
-        <span class="stat-number following-count">{{ displayFollowingCount }}</span>
-        <span class="stat-label following-label">Following</span>
-      </div>
-      <div class="stat-item reputation-stat">
-        <span class="stat-number reputation-count">{{ user.socialStats?.reputation || 0 }}</span>
-        <span class="stat-label reputation-label">Reputation</span>
+    <!-- Reputation Stats (Horizontal) -->
+    <div class="reputation-section">
+      <div class="reputation-stats-horizontal">
+        <div class="reputation-stat-item">
+          <span class="reputation-value">{{
+            Math.round(user.socialStats?.activeReputation || 0)
+          }}</span>
+          <span class="reputation-label">Active</span>
+        </div>
+        <div class="reputation-stat-item">
+          <span class="reputation-value">{{
+            Math.round(user.socialStats?.reputation || 0)
+          }}</span>
+          <span class="reputation-label">Total</span>
+        </div>
+        <div class="reputation-stat-item">
+          <span class="reputation-value">{{
+            Math.round(user.socialStats?.commentsReputation || 0)
+          }}</span>
+          <span class="reputation-label">Comment</span>
+        </div>
+        <div class="reputation-stat-item">
+          <span class="reputation-value">{{
+            Math.round(user.socialStats?.legacyReputation || 0)
+          }}</span>
+          <span class="reputation-label">Legacy</span>
+        </div>
       </div>
     </div>
   </div>
@@ -171,7 +192,7 @@ export default {
       default: false,
     },
   },
-  emits: ["follow", "unfollow", "edit", "openSettings"],
+  emits: ["follow", "unfollow", "edit"],
   setup(props) {
     const store = useStore();
 
@@ -280,7 +301,6 @@ export default {
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   margin-bottom: var(--space-lg);
-  background: var(--glass-morphism-bg);
 }
 
 .header-background {
@@ -417,17 +437,6 @@ export default {
   font-weight: 500;
 }
 
-.skill-level {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.skill-label {
-  color: var(--bright-white);
-  font-size: var(--text-sm);
-}
-
 .profile-actions {
   display: flex;
   flex-direction: column;
@@ -442,53 +451,111 @@ export default {
 .btn {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 8px 20px;
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: 600;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: var(--bright-white);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
+  position: relative;
 }
 
 .btn:hover {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint-green);
+  transform: translateX(5px);
+}
+
+.btn:hover svg {
+  color: var(--mint-green);
+}
+
+.btn svg {
+  font-size: var(--text-xl);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Instagram-style inline stats above bio */
+.profile-stats-inline {
+  display: flex;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  color: var(--bright-white);
+  font-size: var(--text-base);
+}
+
+.inline-stat {
+  display: inline-flex;
+  align-items: baseline;
+  padding: var(--space-xs) var(--space-sm);
+  gap: var(--space-sm);
+}
+
+.inline-stat-number {
+  font-weight: 600;
   color: var(--bright-white);
 }
 
-.profile-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: var(--space-lg);
+.inline-stat-label {
+  font-weight: 400;
+  color: var(--bright-white);
+  opacity: 0.9;
 }
 
-.stat-item {
+.reputation-section {
+  padding: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reputation-stats-horizontal {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  padding: 0 var(--space-md);
+}
+
+.reputation-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   cursor: pointer;
   transition: var(--transition-normal);
+  flex: 1;
+  max-width: 150px;
 }
 
-.stat-item:hover {
+.reputation-stat-item:hover {
   transform: translateY(-2px);
 }
 
-.stat-number {
+.reputation-value {
   display: block;
   font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--bright-white);
+  line-height: 1.2;
+  margin-bottom: var(--space-xs);
+  text-align: center;
 }
 
-.stat-label {
+.reputation-label {
   font-size: var(--text-sm);
   color: var(--bright-white);
   font-weight: 400;
+  opacity: 0.9;
+  text-align: center;
 }
 
 .error {
@@ -519,11 +586,28 @@ export default {
     gap: var(--space-sm);
   }
 
-  .profile-stats {
-    .stat-item {
-      .stat-number {
-        font-size: var(--text-xl);
-      }
+  .profile-stats-inline {
+    font-size: var(--text-sm);
+    gap: var(--space-sm);
+  }
+
+  .reputation-section {
+    padding: var(--space-md);
+
+    .reputation-stats-horizontal {
+      padding: 0 var(--space-sm);
+    }
+
+    .reputation-stat-item {
+      max-width: 120px;
+    }
+
+    .reputation-value {
+      font-size: var(--text-xl);
+    }
+
+    .reputation-label {
+      font-size: var(--text-xs);
     }
   }
 }
@@ -542,8 +626,31 @@ export default {
     font-size: var(--text-2xl);
   }
 
-  .profile-stats {
-    padding: var(--space-md);
+  .profile-stats-inline {
+    font-size: var(--text-xs);
+    gap: var(--space-xs);
+  }
+
+  .reputation-section {
+    padding: var(--space-sm);
+
+    .reputation-stats-horizontal {
+      padding: 0 var(--space-xs);
+      flex-wrap: wrap;
+    }
+
+    .reputation-stat-item {
+      max-width: 100px;
+      min-width: 80px;
+    }
+
+    .reputation-value {
+      font-size: var(--text-lg);
+    }
+
+    .reputation-label {
+      font-size: 10px;
+    }
   }
 }
 </style>

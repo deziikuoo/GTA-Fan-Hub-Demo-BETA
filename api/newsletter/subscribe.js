@@ -1,0 +1,238 @@
+// Newsletter subscription endpoint
+// POST /api/newsletter/subscribe
+import { getSubscribersCollection } from '../utils/db.js';
+import { sendConfirmationEmail } from '../utils/email.js';
+import { validateEmail, sanitizeEmail, generateToken } from '../utils/validation.js';
+
+// Rate limiting: Track subscription attempts per IP
+// In production, use Redis or similar for distributed rate limiting
+const rateLimitMap = new Map();
+const RATE_LIMIT_MAX = 3; // Max attempts per hour
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
+
+/**
+ * Check if IP has exceeded rate limit
+ * @param {string} ip - IP address
+ * @returns {boolean} - True if rate limited
+ */
+function isRateLimited(ip) {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record) {
+    rateLimitMap.set(ip, { count: 1, firstAttempt: now });
+    return false;
+  }
+  
+  // Reset if window has passed
+  if (now - record.firstAttempt > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, firstAttempt: now });
+    return false;
+  }
+  
+  // Check if exceeded
+  if (record.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  // Increment count
+  record.count++;
+  return false;
+}
+
+/**
+ * Clean up old rate limit entries (call periodically)
+ */
+function cleanupRateLimits() {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now - record.firstAttempt > RATE_LIMIT_WINDOW) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}
+
+// Run cleanup every 10 minutes
+setInterval(cleanupRateLimits, 10 * 60 * 1000);
+
+export default async function handler(req, res) {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ 
+      success: false,
+      message: 'Method not allowed. Use POST.' 
+    });
+  }
+
+  try {
+    // Get client IP for rate limiting
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+               req.headers['x-real-ip'] || 
+               req.connection?.remoteAddress || 
+               'unknown';
+
+    // Check rate limit
+    if (isRateLimited(ip)) {
+      console.log('[Subscribe] Rate limit exceeded for IP:', ip);
+      return res.status(429).json({
+        success: false,
+        message: 'Too many subscription attempts. Please try again later.'
+      });
+    }
+
+    // Parse request body
+    const { email, source = 'website' } = req.body;
+
+    // Validate email
+    const validation = validateEmail(email);
+    if (!validation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: validation.reason
+      });
+    }
+
+    // Sanitize email
+    const sanitizedEmail = sanitizeEmail(email);
+
+    // Connect to database
+    const collection = await getSubscribersCollection();
+
+    // Check if email already exists
+    const existing = await collection.findOne({ email: sanitizedEmail });
+
+    if (existing) {
+      // If already confirmed, don't allow re-subscription
+      if (existing.status === 'confirmed') {
+        return res.status(400).json({
+          success: false,
+          message: 'This email is already subscribed.'
+        });
+      }
+      
+      // If pending, resend confirmation email
+      if (existing.status === 'pending') {
+        // Generate new token
+        const newToken = generateToken();
+        
+        // Update with new token
+        await collection.updateOne(
+          { email: sanitizedEmail },
+          {
+            $set: {
+              confirmationToken: newToken,
+              subscribedAt: new Date(),
+              source,
+              ipAddress: ip,
+              userAgent: req.headers['user-agent'] || 'unknown',
+            }
+          }
+        );
+        
+        // Resend confirmation email
+        const emailResult = await sendConfirmationEmail(sanitizedEmail, newToken);
+        
+        if (!emailResult.success) {
+          console.error('[Subscribe] Failed to resend confirmation email:', emailResult.error);
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to send confirmation email. Please try again.'
+          });
+        }
+        
+        return res.status(200).json({
+          success: true,
+          message: 'Confirmation email resent. Please check your inbox.'
+        });
+      }
+      
+      // If unsubscribed, allow re-subscription
+      if (existing.status === 'unsubscribed') {
+        const newToken = generateToken();
+        
+        await collection.updateOne(
+          { email: sanitizedEmail },
+          {
+            $set: {
+              status: 'pending',
+              confirmationToken: newToken,
+              subscribedAt: new Date(),
+              source,
+              ipAddress: ip,
+              userAgent: req.headers['user-agent'] || 'unknown',
+            },
+            $unset: {
+              unsubscribedAt: '',
+            }
+          }
+        );
+        
+        const emailResult = await sendConfirmationEmail(sanitizedEmail, newToken);
+        
+        if (!emailResult.success) {
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to send confirmation email. Please try again.'
+          });
+        }
+        
+        return res.status(200).json({
+          success: true,
+          message: 'Welcome back! Please check your email to confirm your subscription.'
+        });
+      }
+    }
+
+    // New subscriber - generate token and save
+    const token = generateToken();
+    
+    const subscriber = {
+      email: sanitizedEmail,
+      status: 'pending',
+      confirmationToken: token,
+      subscribedAt: new Date(),
+      source,
+      ipAddress: ip,
+      userAgent: req.headers['user-agent'] || 'unknown',
+    };
+
+    await collection.insertOne(subscriber);
+    console.log('[Subscribe] New subscriber added:', sanitizedEmail);
+
+    // Send confirmation email
+    const emailResult = await sendConfirmationEmail(sanitizedEmail, token);
+    
+    if (!emailResult.success) {
+      // Delete the subscriber if email fails
+      await collection.deleteOne({ email: sanitizedEmail });
+      console.error('[Subscribe] Failed to send confirmation email, subscriber removed:', sanitizedEmail);
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send confirmation email. Please try again.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Please check your email to confirm your subscription.'
+    });
+
+  } catch (error) {
+    console.error('[Subscribe] Error:', error);
+    
+    // Handle duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email is already registered.'
+      });
+    }
+    
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred. Please try again later.'
+    });
+  }
+}
+

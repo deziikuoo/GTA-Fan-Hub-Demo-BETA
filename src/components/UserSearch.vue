@@ -88,12 +88,19 @@
                       >Follows you</span
                     >
                   </div>
-                  <div v-if="user.mutualCount || user.followerCount" class="result-meta">
+                  <div
+                    v-if="user.mutualCount || user.followerCount"
+                    class="result-meta"
+                  >
                     <span v-if="user.mutualCount > 0" class="mutual-count">
-                      {{ user.mutualCount }} mutual connection{{ user.mutualCount > 1 ? 's' : '' }}
+                      {{ user.mutualCount }} mutual connection{{
+                        user.mutualCount > 1 ? "s" : ""
+                      }}
                     </span>
                     <span v-if="user.followerCount > 0" class="follower-count">
-                      {{ formatFollowerCount(user.followerCount) }} follower{{ user.followerCount !== 1 ? 's' : '' }}
+                      {{ formatFollowerCount(user.followerCount) }} follower{{
+                        user.followerCount !== 1 ? "s" : ""
+                      }}
                     </span>
                   </div>
                 </div>
@@ -162,10 +169,14 @@
                   </div>
                   <div class="result-meta">
                     <span v-if="user.mutualCount > 0" class="mutual-count">
-                      {{ user.mutualCount }} mutual connection{{ user.mutualCount > 1 ? 's' : '' }}
+                      {{ user.mutualCount }} mutual connection{{
+                        user.mutualCount > 1 ? "s" : ""
+                      }}
                     </span>
                     <span v-if="user.followerCount > 0" class="follower-count">
-                      {{ formatFollowerCount(user.followerCount) }} follower{{ user.followerCount !== 1 ? 's' : '' }}
+                      {{ formatFollowerCount(user.followerCount) }} follower{{
+                        user.followerCount !== 1 ? "s" : ""
+                      }}
                     </span>
                   </div>
                 </div>
@@ -186,6 +197,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import axios from "@/utils/axios";
+import { mockUsers } from "@/mockData/users.js";
 
 export default {
   name: "UserSearch",
@@ -220,37 +232,68 @@ export default {
         if (stored) {
           const storedSearches = JSON.parse(stored);
           recentSearches.value = storedSearches;
-          
+
           // Refresh data for recent searches if user is logged in
           if (currentUser.value?.id && storedSearches.length > 0) {
             refreshRecentSearchesData(storedSearches);
           }
+        } else {
+          // If no stored searches, initialize with mock users (up to 5)
+          // This demonstrates how the search feature works
+          const defaultRecentSearches = mockUsers.slice(0, 5).map(user => ({
+            _id: user._id,
+            username: user.username,
+            profile: user.profile,
+            isFollowing: false,
+            followsYou: false,
+            isMutual: false,
+            mutualCount: 0,
+            followerCount: user.followers || 0,
+            timestamp: Date.now(),
+          }));
+          recentSearches.value = defaultRecentSearches;
+          saveRecentSearches();
         }
       } catch (error) {
         console.error("Error loading recent searches:", error);
-        recentSearches.value = [];
+        // If error, still initialize with mock users
+        const defaultRecentSearches = mockUsers.slice(0, 5).map(user => ({
+          _id: user._id,
+          username: user.username,
+          profile: user.profile,
+          isFollowing: false,
+          followsYou: false,
+          isMutual: false,
+          mutualCount: 0,
+          followerCount: user.followers || 0,
+          timestamp: Date.now(),
+        }));
+        recentSearches.value = defaultRecentSearches;
+        saveRecentSearches();
       }
     };
 
     // Refresh recent searches with current follow status and counts
     const refreshRecentSearchesData = async (searches) => {
       try {
-        const userIds = searches.map(s => s._id).join(',');
+        const userIds = searches.map((s) => s._id).join(",");
         // Fetch fresh data for these users
-        const response = await axios.get('/api/users/batch', {
-          params: { ids: userIds }
+        const response = await axios.get("/api/users/batch", {
+          params: { ids: userIds },
         });
-        
+
         if (response.data.users) {
           // Update recent searches with fresh data
-          recentSearches.value = searches.map(oldUser => {
-            const freshData = response.data.users.find(u => u._id === oldUser._id);
+          recentSearches.value = searches.map((oldUser) => {
+            const freshData = response.data.users.find(
+              (u) => u._id === oldUser._id
+            );
             return freshData ? { ...oldUser, ...freshData } : oldUser;
           });
         }
       } catch (error) {
         // Silently fail - keep old data if refresh fails
-        console.log('Could not refresh recent searches data');
+        console.log("Could not refresh recent searches data");
       }
     };
 
@@ -260,20 +303,24 @@ export default {
         // Cleanup: Remove searches older than 30 days
         const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
         const now = Date.now();
-        
-        const validSearches = recentSearches.value.filter(search => {
+
+        const validSearches = recentSearches.value.filter((search) => {
           // Keep searches without timestamp (backward compatibility)
           if (!search.timestamp) return true;
           // Remove searches older than 30 days
-          return (now - search.timestamp) < THIRTY_DAYS_MS;
+          return now - search.timestamp < THIRTY_DAYS_MS;
         });
-        
+
         // Update if any were removed
         if (validSearches.length !== recentSearches.value.length) {
           recentSearches.value = validSearches;
-          console.log(`Cleaned up ${recentSearches.value.length - validSearches.length} old recent searches`);
+          console.log(
+            `Cleaned up ${
+              recentSearches.value.length - validSearches.length
+            } old recent searches`
+          );
         }
-        
+
         localStorage.setItem(
           storageKey.value,
           JSON.stringify(recentSearches.value)
@@ -330,9 +377,9 @@ export default {
     // Format follower count (e.g., 1.2K, 3.5M)
     const formatFollowerCount = (count) => {
       if (count >= 1000000) {
-        return (count / 1000000).toFixed(1) + 'M';
+        return (count / 1000000).toFixed(1) + "M";
       } else if (count >= 1000) {
-        return (count / 1000).toFixed(1) + 'K';
+        return (count / 1000).toFixed(1) + "K";
       }
       return count.toString();
     };
@@ -616,8 +663,8 @@ export default {
   left: auto;
   max-height: 400px;
   overflow-y: auto;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--skyPurp-SearchDropdown);
+  border: 1px solid rgba(183, 150, 255, 0.6);
   border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   z-index: 1050;
@@ -646,8 +693,6 @@ export default {
 .recent-searches-section,
 .search-results-section {
   padding: var(--space-md);
-  backdrop-filter: blur(100px);
-  background-color: rgb(2, 33, 43);
 }
 
 .section-header {

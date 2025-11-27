@@ -47,12 +47,10 @@ export default {
   setup() {
     const article = ref({});
     const route = useRoute();
-    const baseURL = "http://localhost:3003";
-
     const fetchArticle = async () => {
       try {
         const response = await axios.get(
-          `${baseURL}/api/news/${route.params.id}`
+          `/api/news/${route.params.id}`
         );
         article.value = response.data;
         console.log("Fetched article:", article.value);
@@ -154,7 +152,7 @@ h1 {
   justify-content: space-between;
   font-size: 0.9em;
   color: var(--soft-lavender);
-  text-shadow: 0 0 4px var(--neon-pink), 0 0 8px rgba(255, 20, 147, 0.5);
+  text-shadow: 0 0 4px var(--neon-pink2), 0 0 8px rgba(255, 20, 147, 0.5);
   margin-bottom: 20px;
 }
 .description {
@@ -167,7 +165,7 @@ h1 {
 .author {
   font-size: 0.9em;
   color: var(--soft-lavender);
-  text-shadow: 0 0 4px var(--neon-pink), 0 0 8px rgba(255, 20, 147, 0.5);
+  text-shadow: 0 0 4px var(--neon-pink2), 0 0 8px rgba(255, 20, 147, 0.5);
   margin-bottom: 20px;
 }
 .read-more {

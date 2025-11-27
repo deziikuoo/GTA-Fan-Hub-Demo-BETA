@@ -7,55 +7,75 @@ export default {
 
   state: {
     // Follow state
-    followingUsers: new Set(), // Users current user follows
+    followingUsers: [], // Users current user follows (Array for Vue reactivity)
     followerCount: 0,
     followingCount: 0,
 
     // UI state
-    followActionLoading: new Set(), // Track loading state per user
+    followActionLoading: [], // Track loading state per user (Array for Vue reactivity)
   },
 
   mutations: {
     SET_FOLLOWING(state, userId) {
-      console.log("[Social:Mutation] SET_FOLLOWING - userId:", userId);
+      const userIdStr = String(userId); // Ensure string format
+      console.log("[Social:Mutation] SET_FOLLOWING - userId:", userIdStr);
       console.log(
-        "[Social:Mutation] Before - Set size:",
-        state.followingUsers.size
+        "[Social:Mutation] Before - Array length:",
+        state.followingUsers.length
       );
-      state.followingUsers.add(userId);
+      console.log("[Social:Mutation] Before - Array contents:", state.followingUsers);
+      
+      // Only add if not already present (using string comparison)
+      if (!state.followingUsers.includes(userIdStr)) {
+        state.followingUsers.push(userIdStr);
+        console.log("[Social:Mutation] ✓ Added to array");
+      } else {
+        console.log("[Social:Mutation] Already in array, skipping");
+      }
+      
       console.log(
-        "[Social:Mutation] After - Set size:",
-        state.followingUsers.size
+        "[Social:Mutation] After - Array length:",
+        state.followingUsers.length
       );
       console.log(
-        "[Social:Mutation] Set contents:",
-        Array.from(state.followingUsers)
+        "[Social:Mutation] After - Array contents:",
+        state.followingUsers
       );
     },
 
     REMOVE_FOLLOWING(state, userId) {
-      console.log("[Social:Mutation] REMOVE_FOLLOWING - userId:", userId);
+      const userIdStr = String(userId); // Ensure string format
+      console.log("[Social:Mutation] REMOVE_FOLLOWING - userId:", userIdStr);
       console.log(
-        "[Social:Mutation] Before - Set size:",
-        state.followingUsers.size
+        "[Social:Mutation] Before - Array length:",
+        state.followingUsers.length
       );
-      state.followingUsers.delete(userId);
+      console.log("[Social:Mutation] Before - Array contents:", state.followingUsers);
+      
+      const index = state.followingUsers.indexOf(userIdStr);
+      if (index > -1) {
+        state.followingUsers.splice(index, 1);
+        console.log("[Social:Mutation] ✓ Removed from array at index:", index);
+      } else {
+        console.log("[Social:Mutation] Not found in array, skipping");
+      }
+      
       console.log(
-        "[Social:Mutation] After - Set size:",
-        state.followingUsers.size
+        "[Social:Mutation] After - Array length:",
+        state.followingUsers.length
       );
       console.log(
-        "[Social:Mutation] Set contents:",
-        Array.from(state.followingUsers)
+        "[Social:Mutation] After - Array contents:",
+        state.followingUsers
       );
     },
 
     SET_FOLLOWING_LIST(state, userIds) {
-      state.followingUsers = new Set(userIds);
+      state.followingUsers = userIds.map((id) => String(id));
     },
 
     CLEAR_FOLLOWING_LIST(state) {
-      state.followingUsers.clear();
+      state.followingUsers = [];
     },
 
     SET_COUNTS(state, { followers, following }) {
@@ -112,18 +132,24 @@ export default {
     },
 
     SET_FOLLOW_ACTION_LOADING(state, { userId, loading }) {
+      const userIdStr = String(userId); // Ensure string format
       if (loading) {
-        state.followActionLoading.add(userId);
+        if (!state.followActionLoading.includes(userIdStr)) {
+          state.followActionLoading.push(userIdStr);
+        }
       } else {
-        state.followActionLoading.delete(userId);
+        const index = state.followActionLoading.indexOf(userIdStr);
+        if (index > -1) {
+          state.followActionLoading.splice(index, 1);
+        }
       }
     },
 
     RESET_STATE(state) {
-      state.followingUsers.clear();
+      state.followingUsers = [];
       state.followerCount = 0;
       state.followingCount = 0;
-      state.followActionLoading.clear();
+      state.followActionLoading = [];
     },
   },
 
@@ -134,47 +160,50 @@ export default {
      * @param {Object} payload - { userId, source }
      */
     async followUser({ commit, state }, { userId, source = "profile" }) {
+      const userIdStr = String(userId); // Ensure string format
       console.log("[Social:Action] ========== FOLLOW USER START ==========");
-      console.log("[Social:Action] UserId:", userId);
+      console.log("[Social:Action] UserId (string):", userIdStr);
       console.log("[Social:Action] Source:", source);
       console.log("[Social:Action] Current state before:", {
-        followingUsers: Array.from(state.followingUsers),
+        followingUsers: state.followingUsers,
         followingCount: state.followingCount,
       });
 
-      commit("SET_FOLLOW_ACTION_LOADING", { userId, loading: true });
+      commit("SET_FOLLOW_ACTION_LOADING", { userId: userIdStr, loading: true });
 
       try {
         console.log("[Social:Action] Making API call...");
-        const response = await axios.post(`/api/users/${userId}/follow`, {
+        const response = await axios.post(`/api/users/${userIdStr}/follow`, {
           source,
         });
-        console.log("[Social:Action] API response:", response.data);
+        console.log("[Social:Action] ✓ API response:", response.data);
 
         if (response.data.status === "active") {
           console.log(
-            "[Social:Action] Status is active, committing mutations..."
+            "[Social:Action] ✓ Status is active, committing mutations..."
           );
-          commit("SET_FOLLOWING", userId);
+          commit("SET_FOLLOWING", userIdStr);
           commit("INCREMENT_FOLLOWING_COUNT");
+          console.log("[Social:Action] ✓ Mutations committed successfully");
         } else {
           console.log(
-            "[Social:Action] Status is NOT active:",
+            "[Social:Action] ⚠ Status is NOT active (probably pending):",
             response.data.status
           );
         }
 
         console.log("[Social:Action] Current state after:", {
-          followingUsers: Array.from(state.followingUsers),
+          followingUsers: state.followingUsers,
           followingCount: state.followingCount,
         });
 
         return response.data;
       } catch (error) {
         console.error("[Social:Action] ✗ Follow error:", error);
+        console.error("[Social:Action] ✗ Error response:", error.response?.data);
         throw error;
       } finally {
-        commit("SET_FOLLOW_ACTION_LOADING", { userId, loading: false });
+        commit("SET_FOLLOW_ACTION_LOADING", { userId: userIdStr, loading: false });
         console.log("[Social:Action] ========== FOLLOW USER END ==========");
       }
     },
@@ -185,33 +214,36 @@ export default {
      * @param {string} userId - User ID to unfollow
      */
     async unfollowUser({ commit, state }, userId) {
+      const userIdStr = String(userId); // Ensure string format
       console.log("[Social:Action] ========== UNFOLLOW USER START ==========");
-      console.log("[Social:Action] UserId:", userId);
+      console.log("[Social:Action] UserId (string):", userIdStr);
       console.log("[Social:Action] Current state before:", {
-        followingUsers: Array.from(state.followingUsers),
+        followingUsers: state.followingUsers,
         followingCount: state.followingCount,
       });
 
-      commit("SET_FOLLOW_ACTION_LOADING", { userId, loading: true });
+      commit("SET_FOLLOW_ACTION_LOADING", { userId: userIdStr, loading: true });
 
       try {
         console.log("[Social:Action] Making DELETE API call...");
-        await axios.delete(`/api/users/${userId}/follow`);
-        console.log("[Social:Action] API call successful");
+        const response = await axios.delete(`/api/users/${userIdStr}/follow`);
+        console.log("[Social:Action] ✓ API response:", response.data);
 
-        console.log("[Social:Action] Committing mutations...");
-        commit("REMOVE_FOLLOWING", userId);
+        console.log("[Social:Action] ✓ Committing mutations...");
+        commit("REMOVE_FOLLOWING", userIdStr);
         commit("DECREMENT_FOLLOWING_COUNT");
+        console.log("[Social:Action] ✓ Mutations committed successfully");
 
         console.log("[Social:Action] Current state after:", {
-          followingUsers: Array.from(state.followingUsers),
+          followingUsers: state.followingUsers,
           followingCount: state.followingCount,
         });
       } catch (error) {
         console.error("[Social:Action] ✗ Unfollow error:", error);
+        console.error("[Social:Action] ✗ Error response:", error.response?.data);
         throw error;
       } finally {
-        commit("SET_FOLLOW_ACTION_LOADING", { userId, loading: false });
+        commit("SET_FOLLOW_ACTION_LOADING", { userId: userIdStr, loading: false });
         console.log("[Social:Action] ========== UNFOLLOW USER END ==========");
       }
     },
@@ -225,8 +257,10 @@ export default {
       { state, dispatch, getters },
       { userId, source = "profile" }
     ) {
+      const userIdStr = String(userId); // Ensure string format
       console.log("[Social:Action] ========== TOGGLE FOLLOW ==========");
-      const currentlyFollowing = getters.isFollowing(userId);
+      console.log("[Social:Action] UserId (string):", userIdStr);
+      const currentlyFollowing = getters.isFollowing(userIdStr);
       console.log("[Social:Action] Currently following:", currentlyFollowing);
       console.log(
         "[Social:Action] Will:",
@@ -234,15 +268,21 @@ export default {
       );
 
       if (currentlyFollowing) {
-        await dispatch("unfollowUser", userId);
+        await dispatch("unfollowUser", userIdStr);
       } else {
-        await dispatch("followUser", { userId, source });
+        await dispatch("followUser", { userId: userIdStr, source });
       }
 
+      const newFollowStatus = getters.isFollowing(userIdStr);
       console.log(
-        "[Social:Action] Toggle complete - now following:",
-        getters.isFollowing(userId)
+        "[Social:Action] ✓ Toggle complete - now following:",
+        newFollowStatus
       );
+      
+      // Verify the state actually changed
+      if (currentlyFollowing === newFollowStatus) {
+        console.error("[Social:Action] ✗ WARNING: Follow state did not change!");
+      }
     },
 
     /**
@@ -251,18 +291,23 @@ export default {
      * @param {string} userId - User ID to check
      */
     async checkFollowStatus({ commit }, userId) {
+      const userIdStr = String(userId); // Ensure string format
       try {
-        const { data } = await axios.get(`/api/users/${userId}/follow-status`);
+        console.log("[Social:Action] Checking follow status for:", userIdStr);
+        const { data } = await axios.get(`/api/users/${userIdStr}/follow-status`);
+        console.log("[Social:Action] Follow status response:", data);
 
         if (data.isFollowing) {
-          commit("SET_FOLLOWING", userId);
+          console.log("[Social:Action] ✓ Currently following, setting in state");
+          commit("SET_FOLLOWING", userIdStr);
         } else {
-          commit("REMOVE_FOLLOWING", userId);
+          console.log("[Social:Action] ✓ Not following, removing from state");
+          commit("REMOVE_FOLLOWING", userIdStr);
         }
 
         return data;
       } catch (error) {
-        console.error("[Social] Failed to check follow status:", error);
+        console.error("[Social:Action] ✗ Failed to check follow status:", error);
         return { isFollowing: false, isMutual: false };
       }
     },
@@ -281,10 +326,11 @@ export default {
 
         // Update local state with results
         Object.entries(data.followStatuses).forEach(([userId, isFollowing]) => {
+          const userIdStr = String(userId);
           if (isFollowing) {
-            commit("SET_FOLLOWING", userId);
+            commit("SET_FOLLOWING", userIdStr);
           } else {
-            commit("REMOVE_FOLLOWING", userId);
+            commit("REMOVE_FOLLOWING", userIdStr);
           }
         });
 
@@ -302,20 +348,23 @@ export default {
      * @param {string} userId - Current user ID
      */
     async initializeFollowState({ commit }, userId) {
+      const userIdStr = String(userId); // Ensure string format
       try {
-        console.log("[Social] Initializing follow state for user:", userId);
+        console.log("[Social:Action] Initializing follow state for user:", userIdStr);
 
         // Fetch user's following list (first page only for initial state)
-        const { data } = await axios.get(`/api/users/${userId}/following`, {
+        const { data } = await axios.get(`/api/users/${userIdStr}/following`, {
           params: { limit: 100 },
         });
 
-        const followingIds = data.following.map((user) => user._id);
+        // Convert all user IDs to strings for consistency
+        const followingIds = data.following.map((user) => String(user._id));
+        console.log("[Social:Action] Following IDs (as strings):", followingIds);
         commit("SET_FOLLOWING_LIST", followingIds);
 
         // Get follower count
         const followersResponse = await axios.get(
-          `/api/users/${userId}/followers`,
+          `/api/users/${userIdStr}/followers`,
           {
             params: { limit: 1 }, // We only need the count, not the actual list
           }
@@ -328,10 +377,10 @@ export default {
         });
 
         console.log(
-          `[Social] Initialized follow state: ${followingIds.length} following, ${followersResponse.data.totalCount} followers`
+          `[Social:Action] ✓ Initialized follow state: ${followingIds.length} following, ${followersResponse.data.totalCount} followers`
         );
       } catch (error) {
-        console.error("[Social] Failed to initialize follow state:", error);
+        console.error("[Social:Action] ✗ Failed to initialize follow state:", error);
       }
     },
 
@@ -407,7 +456,11 @@ export default {
      * @returns {Function} Function that takes userId and returns boolean
      */
     isFollowing: (state) => (userId) => {
-      return state.followingUsers.has(userId);
+      const userIdStr = String(userId); // Ensure string format for comparison
+      const result = state.followingUsers.includes(userIdStr);
+      console.log(`[Social:Getter] isFollowing(${userIdStr}) = ${result}`);
+      console.log(`[Social:Getter] Current array:`, state.followingUsers);
+      return result;
     },
 
     /**
@@ -416,7 +469,8 @@ export default {
      * @returns {Function} Function that takes userId and returns boolean
      */
     isFollowActionLoading: (state) => (userId) => {
-      return state.followActionLoading.has(userId);
+      const userIdStr = String(userId); // Ensure string format for comparison
+      return state.followActionLoading.includes(userIdStr);
     },
 
     /**
@@ -443,16 +497,16 @@ export default {
      * @returns {Array} Array of user IDs
      */
     getFollowingIds: (state) => {
-      return Array.from(state.followingUsers);
+      return [...state.followingUsers];
     },
 
     /**
      * Get number of users currently being followed
      * @param {Object} state - Vuex state
-     * @returns {number} Number of users in following set
+     * @returns {number} Number of users in following array
      */
     getFollowingSize: (state) => {
-      return state.followingUsers.size;
+      return state.followingUsers.length;
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-navigation">
+  <div class="profile-navigation main-backdrop-filter">
     <nav class="nav-tabs">
       <button
         v-for="tab in tabs"
@@ -41,11 +41,6 @@ export default {
         count: props.userStats.totalPosts,
       },
       {
-        id: "about",
-        label: "About",
-        icon: "user",
-      },
-      {
         id: "achievements",
         label: "Achievements",
         icon: "trophy",
@@ -63,6 +58,11 @@ export default {
         icon: "user-group",
         count: props.userStats.followingCount,
       },
+      {
+        id: "about",
+        label: "About",
+        icon: "user",
+      },
     ];
 
     const handleTabClick = (tabId) => {
@@ -79,7 +79,6 @@ export default {
 
 <style scoped>
 .profile-navigation {
-  background: var(--card-background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   margin-bottom: var(--space-lg);
@@ -92,7 +91,6 @@ export default {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  background: var(--glass-morphism-bg);
   gap: 2px;
 }
 
@@ -108,7 +106,7 @@ export default {
   padding: var(--space-md) var(--space-lg);
   background: transparent;
   border: none;
-  color: var(--steel-gray);
+  color: var(--bright-white);
   font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;

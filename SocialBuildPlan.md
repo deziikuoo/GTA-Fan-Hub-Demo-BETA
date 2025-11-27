@@ -241,7 +241,7 @@ app.get("/api/profile/:username/achievements", getAchievements);
 ```vue
 <!-- src/components/ProfileHeader.vue -->
 <template>
-  <div class="profile-header">
+  <div class="profile-header main-backdrop-filter">
     <!-- Header Background -->
     <div class="header-background">
       <img
@@ -312,10 +312,6 @@ app.get("/api/profile/:username/achievements", getAchievements);
           >
             <font-awesome-icon icon="gamepad" />
             <span>Playing {{ user.gamingProfile.currentGame }}</span>
-          </div>
-          <div class="skill-level">
-            <span class="skill-label">Skill Level:</span>
-            <SkillBadge :level="user.gamingProfile.skillLevel" />
           </div>
         </div>
       </div>
@@ -562,7 +558,6 @@ app.get("/api/profile/:username/achievements", getAchievements);
 }
 
 .profile-header {
-  background: var(--card-background);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-lg);

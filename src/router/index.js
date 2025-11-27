@@ -95,7 +95,13 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // Log navigation for debugging
   console.log("Navigating from:", from.path, "to:", to.path);
+  // Always allow navigation in demo mode
   next();
+});
+
+// Ensure router is working
+router.afterEach((to, from) => {
+  console.log("Navigation completed to:", to.path);
 });
 
 export default router;

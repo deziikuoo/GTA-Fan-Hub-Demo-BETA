@@ -248,9 +248,9 @@ export default {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid var(--steel-gray);
   cursor: pointer;
   transition: all 0.2s ease;
+  border: 2px solid var(--bright-white);
 }
 
 .author-avatar:hover {

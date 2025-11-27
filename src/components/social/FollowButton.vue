@@ -5,6 +5,11 @@
     @click="handleClick"
     :aria-label="isFollowing ? `Unfollow ${username}` : `Follow ${username}`"
   >
+    <font-awesome-icon
+      v-if="!isLoading"
+      :icon="isFollowing ? 'user-check' : 'user-plus'"
+      class="follow-icon"
+    />
     <span v-if="!isLoading" class="button-text">
       {{ buttonText }}
     </span>
@@ -53,12 +58,14 @@ const emit = defineEmits(["followed", "unfollowed", "error"]);
 const store = useStore();
 
 // Computed properties
+const normalizedUserId = computed(() => String(props.userId));
+
 const isFollowing = computed(() => {
-  return store.getters["social/isFollowing"](props.userId);
+  return store.state.social.followingUsers.includes(normalizedUserId.value);
 });
 
 const isLoading = computed(() => {
-  return store.getters["social/isFollowActionLoading"](props.userId);
+  return store.state.social.followActionLoading.includes(normalizedUserId.value);
 });
 
 const buttonText = computed(() => {
@@ -107,7 +114,7 @@ watch(
 // Methods
 const handleClick = async () => {
   console.log("[FollowButton] ========== CLICK START ==========");
-  console.log("[FollowButton] UserId:", props.userId);
+  console.log("[FollowButton] UserId:", normalizedUserId.value);
   console.log("[FollowButton] Before action - isFollowing:", isFollowing.value);
   console.log("[FollowButton] Before action - isLoading:", isLoading.value);
   console.log(
@@ -121,7 +128,7 @@ const handleClick = async () => {
 
   try {
     await store.dispatch("social/toggleFollow", {
-      userId: props.userId,
+      userId: normalizedUserId.value,
       source: props.source,
     });
 
@@ -141,10 +148,16 @@ const handleClick = async () => {
     // Emit appropriate event
     if (isFollowing.value) {
       console.log("[FollowButton] Emitting 'followed' event");
-      emit("followed", { userId: props.userId, username: props.username });
+      emit("followed", {
+        userId: normalizedUserId.value,
+        username: props.username,
+      });
     } else {
       console.log("[FollowButton] Emitting 'unfollowed' event");
-      emit("unfollowed", { userId: props.userId, username: props.username });
+      emit("unfollowed", {
+        userId: normalizedUserId.value,
+        username: props.username,
+      });
     }
   } catch (error) {
     console.error("[FollowButton] ✗ Error:", error);
@@ -163,16 +176,17 @@ const handleClick = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  border-radius: var(--radius-full);
-  font-weight: 600;
+  gap: var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: var(--bright-white);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
   white-space: nowrap;
 }
 
@@ -181,29 +195,31 @@ const handleClick = async () => {
   cursor: not-allowed;
 }
 
-/* Sizes */
+/* Sizes - Override base padding for different sizes */
 .follow-button-small {
-  padding: 6px 16px;
-  font-size: 13px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
 }
 
 .follow-button-medium {
-  padding: 8px 20px;
-  font-size: 14px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
 }
 
 .follow-button-large {
-  padding: 10px 24px;
-  font-size: 16px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-sm);
 }
 
-/* Variants - All use same base style now */
+/* Variants - All use same hover style */
 .follow-button-primary {
   /* Inherits base styles */
 }
 
 .follow-button-primary:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint-green);
+  transform: translateX(5px);
 }
 
 .follow-button-secondary {
@@ -211,7 +227,9 @@ const handleClick = async () => {
 }
 
 .follow-button-secondary:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint-green);
+  transform: translateX(5px);
 }
 
 .follow-button-outline {
@@ -219,15 +237,19 @@ const handleClick = async () => {
 }
 
 .follow-button-outline:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint-green);
+  transform: translateX(5px);
 }
 
 .follow-button-following {
-  border: 1px solid var(--electric-blue);
+  /* Inherits all base styles */
 }
 
 .follow-button-following:hover:not(:disabled) {
-  border: 1px solid var(--coral-red);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mint-green);
+  transform: translateX(5px);
 }
 
 .follow-button-following:hover:not(:disabled) .button-text::after {
@@ -245,6 +267,7 @@ const handleClick = async () => {
   position: absolute;
   left: 0;
   right: 0;
+  color: var(--mint-green);
 }
 
 /* Loading state */
@@ -270,6 +293,25 @@ const handleClick = async () => {
 
 .button-text {
   white-space: nowrap;
+}
+
+.follow-icon {
+  font-size: var(--text-xl);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Icon color on hover for follow state (primary/outline/secondary) */
+.follow-button-primary:hover:not(:disabled) .follow-icon,
+.follow-button-outline:hover:not(:disabled) .follow-icon,
+.follow-button-secondary:hover:not(:disabled) .follow-icon {
+  color: var(--mint-green);
+}
+
+/* Icon color on hover for following state */
+.follow-button-following:hover:not(:disabled) .follow-icon {
+  color: var(--mint-green);
 }
 
 </style>

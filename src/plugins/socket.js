@@ -1,127 +1,108 @@
-// src/plugins/socket.js
-
-import { io } from "socket.io-client";
-
-// Socket.io client instance
-export const socket = io("http://localhost:3003", {
-  autoConnect: false, // Don't connect automatically, wait for login
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 5,
-});
+// Mock Socket.io implementation for demo
+// Creates a mock socket that emits events based on user actions
 
 // Connection state
 let isConnected = false;
-let reconnectAttempts = 0;
+let eventListeners = {};
+
+// Mock socket object
+const mockSocket = {
+  id: "demo_socket_" + Date.now(),
+  auth: {},
+  
+  on(event, callback) {
+    if (!eventListeners[event]) {
+      eventListeners[event] = [];
+    }
+    eventListeners[event].push(callback);
+  },
+  
+  off(event, callback) {
+    if (eventListeners[event]) {
+      eventListeners[event] = eventListeners[event].filter((cb) => cb !== callback);
+    }
+  },
+  
+  emit(event, data) {
+    console.log("[Mock Socket] Emit:", event, data);
+    // In a real implementation, this would send to server
+    // For demo, we just log it
+  },
+  
+  connect() {
+    isConnected = true;
+    this.trigger("connect");
+    this.trigger("connected", { message: "Connected to demo server" });
+  },
+  
+  disconnect() {
+    isConnected = false;
+    this.trigger("disconnect", "client disconnect");
+  },
+  
+  trigger(event, data) {
+    if (eventListeners[event]) {
+      eventListeners[event].forEach((callback) => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error(`[Mock Socket] Error in ${event} listener:`, error);
+        }
+      });
+    }
+  },
+};
 
 // Connection helpers
 export const connectSocket = () => {
   const token = localStorage.getItem("accessToken");
 
-  console.log("[Socket] Attempting to connect...");
-  console.log("[Socket] Token available:", !!token);
+  console.log("[Mock Socket] Attempting to connect...");
+  console.log("[Mock Socket] Token available:", !!token);
 
   if (!token) {
-    console.warn("[Socket] No access token found, cannot connect");
+    console.warn("[Mock Socket] No access token found, cannot connect");
     return;
   }
 
   if (isConnected) {
-    console.log("[Socket] Already connected");
+    console.log("[Mock Socket] Already connected");
     return;
   }
 
-  // Set the auth token before connecting
-  socket.auth = { token };
-  console.log("[Socket] Auth set with token, connecting to server...");
+  // Set the auth token
+  mockSocket.auth = { token };
+  console.log("[Mock Socket] Auth set with token, connecting...");
 
-  socket.connect();
+  // Simulate connection delay
+  setTimeout(() => {
+    mockSocket.connect();
+  }, 100);
 };
 
 export const disconnectSocket = () => {
   if (!isConnected) {
-    console.log("[Socket] Already disconnected");
+    console.log("[Mock Socket] Already disconnected");
     return;
   }
 
-  console.log("[Socket] Disconnecting...");
-  socket.disconnect();
-  isConnected = false;
+  console.log("[Mock Socket] Disconnecting...");
+  mockSocket.disconnect();
 };
 
 export const isSocketConnected = () => {
   return isConnected;
 };
 
-// ==================== EVENT LISTENERS ====================
-
-socket.on("connect", () => {
-  isConnected = true;
-  reconnectAttempts = 0;
-  console.log("[Socket] Connected successfully (ID:", socket.id, ")");
-});
-
-socket.on("connected", (data) => {
-  console.log("[Socket] Server confirmed connection:", data.message);
-});
-
-socket.on("disconnect", (reason) => {
-  isConnected = false;
-  console.log("[Socket] Disconnected:", reason);
-
-  if (reason === "io server disconnect") {
-    // Server disconnected us, try to reconnect
-    console.log(
-      "[Socket] Server initiated disconnect, attempting reconnect..."
-    );
-    socket.connect();
+// Helper to emit mock notifications (for demo purposes)
+export const emitMockNotification = (notification) => {
+  if (isConnected) {
+    mockSocket.trigger("notification", notification);
   }
-});
+};
 
-socket.on("connect_error", (error) => {
-  console.error("[Socket] Connection error:", error.message);
-  reconnectAttempts++;
-
-  // Check if it's an authentication error
-  if (error.message.includes("Authentication")) {
-    console.error(
-      "[Socket] Authentication failed - token may be invalid or expired"
-    );
-    console.error(
-      "[Socket] Current token:",
-      localStorage.getItem("accessToken") ? "exists" : "missing"
-    );
-
-    // Don't retry on auth errors
-    socket.disconnect();
-    return;
-  }
-
-  if (reconnectAttempts > 3) {
-    console.error("[Socket] Multiple connection failures, please check server");
-  }
-});
-
-socket.on("reconnect", (attemptNumber) => {
-  console.log(`[Socket] Reconnected after ${attemptNumber} attempts`);
-  reconnectAttempts = 0;
-});
-
-socket.on("reconnect_attempt", (attemptNumber) => {
-  console.log(`[Socket] Reconnection attempt ${attemptNumber}...`);
-
-  // Update auth token before reconnecting (in case it was refreshed)
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    socket.auth = { token };
-  }
-});
-
-socket.on("reconnect_failed", () => {
-  console.error("[Socket] Reconnection failed after all attempts");
-  isConnected = false;
-});
+// Export socket (mimics socket.io-client export)
+export const socket = mockSocket;
 
 // Export helpers
 export default {
@@ -129,4 +110,5 @@ export default {
   connectSocket,
   disconnectSocket,
   isSocketConnected,
+  emitMockNotification,
 };

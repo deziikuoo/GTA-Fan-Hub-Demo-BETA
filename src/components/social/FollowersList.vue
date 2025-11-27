@@ -291,8 +291,7 @@ onMounted(() => {
   backdrop-filter: blur(10px);
   border-radius: 1.2rem;
   border: 1px solid transparent;
-  box-shadow: 
-    8px 8px 24px rgba(0, 0, 0, 0.3),
+  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
     -8px -8px 24px rgba(80, 80, 90, 0.05);
   transition: all 0.3s ease;
 }
@@ -300,10 +299,8 @@ onMounted(() => {
 .follower-card:hover {
   transform: translateY(-2px);
   border: var(--hover-border);
-  box-shadow: 
-    10px 10px 30px rgba(0, 0, 0, 0.4),
-    -10px -10px 30px rgba(80, 80, 90, 0.08),
-    var(--neon-glow-hover);
+  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
+    -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
 }
 
 .follower-info {
@@ -320,7 +317,7 @@ onMounted(() => {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--skyOrange, #fbbd59);
+  border: 2px solid var(--bright-white);
 }
 
 .follower-details {

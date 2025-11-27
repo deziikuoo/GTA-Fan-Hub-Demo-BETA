@@ -23,11 +23,17 @@ html {
   --soft-lavender: rgb(230, 230, 250);
   --lavender: rgb(175, 175, 215);
   --bright-white: rgb(255, 255, 255);
-  --neon-pink: rgb(255, 20, 147);
-  --neon-pink2: rgb(231, 22, 225);
+  --mid-white2: rgba(255, 255, 255, 0.7);
+  --mid-white2Hover: rgba(255, 255, 255, 0.2);
+  --neon-pink2: rgb(226, 113, 207);
+  --neon-pinkBoarders: rgb(225, 91, 202);
+  --neon-pink2HeaderBtnBG: rgba(221, 95, 198, 0.2);
   --electric-blue: rgb(0, 191, 255);
   --sunset-orange: rgb(255, 99, 71);
-  --mint-green: rgb(152, 255, 152);
+  --mint-green: rgb(198, 232, 125);
+  --mint-greenHeaderBtnBG: rgba(188, 230, 99, 0.3);
+  --mint-greenClosebtn: rgba(180, 216, 100, 0.5);
+  --ModalDeeepBlue: rgb(9, 35, 44);
   --steel-gray: rgb(119, 136, 153);
   --coral-red: rgb(255, 64, 64);
   /* Dark Glass Base (Option 3 Style) */
@@ -38,7 +44,8 @@ html {
   --neon-glow-hover: 0 0 30px rgba(255, 255, 255, 0.3);
   --hover-border: 1px solid var(--bright-white);
 
-  --skyPurp: #454383;
+  --skyPurp-SearchDropdown: #201b2a;
+  --skyPurp: #413656;
   --skyBlue: #547b98;
   --skyPink: #c56aa8;
   --skyOrange: #fbbd59;
@@ -129,60 +136,13 @@ body {
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
   font-size: var(--text-base);
-  line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
+.main-backdrop-filter {
+  backdrop-filter: blur(100px);
+  background: rgba(0, 191, 255, 0.1) !important;
 }
-
-/* Responsive Container System */
-.container-responsive {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--space-md);
-  padding-right: var(--space-md);
-}
-
-@media (min-width: 640px) {
-  .container-responsive {
-    max-width: var(--container-sm);
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
-  }
-}
-
-@media (min-width: 768px) {
-  .container-responsive {
-    max-width: var(--container-md);
-  }
-}
-
-@media (min-width: 1024px) {
-  .container-responsive {
-    max-width: var(--container-lg);
-  }
-}
-
-@media (min-width: 1280px) {
-  .container-responsive {
-    max-width: var(--container-xl);
-  }
-}
-
-@media (min-width: 1536px) {
-  .container-responsive {
-    max-width: var(--container-2xl);
-  }
-}
-
 /* Responsive Grid System */
 .grid {
   display: grid;

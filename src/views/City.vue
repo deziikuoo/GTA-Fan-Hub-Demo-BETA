@@ -7,36 +7,50 @@ export default {
 </script>
 
 <template>
-  <div class="city"><p>City Page</p></div>
+  <div class="city">
+    <div class="coming-soon-card">
+      <h2>City Page Coming Soon</h2>
+      <p>
+        We're working hard to add the latest GTA 6 city details.<br />
+        Stay tuned for updates as new information is revealed!
+      </p>
+    </div>
+  </div>
 </template>
 
 <style>
-:root {
-  --deep-black: rgb(0, 0, 0); /* Deep Black */
-  --deep-black2: rgb(60, 60, 60);
-  --vibrant-purple: rgb(128, 0, 128); /* Vibrant Purple */
-  --soft-lavender: rgb(230, 230, 250); /* Soft Lavender */
-  --lavender: rgb(175, 175, 215); /* Soft Lavender */
-  --bright-white: rgb(255, 255, 255); /* Bright White */
-  --neon-pink: rgb(255, 20, 147); /* Neon Pink */
-  --neon-pink2: rgb(231, 22, 225); /* Neon Pink2 */
-  --electric-blue: rgb(0, 191, 255); /* Electric Blue */
-  --sunset-orange: rgb(255, 99, 71); /* Sunset Orange */
-  --mint-green: rgb(152, 255, 152); /* Mint Green */
-  --steel-gray: rgb(119, 136, 153); /* Steel Gray */
-  --coral-red: rgb(255, 64, 64); /* Coral Red */
-}
 .city {
   position: absolute;
-  top: 40%;
-  text-align: center;
-  height: auto;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-.city p {
-  color: red;
-  height: auto;
-  width: 100%;
-  font-size: 100px;
-  font-weight: bolder;
+
+.coming-soon-card {
+  background: rgba(35, 35, 35, 0.91);
+  border: 2px solid var(--neon-pink2);
+  border-radius: 16px;
+  padding: 2rem;
+  color: #eee;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.36);
+  max-width: 600px;
+  width: 90%;
+}
+
+.coming-soon-card h2 {
+  color: var(--neon-pink2);
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.coming-soon-card p {
+  color: #eee;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 1rem 0;
 }
 </style>

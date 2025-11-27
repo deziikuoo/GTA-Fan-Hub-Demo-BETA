@@ -32,19 +32,18 @@ export default {
     const currentRedditIndex = ref(0);
     const isRedditPaused = ref(false);
     let redditCarouselInterval = null;
-    const baseURL = "http://localhost:3003"; // TODO: Move to .env
-
     // Social feed state
     const trendingPosts = ref([]);
     const postsLoading = ref(false);
     const postsError = ref(null);
     const isLoggedIn = computed(() => store.getters.isLoggedIn);
+    const currentUser = computed(() => store.state.user);
 
     const fetchCarouselImages = async () => {
       carouselLoading.value = true;
       try {
         const response = await axios.get(
-          `${baseURL}/api/carousel?_t=${Date.now()}`
+          `/api/carousel?_t=${Date.now()}`
         );
         images.value = response.data.images || [];
 
@@ -77,7 +76,7 @@ export default {
       loading.value = true;
       try {
         const response = await axios.get(
-          `${baseURL}/api/news?page=1&limit=5&sortField=pubDate&sortOrder=desc&sourceType=rss`
+          `/api/news?page=1&limit=5&sortField=pubDate&sortOrder=desc&sourceType=rss`
         );
         recentArticles.value = response.data.articles || [];
         errorMessage.value = recentArticles.value.length
@@ -95,7 +94,7 @@ export default {
       redditLoading.value = true;
       try {
         const response = await axios.get(
-          `${baseURL}/api/reddit/trending?limit=20`
+          `/api/reddit/trending?limit=20`
         );
         console.log("Reddit API response:", response.data);
         trendingRedditPosts.value = response.data.posts || [];
@@ -201,6 +200,26 @@ export default {
       trendingPosts.value.unshift(newPost);
     };
 
+    // Sequential color cycling for view-all-link hover
+    const viewAllLinkColor = ref(null);
+    const engagementColors = ["pink", "blue", "orange", "green"];
+    const colorIndex = ref(0);
+    const isFirstHover = ref(true);
+
+    const setRandomViewAllColor = () => {
+      if (isFirstHover.value) {
+        // Randomly select starting color on first hover
+        const randomIndex = Math.floor(Math.random() * engagementColors.length);
+        colorIndex.value = randomIndex;
+        viewAllLinkColor.value = engagementColors[colorIndex.value];
+        isFirstHover.value = false;
+      } else {
+        // Cycle through colors in order after first hover
+        colorIndex.value = (colorIndex.value + 1) % engagementColors.length;
+        viewAllLinkColor.value = engagementColors[colorIndex.value];
+      }
+    };
+
     // Utility function for relative time
     const getRelativeTime = (dateString) => {
       const now = new Date();
@@ -235,7 +254,7 @@ export default {
 
     const openArticleDetails = async (id) => {
       try {
-        const response = await axios.get(`${baseURL}/api/news/${id}`);
+        const response = await axios.get(`/api/news/${id}`);
         selectedArticle.value = response.data;
         isDescriptionExpanded.value = false;
         showDetailsModal.value = true;
@@ -311,6 +330,9 @@ export default {
       postsError,
       isLoggedIn,
       handleNewPost,
+      viewAllLinkColor,
+      setRandomViewAllColor,
+      currentUser,
       // Trending Reddit posts
       trendingRedditPosts,
       redditLoading,
@@ -343,47 +365,8 @@ export default {
               <div class="headerText">
                 <p>Welcome to GTA 6 Fan Hub</p>
               </div>
-              <Countdown class="countdown-overlay" />
+              <Countdown class="countdown-container" />
               <div class="headerButtons">
-                <router-link to="/Events" class="events-btn headerButton-Group">
-                  <font-awesome-icon
-                    :icon="['fas', 'calendar-day']"
-                    :class="{ 'flip-once': homeFlip, 'button-icons': true }"
-                    style="color: #ffffff"
-                    alt="Events"
-                  />
-                  <span class="button-label">Events</span>
-                </router-link>
-                <router-link to="/Social" class="social-btn headerButton-Group">
-                  <font-awesome-icon
-                    :icon="['fas', 'user-group']"
-                    :class="{ 'flip-once': homeFlip, 'button-icons': true }"
-                    style="color: #ffffff"
-                    alt="Social"
-                  />
-                  <span class="button-label">Social</span>
-                </router-link>
-                <router-link to="/News" class="news-btn headerButton-Group">
-                  <font-awesome-icon
-                    :icon="['fas', 'newspaper']"
-                    :class="{ 'flip-once': homeFlip, 'button-icons': true }"
-                    style="color: #ffffff"
-                    alt="News"
-                  />
-                  <span class="button-label">News</span>
-                </router-link>
-                <router-link
-                  to="/Characters"
-                  class="characters-btn headerButton-Group"
-                >
-                  <font-awesome-icon
-                    :icon="['fas', 'users']"
-                    :class="{ 'flip-once': homeFlip, 'button-icons': true }"
-                    style="color: #ffffff"
-                    alt="Characters"
-                  />
-                  <span class="button-label">Characters</span>
-                </router-link>
                 <router-link to="/Story" class="story-btn headerButton-Group">
                   <font-awesome-icon
                     :icon="['fas', 'book']"
@@ -455,11 +438,15 @@ export default {
           <!-- Feed Header -->
           <div class="feed-preview-header">
             <h2>Trending Posts</h2>
-            <router-link to="/Social" class="view-all-link"
-              >View All</router-link
-            >
           </div>
-
+          <router-link
+            to="/Social"
+            class="view-all-link"
+            :class="{ [`hover-${viewAllLinkColor}`]: viewAllLinkColor }"
+            @mouseenter="setRandomViewAllColor"
+          >
+            View All
+          </router-link>
           <!-- Loading State -->
           <div v-if="postsLoading" class="loading-state">
             <p>Loading posts...</p>
@@ -487,7 +474,7 @@ export default {
       </div>
       <div class="Limit-Container">
         <div
-          class="RightSide-Content"
+          class="RightSide-Content main-backdrop-filter"
           ref="rightSideContent"
           :style="{ position: sidebarPosition, top: sidebarTop }"
         >
@@ -824,42 +811,25 @@ export default {
   background-color: transparent;
   z-index: 5;
 }
-
 .Home-Content {
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  background-color: transparent;
-  padding: var(--space-md);
-  gap: var(--space-lg);
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: calc(100vh - 56px);
+  width: 100vw;
+  margin: 0 0 0 0;
   overflow: auto;
-}
-
-@media (min-width: 768px) {
-  .Home-Content {
-    flex-direction: row;
-    padding: var(--space-lg);
-    gap: var(--space-xl);
-  }
+  padding-top: calc(64px + 20px);
+  gap: var(--space-xl);
 }
 
 .LeftSide-Content {
-  flex: 1;
   display: flex;
+  position: relative;
   flex-direction: column;
-  padding: var(--space-sm);
-  padding-top: 0 !important;
   height: auto;
-  margin-left: 0;
-  align-items: center;
-}
-
-@media (min-width: 768px) {
-  .LeftSide-Content {
-    margin-left: 62px;
-    padding: var(--space-md);
-  }
+  left: 20%;
+  width: 55%;
 }
 
 .Header-Section {
@@ -869,7 +839,6 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 100%;
   height: 300px;
   min-height: 300px;
   overflow: hidden;
@@ -878,37 +847,14 @@ export default {
   box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
     -8px -8px 24px rgba(80, 80, 90, 0.05);
   margin-bottom: var(--space-lg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(45px);
   transition: all 0.3s ease;
 }
 
 .Header-Section:hover {
-  border: 1px solid var(--bright-white);
+  border: 1px solid var(--neon-pinkBoarders);
   box-shadow: 12px 12px 30px rgba(0, 0, 0, 0.4),
     -12px -12px 30px rgba(80, 80, 90, 0.08), 0 0 40px rgba(255, 255, 255, 0.2);
-}
-
-@media (min-width: 640px) {
-  .Header-Section {
-    height: 350px;
-    min-height: 350px;
-  }
-}
-
-@media (min-width: 768px) {
-  .Header-Section {
-    height: 400px;
-    min-height: 400px;
-    max-width: 90%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .Header-Section {
-    height: 450px;
-    min-height: 450px;
-    max-width: 1000px;
-  }
 }
 .headerInner {
   position: absolute;
@@ -927,7 +873,7 @@ export default {
   z-index: 20;
 }
 .headerText p {
-  font-size: var(--text-3xl);
+  font-size: var(--text-5xl);
   font-weight: 600;
   color: var(--bright-white);
   text-align: center;
@@ -936,71 +882,36 @@ export default {
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.3);
   letter-spacing: 2px;
 }
-
-@media (min-width: 640px) {
-  .headerText p {
-    font-size: var(--text-4xl);
-  }
-}
-
-@media (min-width: 768px) {
-  .headerText p {
-    font-size: var(--text-5xl);
-  }
-}
-
-@media (min-width: 1024px) {
-  .headerText p {
-    font-size: var(--text-6xl);
-  }
-}
 .headerButton-Group {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: auto;
+  height: 70px;
   min-height: 70px;
+  max-height: 70px;
   width: 70px;
+  max-width: 70px;
   padding: var(--space-sm);
   gap: var(--space-xs);
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  border-radius: 1rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.4),
-    -6px -6px 20px rgba(80, 80, 90, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  backdrop-filter: blur(45px);
   opacity: 1;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-decoration: none;
-}
-
-@media (min-width: 640px) {
-  .headerButton-Group {
-    min-height: 80px;
-    width: 80px;
-    padding: var(--space-md);
-  }
-}
-
-@media (min-width: 768px) {
-  .headerButton-Group {
-    min-height: 90px;
-    width: 90px;
-    padding: var(--space-md);
-  }
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-shrink: 0;
+  flex-grow: 0;
+  color: rgba(255, 255, 255, 0.7);
 }
 .headerButton-Group:hover {
-  border: 1px solid var(--bright-white);
-  transform: translateY(-4px);
-  box-shadow: 8px 8px 25px rgba(0, 0, 0, 0.5),
-    -8px -8px 25px rgba(80, 80, 90, 0.15), 0 0 25px rgba(255, 255, 255, 0.3);
+  background: var(--neon-pink2HeaderBtnBG);
+  border-color: var(--neon-pinkBoarders);
+  color: var(--bright-white);
 }
-
-.headerButton-Group:hover .button-icons {
-  filter: drop-shadow(0 0 8px var(--bright-white));
-}
-
 .headerButtons {
   position: absolute;
   display: flex;
@@ -1016,64 +927,27 @@ export default {
   padding: var(--space-sm);
   z-index: 20;
 }
-
-@media (min-width: 640px) {
-  .headerButtons {
-    gap: var(--space-md);
-    padding: var(--space-md);
-  }
-}
-
-@media (min-width: 768px) {
-  .headerButtons {
-    gap: var(--space-lg);
-    flex-wrap: nowrap;
-  }
-}
 .button-icons {
   font-size: var(--text-lg);
   transition: var(--transition-fast);
 }
 
-@media (min-width: 640px) {
-  .button-icons {
-    font-size: var(--text-xl);
-  }
-}
-
-@media (min-width: 768px) {
-  .button-icons {
-    font-size: var(--text-2xl);
-  }
-}
-
 .button-label {
-  color: var(--bright-white);
+  color: inherit;
   font-size: 0.65rem;
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
   margin-top: var(--space-xs);
   white-space: nowrap;
   text-transform: capitalize;
-  opacity: 0.7;
+  opacity: 0.9;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
+
 .headerButton-Group:hover .button-label {
   opacity: 1;
   color: var(--bright-white);
-}
-
-@media (min-width: 640px) {
-  .button-label {
-    font-size: 0.75rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .button-label {
-    font-size: 0.85rem;
-  }
 }
 .carousel {
   position: relative;
@@ -1162,55 +1036,68 @@ export default {
 .Explore-SocialFeed {
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
   height: auto;
-  width: 60%;
-  border-radius: 8px;
+  width: 100%;
   margin-top: 15px;
   opacity: 1;
+  border-radius: 20px;
+  padding: var(--space-lg);
 }
 /* Feed Preview Styles */
 .feed-preview-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 20px;
+  text-align: center;
+  align-self: center;
+  width: auto;
+  padding: 20px 80px;
   margin-bottom: 10px;
-  background: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
-  border-radius: 1.2rem;
-  border: 1px solid transparent;
-  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
-    -8px -8px 24px rgba(80, 80, 90, 0.05);
 }
 
 .feed-preview-header h2 {
   color: var(--bright-white);
   font-size: 1.5em;
-  margin: 0;
   font-weight: 600;
+  text-align: center;
+  text-wrap: none;
 }
 
 .view-all-link {
+  display: flex;
+  position: absolute;
+  right: 8%;
+  top: 225px;
   color: var(--bright-white);
   text-decoration: none;
-  font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 20px;
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
   font-size: 0.9em;
   white-space: nowrap;
   flex-shrink: 0;
+  margin: 10px;
+  background-color: none;
 }
 
 .view-all-link:hover {
-  border: 1px solid var(--bright-white);
-  color: var(--bright-white);
+  /* Base hover - will be overridden by color classes */
+  transition: all 0.2s ease;
+}
+
+.view-all-link.hover-pink:hover {
+  color: var(--neon-pink2);
+}
+
+.view-all-link.hover-blue:hover {
+  color: var(--electric-blue);
+}
+
+.view-all-link.hover-orange:hover {
+  color: var(--sunset-orange);
+}
+
+.view-all-link.hover-green:hover {
+  color: var(--mint-green);
 }
 
 .feed-preview {
@@ -1225,9 +1112,9 @@ export default {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  background-color: var(--glass-morphism-bg);
-  backdrop-filter: blur(2.2px);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(45px);
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -1240,7 +1127,7 @@ export default {
 }
 
 .error-state p {
-  color: var(--neon-pink);
+  color: var(--neon-pink2);
 }
 
 .loading-state p::after {
@@ -1263,37 +1150,16 @@ export default {
 }
 
 .RightSide-Content {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  background-color: var(--glass-morphism-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--bright-white);
-  opacity: 0.84;
-  backdrop-filter: blur(2.2px);
-  padding: var(--space-md);
   transition: var(--transition-normal);
   z-index: 15;
   width: 100%;
   min-height: 400px;
-}
-
-@media (min-width: 768px) {
-  .RightSide-Content {
-    display: flex;
-    width: 300px;
-    min-height: 500px;
-    height: auto;
-    max-height: none;
-  }
-}
-
-@media (min-width: 1024px) {
-  .RightSide-Content {
-    width: 350px;
-    min-height: 600px;
-  }
 }
 
 .Trending-Articles {
@@ -1310,13 +1176,6 @@ export default {
   border: var(--hover-border);
   box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
     -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
-}
-
-@media (min-width: 768px) {
-  .Trending-Articles {
-    height: 50%;
-    min-height: 250px;
-  }
 }
 .article {
   height: 100%;
@@ -1549,73 +1408,6 @@ export default {
   box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
 }
 
-/* Responsive adjustments for Reddit titles */
-@media (max-width: 768px) {
-  .reddit-title {
-    font-size: 1em;
-    -webkit-line-clamp: 3; /* Reduce to 3 lines on mobile */
-    max-height: calc(1.3em * 3);
-  }
-
-  .reddit-content {
-    max-height: 45%; /* Slightly less space on mobile */
-  }
-
-  .reddit-avatar {
-    width: 20px;
-    height: 20px;
-  }
-
-  .reddit-subreddit-icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .reddit-author {
-    font-size: 0.7em;
-  }
-}
-
-@media (max-width: 480px) {
-  .reddit-title {
-    font-size: 0.9em;
-    -webkit-line-clamp: 2; /* Only 2 lines on very small screens */
-    max-height: calc(1.3em * 2);
-  }
-
-  .reddit-content {
-    max-height: 40%; /* Even less space on very small screens */
-  }
-
-  .reddit-avatar {
-    width: 18px;
-    height: 18px;
-  }
-
-  .reddit-subreddit-icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .reddit-author {
-    font-size: 0.65em;
-  }
-
-  .reddit-header {
-    gap: 8px;
-  }
-
-  .reddit-subreddit-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .reddit-stats {
-    align-self: flex-end;
-  }
-}
-
 .tweet-content {
   color: var(--bright-white);
 }
@@ -1625,7 +1417,7 @@ export default {
   font-weight: 600;
   margin-bottom: 6px;
   color: var(--bright-white);
-  text-shadow: 0 0 4px var(--neon-pink), 0 0 8px rgba(255, 20, 147, 0.5);
+  text-shadow: 0 0 4px var(--neon-pink2), 0 0 8px rgba(255, 20, 147, 0.5);
   line-height: 1.3;
 }
 
@@ -1652,7 +1444,7 @@ export default {
 .tweet-time {
   color: var(--soft-lavender);
   font-size: 0.7em;
-  text-shadow: 0 0 4px var(--neon-pink), 0 0 8px rgba(255, 20, 147, 0.5);
+  text-shadow: 0 0 4px var(--neon-pink2), 0 0 8px rgba(255, 20, 147, 0.5);
 }
 
 .tweet-link {
@@ -1685,20 +1477,13 @@ export default {
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
   padding: var(--space-md);
-  backdrop-filter: blur(2.2px);
-  background-color: var(--glass-morphism-bg);
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
 }
 .Recent-Articles:hover {
-  border: 1px solid var(--bright-white);
-}
-
-@media (min-width: 768px) {
-  .Recent-Articles {
-    height: 50%;
-    min-height: 250px;
-  }
+  border: var(--hover-border);
+  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
+    -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
 }
 .recentArticle {
   height: 100%;
@@ -1886,7 +1671,7 @@ export default {
 }
 
 .carousel-dot.active {
-  background-color: var(--neon-pink);
+  background-color: var(--neon-pink2);
 }
 
 .carousel-dot:hover {
@@ -1894,11 +1679,14 @@ export default {
 }
 .Limit-Container {
   display: flex;
+  position: relative;
   flex-direction: column;
   /*Sets right side container scroll limit - Adjusted for 2400px offset*/
   min-height: 300vh;
   max-height: 300vh;
   background-color: transparent;
+  width: 20%;
+  right: 1.5%;
 }
 .Limit-InnerContainer {
   position: relative;
@@ -1913,83 +1701,6 @@ export default {
 }
 .flip-once:hover {
   transform: rotateY(180deg);
-}
-
-/* Mobile-first responsive design - additional mobile optimizations */
-@media (max-width: 640px) {
-  .Home-Content {
-    padding: var(--space-sm);
-    gap: var(--space-md);
-  }
-
-  .LeftSide-Content {
-    padding: var(--space-xs);
-    margin-left: 0;
-  }
-
-  .Header-Section {
-    height: 250px;
-    min-height: 250px;
-    margin-bottom: var(--space-md);
-  }
-
-  .headerText p {
-    font-size: var(--text-2xl);
-  }
-
-  .headerButtons {
-    gap: var(--space-xs);
-    padding: var(--space-xs);
-  }
-
-  .headerButton-Group {
-    min-height: 60px;
-    width: 60px;
-    padding: var(--space-xs);
-  }
-
-  .button-icons {
-    font-size: var(--text-base);
-  }
-
-  .button-label {
-    font-size: 0.6rem;
-  }
-
-  .carousel-btn {
-    padding: var(--space-sm);
-  }
-
-  .carousel-dots {
-    left: 50%;
-    transform: translateX(-50%);
-    gap: var(--space-xs);
-  }
-
-  .carousel-dot {
-    width: 6px;
-    height: 6px;
-  }
-}
-
-/* Countdown positioned above headerButtons */
-.countdown-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 25;
-  pointer-events: none;
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  border-radius: 1rem;
-  padding: 12px 20px;
-  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.4),
-    -6px -6px 20px rgba(80, 80, 90, 0.1);
-  backdrop-filter: blur(10px);
 }
 
 /* Article Details Modal Styles */
@@ -2237,7 +1948,7 @@ export default {
   background: linear-gradient(
     135deg,
     var(--vibrant-purple) 0%,
-    var(--neon-pink) 100%
+    var(--neon-pink2) 100%
   );
   color: var(--bright-white);
   text-decoration: none;
@@ -2256,13 +1967,171 @@ export default {
   box-shadow: 0 8px 25px rgba(128, 0, 128, 0.5);
   background: linear-gradient(
     135deg,
-    var(--neon-pink) 0%,
+    var(--neon-pink2) 0%,
     var(--vibrant-purple) 100%
   );
 }
 
-/* Responsive Modal */
+.modal-content-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.modal-content-wrapper::-webkit-scrollbar-thumb {
+  background: var(--vibrant-purple);
+  border-radius: 10px;
+}
+
+.modal-content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-pink2);
+}
+
+/* ============================================
+   RESPONSIVE MEDIA QUERIES
+   Ordered from smallest to largest screen size
+   ============================================ */
+
+/* Smallest screens - max-width: 480px */
+@media (max-width: 480px) {
+  .reddit-title {
+    font-size: 0.9em;
+    -webkit-line-clamp: 2; /* Only 2 lines on very small screens */
+    max-height: calc(1.3em * 2);
+  }
+
+  .reddit-content {
+    max-height: 40%; /* Even less space on very small screens */
+  }
+
+  .reddit-avatar {
+    width: 18px;
+    height: 18px;
+  }
+
+  .reddit-subreddit-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .reddit-author {
+    font-size: 0.65em;
+  }
+
+  .reddit-header {
+    gap: 8px;
+  }
+
+  .reddit-subreddit-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .reddit-stats {
+    align-self: flex-end;
+  }
+}
+
+/* Small screens - max-width: 640px */
+@media (max-width: 640px) {
+  .Home {
+    padding-top: 48px; /* Account for smaller top navigation bar */
+  }
+
+  .Home-Content {
+    padding-top: 64px;
+    min-height: calc(100vh - 64px);
+    padding: var(--space-sm);
+    gap: var(--space-md);
+    flex-direction: column;
+  }
+
+  .LeftSidebar {
+    display: none; /* Hide sidebar on small screens */
+  }
+
+  .Header-Section {
+    height: 250px;
+    min-height: 250px;
+    margin-bottom: var(--space-md);
+  }
+
+  .headerButtons {
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+  }
+
+  .headerButton-Group {
+    height: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    width: 60px;
+    max-width: 60px;
+    padding: var(--space-xs);
+  }
+
+  .button-icons {
+    font-size: var(--text-base);
+  }
+
+  .button-label {
+    font-size: 0.6rem;
+  }
+
+  .carousel-btn {
+    padding: var(--space-sm);
+  }
+
+  .carousel-dots {
+    left: 50%;
+    transform: translateX(-50%);
+    gap: var(--space-xs);
+  }
+
+  .carousel-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Medium screens - max-width: 768px */
 @media (max-width: 768px) {
+  .Home-Content {
+    flex-direction: column;
+  }
+
+  .LeftSidebar {
+    display: none; /* Hide sidebar on medium screens */
+  }
+
+  .reddit-title {
+    font-size: 1em;
+    -webkit-line-clamp: 3; /* Reduce to 3 lines on mobile */
+    max-height: calc(1.3em * 3);
+  }
+
+  .reddit-content {
+    max-height: 45%; /* Slightly less space on mobile */
+  }
+
+  .reddit-avatar {
+    width: 20px;
+    height: 20px;
+  }
+
+  .reddit-subreddit-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .reddit-author {
+    font-size: 0.7em;
+  }
+
   .modal-content-wrapper {
     width: 95%;
     max-height: 95vh;
@@ -2327,21 +2196,101 @@ export default {
   }
 }
 
-.modal-content-wrapper::-webkit-scrollbar {
-  width: 8px;
+/* Small tablets and up - min-width: 640px */
+@media (min-width: 640px) {
+  .Header-Section {
+    height: 350px;
+    min-height: 350px;
+  }
+
+  .headerButton-Group {
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+    width: 80px;
+    max-width: 80px;
+    padding: var(--space-md);
+  }
+
+  .headerButtons {
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .button-icons {
+    font-size: var(--text-xl);
+  }
+
+  .button-label {
+    font-size: 0.75rem;
+  }
 }
 
-.modal-content-wrapper::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+/* Tablets and up - min-width: 768px */
+@media (min-width: 768px) {
+  .Home-Content {
+    flex-direction: row;
+  }
+
+  .LeftSidebar {
+    display: flex; /* Show sidebar on tablets and up */
+  }
+
+  .Header-Section {
+    height: 400px;
+    min-height: 400px;
+    max-width: 100%;
+  }
+
+  .headerButton-Group {
+    height: 90px;
+    min-height: 90px;
+    max-height: 90px;
+    width: 90px;
+    max-width: 90px;
+    padding: var(--space-md);
+  }
+
+  .headerButtons {
+    gap: var(--space-lg);
+    flex-wrap: nowrap;
+  }
+
+  .button-icons {
+    font-size: var(--text-2xl);
+  }
+
+  .button-label {
+    font-size: 0.85rem;
+  }
+
+  .RightSide-Content {
+    display: flex;
+    min-height: 500px;
+    height: auto;
+    max-height: none;
+  }
+
+  .Trending-Articles {
+    height: 50%;
+    min-height: 250px;
+  }
+
+  .Recent-Articles {
+    height: 50%;
+    min-height: 250px;
+  }
 }
 
-.modal-content-wrapper::-webkit-scrollbar-thumb {
-  background: var(--vibrant-purple);
-  border-radius: 10px;
-}
+/* Desktop and up - min-width: 1024px */
+@media (min-width: 1024px) {
+  .Header-Section {
+    height: 450px;
+    min-height: 450px;
+  }
 
-.modal-content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-pink);
+  .RightSide-Content {
+    min-height: 600px;
+  }
 }
 </style>

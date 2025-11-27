@@ -202,7 +202,7 @@ export default {
   font-size: var(--text-lg);
   font-weight: 500;
   box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(40px);
 }
 
 /* Done Button - positioned directly below header */

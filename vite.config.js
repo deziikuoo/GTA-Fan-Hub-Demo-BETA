@@ -17,33 +17,6 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:3003",
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on("proxyReq", (proxyReq, req, res) => {
-            console.log(
-              `Proxying ${req.method} ${req.url} to ${options.target}${req.url}`
-            );
-          });
-          proxy.on("error", (err, req, res) => {
-            console.error(`Proxy error: ${err.message}`);
-          });
-        },
-      },
-      "/uploads": {
-        target: "http://localhost:3003",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-  build: {
-    rollupOptions: {
-      external: ["mock-aws-s3", "nock", "@mapbox/node-pre-gyp"],
-    },
   },
   resolve: {
     alias: {

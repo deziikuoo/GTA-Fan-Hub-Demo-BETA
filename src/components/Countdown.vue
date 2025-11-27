@@ -1,6 +1,6 @@
 <!-- GtaFanHub/src/components/Comps/Countdown.vue -->
 <script>
-import axios from "@/utils/axios";
+// Removed axios import - using hardcoded release date for demo
 
 export default {
   name: "Countdown",
@@ -48,86 +48,17 @@ export default {
     },
 
     async fetchCountdown() {
-      try {
-        // Get the user's time zone
-        const clientNow = new Date().getTime();
-        console.log(
-          "User's Current Time:",
-          new Date(clientNow).toLocaleString()
-        );
-        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        console.log("User's Time Zone:", userTimeZone);
+      // Use hardcoded release date for demo: November 19, 2026
+      const targetDate = new Date("2026-11-19T00:00:00Z");
+      
+      // Store target date
+      this.targetDate = targetDate;
+      this.serverStartTime = new Date(); // Use current time as server time
+      this.clientStartFetch = new Date().getTime();
+      this.loading = false;
 
-        // Fetch server time and target date
-        const [timeResponse, dateResponse] = await Promise.all([
-          axios.get(`http://localhost:3003/api/countdown/server-time`),
-          axios.get(`http://localhost:3003/api/countdown/target-date`, {
-            params: {
-              region: userTimeZone,
-              timestamp: clientNow, // Add a unique timestamp
-            },
-          }),
-        ]);
-
-        // Extract server time and target date
-        const serverTime = new Date(timeResponse.data.server_time);
-        const targetDate = new Date(dateResponse.data.target_date);
-
-        // Log the fetched times in a user-friendly format
-        console.log(
-          "Fetched Server Time:",
-          serverTime.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-            hour12: true,
-          })
-        );
-
-        console.log(
-          "Fetched Target Date:",
-          targetDate.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-            month: "numeric",
-            day: "numeric",
-            year: "numeric",
-            hour12: true,
-          })
-        );
-
-        // Check if targetDate is valid
-        if (isNaN(targetDate.getTime())) {
-          console.error("Invalid Target Date:", targetDate);
-          return; // Exit if invalid
-        }
-
-        // Check if the target date is in the future
-        if (targetDate <= serverTime) {
-          console.error("Target date must be in the future.");
-          this.loading = false;
-          return; // Exit if target date is invalid
-        }
-
-        // Store fetched data
-        this.targetDate = targetDate; // Store target date
-        this.serverStartTime = serverTime; // Store server's current time
-        this.clientStartFetch = this.clientNow; // Set client's start time to server start time
-        this.loading = false; // Stop loading indicator
-
-        // Start the countdown
-        this.startCountdown();
-      } catch (error) {
-        console.error("Error fetching countdown data:", error);
-
-        // Use fallback values if fetch fails
-        // this.targetDate = this.fallbackTargetDate;
-        this.loading = false;
-
-        // Start countdown with fallback values
-        this.startCountdown();
-      }
+      // Start the countdown
+      this.startCountdown();
     },
 
     startCountdown() {
@@ -172,20 +103,8 @@ export default {
     },
 
     async fetchReleaseTimes() {
-      try {
-        const response = await axios.get("/api/countdown/release-times", {
-          baseURL: "http://localhost:3003", // Explicitly set base URL
-        });
-        console.log("Full response:", response);
-        // Process response
-      } catch (error) {
-        console.error("Detailed error fetching release times:", {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status,
-          config: error.config,
-        });
-      }
+      // No API call needed for demo - release date is hardcoded
+      console.log("Release date: November 19, 2026");
     },
     getUserRegion(timeZone) {
       const timeZoneMap = {
@@ -243,7 +162,12 @@ export default {
 </script>
 
 <template>
-  <div :class="['countdown-container', { minimized: isMinimized }]">
+  <div
+    :class="[
+      'countdown-container main-backdrop-filter',
+      { minimized: isMinimized },
+    ]"
+  >
     <!--<h2 class="title">COUNTDOWN TIME</h2>-->
     <div v-if="loading">Loading...</div>
     <div v-else-if="expired">TIME EXPIRED</div>
@@ -272,21 +196,6 @@ export default {
 </template>
 
 <style>
-:root {
-  --deep-black: rgb(0, 0, 0); /* Deep Black */
-  --deep-black2: rgb(60, 60, 60);
-  --vibrant-purple: rgb(128, 0, 128); /* Vibrant Purple */
-  --soft-lavender: rgb(230, 230, 250); /* Soft Lavender */
-  --lavender: rgb(175, 175, 215); /* Soft Lavender */
-  --bright-white: rgb(255, 255, 255); /* Bright White */
-  --neon-pink: rgb(255, 20, 147); /* Neon Pink */
-  --neon-pink2: rgb(231, 22, 225); /* Neon Pink2 */
-  --electric-blue: rgb(0, 191, 255); /* Electric Blue */
-  --sunset-orange: rgb(255, 99, 71); /* Sunset Orange */
-  --mint-green: rgb(152, 255, 152); /* Mint Green */
-  --steel-gray: rgb(119, 136, 153); /* Steel Gray */
-  --coral-red: rgb(255, 64, 64); /* Coral Red */
-}
 body {
   font-family: "Montserrat";
   font-weight: 100;
@@ -303,20 +212,23 @@ body {
 .countdown-container {
   position: absolute;
   display: flex;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   flex-direction: column;
   align-items: center;
   width: 430px;
   height: 47px;
   z-index: 25;
-  border: 1px solid var(--bright-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  transition: all 0.5s ease; /* Add transition for smooth animation */
-  background-color: transparent;
-  opacity: 0.84;
-  backdrop-filter: blur(2.2px);
+  border: 1px solid var(--neon-pink2);
+  border-radius: 20px;
+  transition: all 0.2s ease;
   padding: var(--space-md);
+  opacity: 1;
+  justify-content: center;
+  pointer-events: none;
 }
+
 .title {
   font-family: "Montserrat";
   position: relative;
@@ -368,8 +280,8 @@ body {
   background: none;
   border: none;
   letter-spacing: 7px;
-  text-shadow: 0 0 5px black, 0 0 5px var(--bright-white),
-    0 0 12px var(--sunset-orange);
+  text-shadow: 0 0 2.5px black, 0 0 2.5px var(--bright-white),
+    0 0 12px var(--bright-white);
   margin-bottom: 0px;
 }
 .label {
@@ -379,8 +291,8 @@ body {
   font-weight: 500;
   letter-spacing: 3.5px;
   color: var(--bright-white);
-  text-shadow: 0 0 5px black, 0 0 5px var(--bright-white),
-    0 0 12px var(--sunset-orange);
+  text-shadow: 0 0 5px black, 0 0 2.5px var(--bright-white),
+    0 0 6px var(--bright-white);
 }
 
 /* countdown Minimized Rules*/
@@ -395,14 +307,13 @@ body {
   right: 10px;
   width: 120px;
   height: 35px;
-  border: 1px solid var(--bright-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  transition: all 0.5s ease;
-  background-color: transparent;
-  opacity: 0.84;
-  backdrop-filter: blur(2.2px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--mint-green);
+  border-radius: 20px;
+  backdrop-filter: blur(40px);
+  transition: all 0.2s ease;
   padding: var(--space-sm);
+  opacity: 1;
 }
 
 .minimized .title {

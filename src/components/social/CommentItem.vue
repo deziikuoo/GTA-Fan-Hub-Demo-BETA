@@ -573,18 +573,15 @@ export default {
   padding: 20px;
   border: 1px solid transparent;
   backdrop-filter: blur(10px);
-  box-shadow: 
-    8px 8px 24px rgba(0, 0, 0, 0.3),
+  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
     -8px -8px 24px rgba(80, 80, 90, 0.05);
   transition: all 0.3s ease;
 }
 
 .comment-main:hover {
   border: var(--hover-border);
-  box-shadow: 
-    10px 10px 30px rgba(0, 0, 0, 0.4),
-    -10px -10px 30px rgba(80, 80, 90, 0.08),
-    var(--neon-glow-hover);
+  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
+    -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
 }
 
 .comment-header {
@@ -596,6 +593,7 @@ export default {
 
 .author-avatar {
   flex-shrink: 0;
+  border: 2px solid var(--bright-white);
 }
 
 .avatar-img {
@@ -749,11 +747,11 @@ export default {
 }
 
 .action-btn.active {
-  color: var(--neon-pink);
+  color: var(--neon-pink2);
 }
 
 .action-btn.active:hover {
-  color: var(--neon-pink);
+  color: var(--neon-pink2);
 }
 
 .reply-input {
@@ -950,7 +948,7 @@ export default {
 }
 
 .save-btn:hover:not(:disabled) {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
 }
 
 .save-btn:disabled {

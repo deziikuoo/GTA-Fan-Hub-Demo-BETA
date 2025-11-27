@@ -1,6 +1,6 @@
 <template>
   <div class="settings-modal-overlay" @click="handleClose">
-    <div class="settings-modal-content" @click.stop>
+    <div class="settings-modal-content main-backdrop-filter" @click.stop>
       <div class="settings-header">
         <h2>Settings</h2>
         <button @click="handleClose" class="close-btn">
@@ -166,57 +166,118 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 2000;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-out;
   padding: var(--space-lg);
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .settings-modal-content {
-  background: var(--card-background);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 500px;
-  max-height: 80vh;
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+  position: relative;
   display: flex;
   flex-direction: column;
+}
+
+/* Custom Scrollbar */
+.settings-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-modal-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+}
+
+.settings-modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  transition: background 0.2s ease;
+}
+
+.settings-modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.settings-modal-overlay:focus {
+  outline: none;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .settings-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-lg);
-  border-bottom: 1px solid var(--border-color);
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .settings-header h2 {
-  font-size: var(--text-2xl);
-  font-weight: 700;
   color: var(--bright-white);
   margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  text-align: center;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  color: var(--steel-gray);
-  font-size: var(--text-xl);
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--bright-white);
+  font-size: var(--text-lg);
   cursor: pointer;
   padding: var(--space-sm);
-  border-radius: var(--radius-md);
-  transition: var(--transition-normal);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
 .close-btn:hover {
-  background: var(--steel-gray);
-  color: var(--bright-white);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--bright-white);
+  transform: rotate(90deg);
 }
 
 .settings-body {
@@ -230,10 +291,15 @@ export default {
 }
 
 .settings-section h3 {
+  color: var(--bright-white);
+  margin-bottom: var(--space-lg);
   font-size: var(--text-lg);
   font-weight: 600;
-  color: var(--bright-white);
-  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .settings-options {
@@ -245,22 +311,28 @@ export default {
 .logout-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
-  padding: 8px 20px;
-  background: var(--glass-morphism-bg);
-  color: var(--bright-white);
+  padding: var(--space-sm) var(--space-xl);
+  background: rgba(255, 64, 64, 0.2);
+  color: var(--coral-red);
   border: 1px solid var(--coral-red);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   font-size: var(--text-base);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  min-width: 140px;
 }
 
 .logout-btn:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: var(--coral-red);
+  color: var(--bright-white);
+  border-color: var(--bright-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 64, 64, 0.3);
 }
 
 .logout-btn:disabled {
@@ -274,8 +346,15 @@ export default {
   justify-content: space-between;
   padding: var(--space-md);
   background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.setting-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .setting-item label {
@@ -287,45 +366,57 @@ export default {
 .toggle-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-xs);
-  padding: 8px 20px;
-  background: var(--glass-morphism-bg);
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--bright-white);
-  border: 1px solid var(--sunset-orange);
-  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  min-width: 120px;
 }
 
 .toggle-btn:hover {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--mint-green);
+  color: var(--mint-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(152, 255, 152, 0.2);
 }
 
 .settings-footer {
   padding: var(--space-lg);
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: flex-end;
 }
 
 .cancel-btn {
-  padding: 8px 20px;
-  background: var(--glass-morphism-bg);
+  padding: var(--space-sm) var(--space-xl);
+  background: transparent;
   color: var(--bright-white);
-  border: 1px solid var(--sunset-orange);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cancel-btn:hover {
   border: 1px solid var(--bright-white);
+  transform: translateY(-2px);
+  color: var(--bright-white);
 }
 
 /* Responsive Design */

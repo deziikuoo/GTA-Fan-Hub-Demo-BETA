@@ -41,6 +41,7 @@ export default createStore({
   },
   getters: {
     isLoggedIn: (state) => !!state.user,
+    currentUser: (state) => state.user,
   },
   plugins: [
     createPersistedState({

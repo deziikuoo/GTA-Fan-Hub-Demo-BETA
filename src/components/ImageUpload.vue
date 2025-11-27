@@ -13,7 +13,7 @@
           class="preview-image"
         />
         <div v-else class="placeholder">
-          <font-awesome-icon :icon="icon" class="placeholder-icon" />
+          <font-awesome-icon :icon="typeof icon === 'string' ? ['fas', icon] : icon" class="placeholder-icon" />
           <span class="placeholder-text">{{ placeholderText }}</span>
         </div>
       </div>

@@ -192,41 +192,22 @@ Landlord by day, runner by night. Brian’s got hands in everything from coke sh
 </template>
 
 <style scoped>
-:root {
-  --deep-black: rgb(0, 0, 0);
-  --deep-black2: rgb(60, 60, 60);
-  --vibrant-purple: rgb(128, 0, 128);
-  --soft-lavender: rgb(230, 230, 250);
-  --lavender: rgb(175, 175, 215);
-  --bright-white: rgb(255, 255, 255);
-  --neon-pink: rgb(255, 20, 147);
-  --neon-pink2: rgb(231, 22, 225);
-  --electric-blue: rgb(0, 191, 255);
-  --sunset-orange: rgb(255, 99, 71);
-  --mint-green: rgb(152, 255, 152);
-  --steel-gray: rgb(119, 136, 153);
-  --coral-red: rgb(255, 64, 64);
-  --skyPurp: #454383;
-  --skyBlue: #547b98;
-  --skyPink: #c56aa8;
-  --skyOrange: #fbbd59;
-}
 @keyframes filterFade {
   0% {
     filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg)
-      drop-shadow(0 0 0 var(--skyOrange));
+      drop-shadow(0 0 0 var(--bright-white));
   }
   20% {
     filter: brightness(1.4) contrast(1.1) saturate(1.3) hue-rotate(5deg)
-      drop-shadow(0 0 5px var(--skyOrange));
+      drop-shadow(0 0 5px var(--bright-white));
   }
   40% {
     filter: brightness(1.4) contrast(1.1) saturate(1.3) hue-rotate(5deg)
-      drop-shadow(0 0 5px var(--skyOrange));
+      drop-shadow(0 0 5px var(--bright-white));
   }
   100% {
     filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg)
-      drop-shadow(0 0 0 var(--skyOrange));
+      drop-shadow(0 0 0 var(--bright-white));
   }
 }
 .character-container {
@@ -254,7 +235,7 @@ Landlord by day, runner by night. Brian’s got hands in everything from coke sh
 /* Ensure expanded character is not blurred and has the specified filter */
 .character-card.expanded {
   filter: brightness(1.4) contrast(1.1) saturate(1.3) hue-rotate(5deg)
-    drop-shadow(0 0 5px var(--skyOrange)) !important;
+    drop-shadow(0 0 5px var(--bright-white)) !important;
   animation: filterFade 10s ease-in-out;
   z-index: 30 !important; /* Above overlay and other characters */
 }
@@ -262,7 +243,7 @@ Landlord by day, runner by night. Brian’s got hands in everything from coke sh
 /* Remove filter from non-expanded or hovered states */
 .character-card:not(.expanded) img.hovered {
   filter: brightness(1.4) contrast(1.1) saturate(1.3) hue-rotate(5deg)
-    drop-shadow(0 0 5px var(--skyOrange)) !important;
+    drop-shadow(0 0 5px var(--bright-white)) !important;
 }
 .character-card.expanded img.hovered {
   filter: none;

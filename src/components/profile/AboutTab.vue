@@ -8,16 +8,6 @@
           Gaming Profile
         </h3>
         <div class="section-content">
-          <div v-if="user.gamingProfile?.playStyle" class="info-group">
-            <label>Play Style:</label>
-            <span class="info-value">{{ user.gamingProfile.playStyle }}</span>
-          </div>
-
-          <div v-if="user.gamingProfile?.skillLevel" class="info-group">
-            <label>Skill Level:</label>
-            <SkillBadge :level="user.gamingProfile.skillLevel" />
-          </div>
-
           <div
             v-if="user.gamingProfile?.preferredGameMode?.length"
             class="info-group"
@@ -89,13 +79,8 @@
 </template>
 
 <script>
-import SkillBadge from "@/components/SkillBadge.vue";
-
 export default {
   name: "AboutTab",
-  components: {
-    SkillBadge,
-  },
   props: {
     user: {
       type: Object,

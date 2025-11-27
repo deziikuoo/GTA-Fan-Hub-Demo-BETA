@@ -344,8 +344,7 @@ export default {
   border: 1px solid transparent;
   border-radius: 1.2rem;
   backdrop-filter: blur(20px);
-  box-shadow: 
-    8px 8px 24px rgba(0, 0, 0, 0.3),
+  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
     -8px -8px 24px rgba(80, 80, 90, 0.05);
   width: 100%;
   max-width: 800px;
@@ -421,7 +420,7 @@ export default {
 }
 
 .login-link:hover {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
   transform: translateY(-2px);
 }
 
@@ -506,7 +505,7 @@ export default {
 }
 
 .retry-btn:hover {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
   transform: translateY(-2px);
 }
 

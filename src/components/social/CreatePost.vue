@@ -1,13 +1,6 @@
 <template>
-  <div class="create-post">
+  <div class="create-post main-backdrop-filter">
     <div class="post-composer">
-      <!-- Author Avatar -->
-      <img
-        :src="currentUser?.profilePicture || '/src/assets/images/user.png'"
-        :alt="currentUser?.username"
-        class="composer-avatar"
-      />
-
       <!-- Text Area -->
       <div class="composer-input-container">
         <textarea
@@ -45,7 +38,7 @@
               @click="removeMedia(index)"
               title="Remove"
             >
-              <font-awesome-icon icon="times" />
+              <font-awesome-icon :icon="['fas', 'times']" />
             </button>
           </div>
         </div>
@@ -60,7 +53,7 @@
               :disabled="mediaFiles.length >= 4"
               title="Add photos or videos"
             >
-              <font-awesome-icon icon="image" />
+              <font-awesome-icon :icon="['fas', 'image']" />
             </button>
 
             <!-- Privacy Selector -->
@@ -131,14 +124,14 @@
             @click="previousLightboxMedia"
             class="lightbox-nav-btn lightbox-prev"
           >
-            <font-awesome-icon icon="chevron-left" />
+            <font-awesome-icon :icon="['fas', 'chevron-left']" />
           </button>
           <button
             v-if="lightboxIndex < mediaFiles.length - 1"
             @click="nextLightboxMedia"
             class="lightbox-nav-btn lightbox-next"
           >
-            <font-awesome-icon icon="chevron-right" />
+            <font-awesome-icon :icon="['fas', 'chevron-right']" />
           </button>
         </div>
 
@@ -157,7 +150,7 @@ import axios from "@/utils/axios";
 
 export default {
   name: "CreatePost",
-  emits: ["posted"],
+  emits: ["posted", "close"],
   setup(props, { emit }) {
     const store = useStore();
     const textarea = ref(null);
@@ -346,36 +339,22 @@ export default {
 
 <style scoped>
 .create-post {
-  background: var(--glass-morphism-bg);
-  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
   padding: 20px 20px;
   margin-bottom: var(--space-lg);
-  border: 1px solid transparent;
-  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.3),
-    -8px -8px 24px rgba(80, 80, 90, 0.05);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: auto;
+  align-self: center;
 }
 
 .create-post:hover {
-  transform: translateY(-2px);
-  border: var(--hover-border);
-  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
-    -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .post-composer {
   display: flex;
-  gap: 12px;
   width: 400px;
-}
-
-.composer-avatar {
-  width: 36px;
-  height: 36px;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
 }
 
 .composer-input-container {
@@ -383,38 +362,44 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.composer-input-container:focus-within {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .composer-textarea {
   width: 100%;
   min-height: 48px;
   max-height: 300px;
-  background: rgba(40, 40, 45, 0.8);
+  background: transparent;
   border: none;
   outline: none;
   color: var(--bright-white);
-  font-size: 15px;
+  font-size: var(--text-base);
   font-family: inherit;
   resize: none;
   overflow-y: auto;
   line-height: 20px;
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 12px 12px 30px rgba(0, 0, 0, 0.4),
-    -12px -12px 30px rgba(80, 80, 90, 0.1);
-  transition: all 0.3s ease;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .composer-textarea:focus {
   outline: none;
-  background: rgba(40, 40, 45, 0.9);
-  box-shadow: inset 12px 12px 30px rgba(0, 0, 0, 0.5),
-    inset -12px -12px 30px rgba(80, 80, 90, 0.2);
-  transition: all 0.3s ease;
 }
 
 .composer-textarea::placeholder {
-  color: var(--steel-gray);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .media-preview-grid {
@@ -487,18 +472,20 @@ export default {
   height: 34px;
   background: none;
   border: none;
-  color: var(--bright-white);
+  color: var(--mid-white2);
   cursor: pointer;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
   font-size: 18px;
+  transition: all 0.2s ease;
 }
 
 .action-btn:hover:not(:disabled) {
-  color: var(--sunset-orange);
+  background: none;
+  border-color: var(--mint-green);
+  color: var(--mint-green);
+  opacity: 0.8;
 }
 
 .action-btn:disabled {
@@ -508,20 +495,32 @@ export default {
 
 .privacy-btn {
   width: auto;
-  padding: 0 var(--space-md);
-  border-radius: var(--radius-full);
+  padding: 6px var(--space-md);
   gap: var(--space-xs);
+  transition: all 0.2s ease;
+  color: var(--mint-green);
+}
+
+.privacy-btn svg {
+  color: var(--mid-white2);
 }
 
 .privacy-label {
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--bright-white);
-  transition: all 0.3s ease;
+  color: var(--mid-white2);
+  transition: color 0.2s ease;
 }
 
-.privacy-btn:hover:not(:disabled) .privacy-label {
-  color: var(--sunset-orange);
+.privacy-btn:hover:not(:disabled) {
+  background: none;
+  border-color: var(--mint-green);
+}
+
+.privacy-btn:hover:not(:disabled) .privacy-label,
+.privacy-btn:hover:not(:disabled) svg {
+  color: var(--mint-green);
+  opacity: 0.8;
 }
 
 .composer-meta {
@@ -546,21 +545,21 @@ export default {
 
 .post-btn {
   padding: 6px 16px;
-  background: var(--glass-morphism-bg);
-  color: var(--bright-white);
-  border: 1px solid var(--sunset-orange);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--mid-white2);
+  border: 1px solid var(--mid-white2);
   border-radius: var(--radius-full);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
   white-space: nowrap;
   flex-shrink: 0;
   min-width: fit-content;
 }
 
 .post-btn:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: var(--mid-white2Hover);
+  border-color: var(--bright-white);
   color: var(--bright-white);
 }
 
@@ -575,27 +574,20 @@ export default {
     border-radius: 1rem;
   }
 
-  .composer-avatar {
-    width: 36px;
-    height: 36px;
-  }
-
   .privacy-label {
     display: none;
   }
 
   .composer-textarea {
-    font-size: 15px;
+    font-size: var(--text-base);
     min-height: 44px;
-    padding: 0.8rem;
-    border-radius: 0.8rem;
-    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.4),
-      -8px -8px 20px rgba(80, 80, 90, 0.08);
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .composer-textarea:focus {
-    box-shadow: inset 8px 8px 20px rgba(0, 0, 0, 0.5),
-      inset -8px -8px 20px rgba(80, 80, 90, 0.15);
+    outline: none;
   }
 }
 

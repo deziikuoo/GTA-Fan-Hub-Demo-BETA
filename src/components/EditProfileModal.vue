@@ -1,6 +1,10 @@
 <template>
   <div class="modal-overlay" @click="handleClose">
-    <div v-if="!showHeaderEditor" class="modal-content" @click.stop>
+    <div
+      v-if="!showHeaderEditor"
+      class="modal-content main-backdrop-filter"
+      @click.stop
+    >
       <div class="modal-header">
         <h2>Edit Profile</h2>
         <button @click="handleClose" class="close-btn">
@@ -112,32 +116,6 @@
           </div>
         </div>
 
-        <!-- Gaming Profile -->
-        <div class="form-section">
-          <h3>Gaming Profile</h3>
-
-          <div class="form-group">
-            <label for="playStyle">Play Style</label>
-            <select id="playStyle" v-model="formData.playStyle">
-              <option value="">Select your play style</option>
-              <option value="casual">Casual</option>
-              <option value="competitive">Competitive</option>
-              <option value="roleplay">Roleplay</option>
-              <option value="explorer">Explorer</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="skillLevel">Skill Level</label>
-            <select id="skillLevel" v-model="formData.skillLevel">
-              <option value="">Select your skill level</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-              <option value="expert">Expert</option>
-            </select>
-          </div>
-        </div>
 
         <div class="form-actions">
           <button type="button" @click="handleClose" class="btn btn-secondary">
@@ -208,8 +186,6 @@ export default {
       headerImagePositionX: 50,
       headerImagePositionY: 50,
       profilePicture: null,
-      playStyle: "",
-      skillLevel: "",
     });
 
     // Drag state
@@ -242,8 +218,6 @@ export default {
       formData.headerImagePositionY = y;
 
       formData.profilePicture = props.user.profile?.profilePicture || null;
-      formData.playStyle = props.user.gamingProfile?.playStyle || "";
-      formData.skillLevel = props.user.gamingProfile?.skillLevel || "";
     };
 
     const handleSave = async () => {
@@ -259,8 +233,6 @@ export default {
           "profile.headerImagePosition",
           `${formData.headerImagePositionX}% ${formData.headerImagePositionY}%`
         );
-        formDataToSend.append("gamingProfile.playStyle", formData.playStyle);
-        formDataToSend.append("gamingProfile.skillLevel", formData.skillLevel);
 
         // Add header image if it's a new file
         if (formData.headerImage instanceof File) {
@@ -454,53 +426,116 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-out;
   padding: var(--space-md);
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .modal-content {
-  background: var(--card-background);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+}
+
+/* Custom Scrollbar */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  transition: background 0.2s ease;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-overlay:focus {
+  outline: none;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-lg);
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .modal-header h2 {
   color: var(--bright-white);
   margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  text-align: center;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  color: var(--steel-gray);
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--bright-white);
   font-size: var(--text-lg);
   cursor: pointer;
-  padding: var(--space-xs);
-  border-radius: var(--radius-sm);
-  transition: var(--transition-normal);
+  padding: var(--space-sm);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--bright-white);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--bright-white);
+  transform: rotate(90deg);
 }
 
 .edit-form {
@@ -515,6 +550,12 @@ export default {
   color: var(--bright-white);
   margin-bottom: var(--space-lg);
   font-size: var(--text-lg);
+  font-weight: 600;
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .form-group {
@@ -534,19 +575,26 @@ export default {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
   color: var(--bright-white);
   font-size: var(--text-base);
-  transition: var(--transition-normal);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--skyOrange);
-  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--mint-green);
+  box-shadow: 0 0 0 3px rgba(152, 255, 152, 0.15);
 }
 
 .form-group textarea {
@@ -587,12 +635,12 @@ export default {
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-lg);
-  background: var(--steel-gray);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--bright-white);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: all 0.2s ease;
   font-size: var(--text-sm);
   font-weight: 500;
   min-width: 140px;
@@ -600,8 +648,11 @@ export default {
 }
 
 .change-header-btn:hover {
-  background: #8a9ba8;
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--electric-blue);
+  color: var(--electric-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 191, 255, 0.2);
 }
 
 .edit-header-btn {
@@ -609,12 +660,16 @@ export default {
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-lg);
-  background: var(--skyOrange);
+  background: linear-gradient(
+    135deg,
+    var(--skyOrange) 0%,
+    var(--sunset-orange) 100%
+  );
   color: var(--bright-white);
-  border: none;
+  border: 1px solid var(--sunset-orange);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: all 0.2s ease;
   font-size: var(--text-sm);
   font-weight: 500;
   min-width: 160px;
@@ -622,8 +677,14 @@ export default {
 }
 
 .edit-header-btn:hover {
-  background: #e55a2b;
-  transform: translateY(-1px);
+  background: linear-gradient(
+    135deg,
+    var(--sunset-orange) 0%,
+    var(--skyOrange) 100%
+  );
+  border-color: var(--bright-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 189, 89, 0.3);
 }
 
 .delete-header-btn {
@@ -631,12 +692,12 @@ export default {
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-lg);
-  background: var(--coral-red);
-  color: var(--bright-white);
-  border: none;
+  background: rgba(255, 64, 64, 0.2);
+  color: var(--coral-red);
+  border: 1px solid var(--coral-red);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: all 0.2s ease;
   font-size: var(--text-sm);
   font-weight: 500;
   min-width: 120px;
@@ -644,8 +705,11 @@ export default {
 }
 
 .delete-header-btn:hover {
-  background: #d63031;
-  transform: translateY(-1px);
+  background: var(--coral-red);
+  color: var(--bright-white);
+  border-color: var(--bright-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 64, 64, 0.3);
 }
 
 .checkbox-group {
@@ -737,17 +801,20 @@ export default {
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  background: var(--steel-gray);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--bright-white);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: all 0.2s ease;
   font-size: var(--text-sm);
 }
 
 .reset-btn:hover {
-  background: #8a9ba8;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--mint-green);
+  color: var(--mint-green);
+  transform: translateY(-2px);
 }
 
 .position-display {
@@ -765,29 +832,55 @@ export default {
 }
 
 .btn {
-  padding: 8px 20px;
-  background: var(--glass-morphism-bg);
-  border: 1px solid var(--sunset-orange);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
+  padding: var(--space-sm) var(--space-xl);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--bright-white);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-xs);
   white-space: nowrap;
   flex-shrink: 0;
+  min-width: 120px;
 }
 
 .btn:hover:not(:disabled) {
-  border: 1px solid var(--bright-white);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--mint-green);
+  color: var(--mint-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(152, 255, 152, 0.2);
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn[type="submit"] {
+  background: linear-gradient(
+    135deg,
+    var(--skyOrange) 0%,
+    var(--sunset-orange) 100%
+  );
+  border-color: var(--sunset-orange);
+}
+
+.btn[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    var(--sunset-orange) 0%,
+    var(--skyOrange) 100%
+  );
+  border-color: var(--bright-white);
+  color: var(--bright-white);
+  box-shadow: 0 4px 12px rgba(251, 189, 89, 0.3);
 }
 
 /* Responsive Design */

@@ -200,6 +200,7 @@ export default {
 
 .user-avatar {
   flex-shrink: 0;
+  border: 2px solid var(--bright-white);
 }
 
 .avatar-img {
@@ -231,8 +232,7 @@ export default {
   line-height: 1.5;
   resize: none;
   overflow-y: auto;
-  box-shadow: 
-    12px 12px 30px rgba(0, 0, 0, 0.4),
+  box-shadow: 12px 12px 30px rgba(0, 0, 0, 0.4),
     -12px -12px 30px rgba(80, 80, 90, 0.1);
   transition: all 0.3s ease;
 }
@@ -240,8 +240,7 @@ export default {
 .comment-textarea:focus {
   outline: none;
   background: rgba(40, 40, 45, 0.9);
-  box-shadow: 
-    inset 12px 12px 30px rgba(0, 0, 0, 0.5),
+  box-shadow: inset 12px 12px 30px rgba(0, 0, 0, 0.5),
     inset -12px -12px 30px rgba(80, 80, 90, 0.2);
 }
 

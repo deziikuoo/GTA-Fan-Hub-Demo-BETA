@@ -1,8 +1,8 @@
 <template>
-  <div ref="postCardRef" class="post-card">
+  <div ref="postCardRef" class="post-card main-backdrop-filter">
     <!-- Repost Header (if this is a repost) -->
     <div v-if="post.type === 'repost'" class="repost-header">
-      <font-awesome-icon icon="retweet" />
+      <font-awesome-icon :icon="['fas', 'retweet']" />
       <span
         >{{
           post.author.profile?.displayName || post.author.username
@@ -38,7 +38,7 @@
             </span>
             <font-awesome-icon
               v-if="actualPost.author.profile?.verified"
-              icon="check-circle"
+              :icon="['fas', 'check-circle']"
               class="verified-badge"
             />
           </div>
@@ -48,7 +48,7 @@
 
         <!-- More Options -->
         <div class="post-options" @click="toggleOptions">
-          <font-awesome-icon icon="ellipsis-h" />
+          <font-awesome-icon :icon="['fas', 'ellipsis-h']" />
 
           <div v-if="showOptions" class="options-menu" @click.stop>
             <button
@@ -56,22 +56,22 @@
               @click="handleEdit"
               :disabled="!actualPost.isEditable"
             >
-              <font-awesome-icon icon="edit" /> Edit
+              <font-awesome-icon :icon="['fas', 'edit']" /> Edit
             </button>
             <button v-if="isOwnPost" @click="handleDelete">
-              <font-awesome-icon icon="trash" /> Delete
+              <font-awesome-icon :icon="['fas', 'trash']" /> Delete
             </button>
             <button v-if="!isOwnPost" @click="handleReport">
-              <font-awesome-icon icon="flag" /> Report
+              <font-awesome-icon :icon="['fas', 'flag']" /> Report
             </button>
             <button v-if="!isOwnPost" @click="handleBlock">
-              <font-awesome-icon icon="ban" /> Block User
+              <font-awesome-icon :icon="['fas', 'ban']" /> Block User
             </button>
             <button @click="handleHide">
-              <font-awesome-icon icon="eye-slash" /> Hide
+              <font-awesome-icon :icon="['fas', 'eye-slash']" /> Hide
             </button>
             <button @click="handleCopyLink">
-              <font-awesome-icon icon="link" /> Copy Link
+              <font-awesome-icon :icon="['fas', 'link']" /> Copy Link
             </button>
           </div>
         </div>
@@ -119,30 +119,58 @@
           @click.stop="handleLike"
           :disabled="liking"
         >
-          <font-awesome-icon :icon="isLiked ? 'heart' : ['far', 'heart']" />
-          <span>{{ formatCount(actualPost.engagement.likes) }}</span>
+          <font-awesome-icon :icon="isLiked ? ['fas', 'heart'] : ['far', 'heart']" />
+          <span>{{ formatCount(engagementCounts.likes) }}</span>
         </button>
 
         <!-- Comments -->
-        <button class="engagement-btn" @click.stop="handleComment">
-          <font-awesome-icon :icon="['far', 'comment']" />
+        <button
+          class="engagement-btn"
+          :class="{ active: hasCommented }"
+          @click.stop="handleComment"
+        >
+          <font-awesome-icon
+            :icon="hasCommented ? ['fas', 'comment'] : ['far', 'comment']"
+          />
           <span>{{ formatCount(actualPost.engagement.comments) }}</span>
         </button>
 
         <!-- Repost -->
-        <button
-          class="engagement-btn"
-          :class="{ active: isReposted }"
-          @click.stop="handleRepost"
-          :disabled="reposting"
-        >
-          <font-awesome-icon icon="retweet" />
-          <span>{{
-            formatCount(
-              actualPost.engagement.reposts + actualPost.engagement.quotes
-            )
-          }}</span>
-        </button>
+        <div class="repost-container" ref="repostContainerRef">
+          <button
+            class="engagement-btn"
+            :class="{ active: isReposted }"
+            @click.stop="toggleRepostMenu"
+            :disabled="reposting"
+          >
+            <font-awesome-icon :icon="isReposted ? ['fas', 'check'] : ['fas', 'retweet']" />
+            <span>{{
+              formatCount(
+                engagementCounts.reposts + (actualPost.engagement.quotes || 0)
+              )
+            }}</span>
+          </button>
+
+          <!-- Repost Menu Tooltip -->
+          <div v-if="showRepostMenu" class="repost-menu" @click.stop>
+            <button
+              v-if="!isReposted"
+              class="repost-menu-item"
+              @click="handleSimpleRepost"
+            >
+              <font-awesome-icon :icon="['fas', 'retweet']" />
+              <span>Repost</span>
+            </button>
+            <button v-else class="repost-menu-item" @click="handleSimpleRepost">
+              <font-awesome-icon :icon="['fas', 'check']" />
+              <span>Undo repost</span>
+            </button>
+            <button class="repost-menu-item" @click="handleQuoteRepost">
+              <font-awesome-icon :icon="['fas', 'comment']" />
+              <span>Quote</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Bookmark -->
         <button
@@ -152,13 +180,13 @@
           :disabled="bookmarking"
         >
           <font-awesome-icon
-            :icon="isBookmarked ? 'bookmark' : ['far', 'bookmark']"
+            :icon="isBookmarked ? ['fas', 'bookmark'] : ['far', 'bookmark']"
           />
         </button>
 
         <!-- Views -->
         <span class="views-count">
-          <font-awesome-icon icon="eye" />
+          <font-awesome-icon :icon="['fas', 'eye']" />
           {{ formatCount(actualPost.engagement.views) }}
         </span>
       </div>
@@ -174,7 +202,7 @@
         <div class="edit-modal-header">
           <h3>Edit Post</h3>
           <button class="edit-modal-close" @click="closeEditModal">
-            <font-awesome-icon icon="times" />
+            <font-awesome-icon :icon="['fas', 'times']" />
           </button>
         </div>
 
@@ -221,11 +249,90 @@
       @comment-added="handleCommentAdded"
       @comment-deleted="handleCommentDeleted"
     />
+
+    <!-- Quote Post Modal -->
+    <div
+      v-if="showQuoteModal"
+      class="quote-modal-overlay"
+      @click="closeQuoteModal"
+    >
+      <div class="quote-modal-content" @click.stop>
+        <div class="quote-modal-header">
+          <h3>Quote Post</h3>
+          <button class="quote-modal-close" @click="closeQuoteModal">
+            <font-awesome-icon :icon="['fas', 'times']" />
+          </button>
+        </div>
+
+        <div class="quote-modal-body">
+          <!-- Your Quote Text -->
+          <textarea
+            v-model="quoteText"
+            class="quote-textarea"
+            placeholder="Add a comment..."
+            maxlength="5000"
+            ref="quoteTextarea"
+          ></textarea>
+
+          <div
+            class="quote-character-count"
+            :class="{
+              warning: quoteText.length >= 4500,
+              error: quoteText.length >= 5000,
+            }"
+          >
+            {{ quoteText.length }} / 5000
+          </div>
+
+          <!-- Original Post Preview -->
+          <div class="quoted-post-preview">
+            <div class="quoted-post-header">
+              <img
+                :src="
+                  actualPost.author.profile?.profilePicture ||
+                  '/src/assets/images/user.png'
+                "
+                class="quoted-avatar-small"
+              />
+              <div class="quoted-author-info">
+                <span class="quoted-author-name">{{
+                  actualPost.author.profile?.displayName ||
+                  actualPost.author.username
+                }}</span>
+                <span class="quoted-author-username"
+                  >@{{ actualPost.author.username }}</span
+                >
+              </div>
+            </div>
+            <p class="quoted-post-text">{{ actualPost.content?.text }}</p>
+            <MediaGrid
+              v-if="actualPost.media && actualPost.media.length > 0"
+              :media="actualPost.media"
+              @click.stop
+            />
+          </div>
+        </div>
+
+        <div class="quote-modal-footer">
+          <button class="quote-cancel-btn" @click="closeQuoteModal">
+            Cancel
+          </button>
+          <button
+            class="quote-post-btn"
+            @click="submitQuotePost"
+            :disabled="!quoteText.trim() || quoteText.length > 5000 || quoting"
+          >
+            <span v-if="quoting">Posting...</span>
+            <span v-else>Quote Post</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import axios from "@/utils/axios";
@@ -245,7 +352,7 @@ export default {
       required: true,
     },
   },
-  emits: ["deleted", "edited"],
+  emits: ["deleted", "edited", "quoted"],
   setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
@@ -262,10 +369,37 @@ export default {
     const editTextarea = ref(null);
     const showCommentModal = ref(false);
 
-    // Local engagement state
+    // Repost menu state
+    const showRepostMenu = ref(false);
+    const repostContainerRef = ref(null);
+
+    // Quote modal state
+    const showQuoteModal = ref(false);
+    const quoteText = ref("");
+    const quoting = ref(false);
+    const quoteTextarea = ref(null);
+
+    // Local engagement state - initialized from props to persist across reloads
     const isLiked = ref(props.post.userEngagement?.isLiked || false);
     const isBookmarked = ref(props.post.userEngagement?.isBookmarked || false);
-    const isReposted = ref(false); // TODO: Track repost status
+    const isReposted = ref(props.post.userEngagement?.isReposted || false);
+    const hasCommented = ref(props.post.userEngagement?.hasCommented || false);
+
+    // Local engagement counts for instant updates
+    const engagementCounts = ref({
+      likes:
+        props.post.type === "repost" && props.post.originalPost
+          ? props.post.originalPost.engagement?.likes || 0
+          : props.post.engagement?.likes || 0,
+      reposts:
+        props.post.type === "repost" && props.post.originalPost
+          ? props.post.originalPost.engagement?.reposts || 0
+          : props.post.engagement?.reposts || 0,
+      bookmarks:
+        props.post.type === "repost" && props.post.originalPost
+          ? props.post.originalPost.engagement?.bookmarks || 0
+          : props.post.engagement?.bookmarks || 0,
+    });
 
     const currentUser = computed(() => store.state.user);
     const isOwnPost = computed(
@@ -384,8 +518,22 @@ export default {
           `/api/posts/${actualPost.value._id}/like`
         );
 
+        // Update state immediately
         isLiked.value = response.data.liked;
-        actualPost.value.engagement.likes = response.data.likesCount;
+
+        // Update local engagement count for instant UI update
+        engagementCounts.value.likes = response.data.postLikes;
+
+        // Also update the post object for consistency
+        if (props.post.type === "repost" && props.post.originalPost) {
+          if (props.post.originalPost.engagement) {
+            props.post.originalPost.engagement.likes = response.data.postLikes;
+          }
+        } else {
+          if (props.post.engagement) {
+            props.post.engagement.likes = response.data.postLikes;
+          }
+        }
       } catch (error) {
         console.error("Error liking post:", error);
       } finally {
@@ -398,7 +546,32 @@ export default {
       showCommentModal.value = true;
     };
 
-    const handleRepost = async () => {
+    const toggleRepostMenu = () => {
+      showRepostMenu.value = !showRepostMenu.value;
+      if (showRepostMenu.value) {
+        // Add click outside listener
+        nextTick(() => {
+          document.addEventListener("click", handleRepostMenuClickOutside);
+        });
+      }
+    };
+
+    const closeRepostMenu = () => {
+      showRepostMenu.value = false;
+      document.removeEventListener("click", handleRepostMenuClickOutside);
+    };
+
+    const handleRepostMenuClickOutside = (event) => {
+      if (
+        repostContainerRef.value &&
+        !repostContainerRef.value.contains(event.target)
+      ) {
+        closeRepostMenu();
+      }
+    };
+
+    const handleSimpleRepost = async () => {
+      closeRepostMenu();
       if (reposting.value) return;
 
       try {
@@ -407,17 +580,114 @@ export default {
           `/api/posts/${actualPost.value._id}/repost`
         );
 
+        // Update state immediately
         isReposted.value = response.data.reposted;
-        // Update engagement count
+
+        // Update local engagement count for instant UI update
         if (response.data.reposted) {
-          actualPost.value.engagement.reposts++;
+          engagementCounts.value.reposts++;
         } else {
-          actualPost.value.engagement.reposts--;
+          engagementCounts.value.reposts = Math.max(
+            0,
+            engagementCounts.value.reposts - 1
+          );
+        }
+
+        // Also update the post object for consistency
+        if (props.post.type === "repost" && props.post.originalPost) {
+          if (props.post.originalPost.engagement) {
+            if (response.data.reposted) {
+              props.post.originalPost.engagement.reposts++;
+            } else {
+              props.post.originalPost.engagement.reposts = Math.max(
+                0,
+                props.post.originalPost.engagement.reposts - 1
+              );
+            }
+          }
+        } else {
+          if (props.post.engagement) {
+            if (response.data.reposted) {
+              props.post.engagement.reposts++;
+            } else {
+              props.post.engagement.reposts = Math.max(
+                0,
+                props.post.engagement.reposts - 1
+              );
+            }
+          }
         }
       } catch (error) {
         console.error("Error reposting:", error);
       } finally {
         reposting.value = false;
+      }
+    };
+
+    const handleQuoteRepost = () => {
+      closeRepostMenu();
+      quoteText.value = "";
+      showQuoteModal.value = true;
+      document.body.style.overflow = "hidden";
+
+      // Add keyboard event listener for Escape key
+      document.addEventListener("keydown", handleQuoteModalKeydown);
+
+      // Focus textarea after modal opens
+      nextTick(() => {
+        if (quoteTextarea.value) {
+          quoteTextarea.value.focus();
+        }
+      });
+    };
+
+    const handleQuoteModalKeydown = (event) => {
+      // Close modal on Escape key
+      if (event.key === "Escape") {
+        closeQuoteModal();
+      }
+    };
+
+    const closeQuoteModal = () => {
+      showQuoteModal.value = false;
+      quoteText.value = "";
+      document.body.style.overflow = "auto";
+      document.removeEventListener("keydown", handleQuoteModalKeydown);
+    };
+
+    const submitQuotePost = async () => {
+      if (!quoteText.value.trim() || quoteText.value.length > 5000) return;
+
+      try {
+        quoting.value = true;
+        const response = await axios.post(
+          `/api/posts/${actualPost.value._id}/quote`,
+          {
+            text: quoteText.value.trim(),
+          }
+        );
+
+        // Update engagement counts
+        if (props.post.type === "repost" && props.post.originalPost) {
+          if (props.post.originalPost.engagement) {
+            props.post.originalPost.engagement.quotes =
+              (props.post.originalPost.engagement.quotes || 0) + 1;
+          }
+        } else {
+          if (props.post.engagement) {
+            props.post.engagement.quotes =
+              (props.post.engagement.quotes || 0) + 1;
+          }
+        }
+
+        closeQuoteModal();
+        // Optionally emit event to refresh feed
+        emit("quoted", response.data.post);
+      } catch (error) {
+        console.error("Error creating quote post:", error);
+        alert(error.response?.data?.error || "Failed to create quote post");
+      } finally {
+        quoting.value = false;
       }
     };
 
@@ -430,7 +700,26 @@ export default {
           `/api/posts/${actualPost.value._id}/bookmark`
         );
 
+        // Update state immediately
         isBookmarked.value = response.data.bookmarked;
+
+        // Update bookmark count if provided
+        if (response.data.bookmarksCount !== undefined) {
+          // Update local engagement count for instant UI update
+          engagementCounts.value.bookmarks = response.data.bookmarksCount;
+
+          // Also update the post object for consistency
+          if (props.post.type === "repost" && props.post.originalPost) {
+            if (props.post.originalPost.engagement) {
+              props.post.originalPost.engagement.bookmarks =
+                response.data.bookmarksCount;
+            }
+          } else {
+            if (props.post.engagement) {
+              props.post.engagement.bookmarks = response.data.bookmarksCount;
+            }
+          }
+        }
       } catch (error) {
         console.error("Error bookmarking post:", error);
       } finally {
@@ -572,6 +861,8 @@ export default {
     const handleCommentAdded = (data) => {
       // Update comment count
       actualPost.value.engagement.comments += 1;
+      // Mark that user has commented
+      hasCommented.value = true;
     };
 
     const handleCommentDeleted = (data) => {
@@ -588,8 +879,14 @@ export default {
       document.removeEventListener("keydown", handleEditModalKeydown);
       document.removeEventListener("keydown", handleOptionsKeydown);
       document.removeEventListener("click", handleOptionsClickOutside);
+      document.removeEventListener("click", handleRepostMenuClickOutside);
+      document.removeEventListener("keydown", handleQuoteModalKeydown);
       document.body.style.overflow = "auto";
     });
+
+    // Note: Engagement states are initialized from props on mount.
+    // User actions (like, comment, repost, bookmark) update local state directly.
+    // Props don't change after initial render, so no watcher needed for performance.
 
     // View tracking with Intersection Observer
     const postCardRef = ref(null);
@@ -635,6 +932,7 @@ export default {
       isLiked,
       isBookmarked,
       isReposted,
+      engagementCounts,
       isOwnPost,
       actualPost,
       formattedText,
@@ -645,7 +943,6 @@ export default {
       navigateToPost,
       handleLike,
       handleComment,
-      handleRepost,
       handleBookmark,
       handleEdit,
       handleDelete,
@@ -670,8 +967,24 @@ export default {
       showCommentModal,
       handleCommentAdded,
       handleCommentDeleted,
+      // Repost menu
+      showRepostMenu,
+      repostContainerRef,
+      toggleRepostMenu,
+      handleSimpleRepost,
+      handleQuoteRepost,
+      closeRepostMenu,
+      // Quote modal
+      showQuoteModal,
+      quoteText,
+      quoting,
+      quoteTextarea,
+      closeQuoteModal,
+      submitQuotePost,
       // View tracking
       postCardRef,
+      // Comment state
+      hasCommented,
     };
   },
 };
@@ -679,31 +992,26 @@ export default {
 
 <style scoped>
 .post-card {
-  background: var(--glass-morphism-bg);
-  border-radius: 1.2rem;
+  border-radius: 20px;
   padding: 20px;
   margin-bottom: var(--space-md);
-  border: 1px solid transparent;
-  box-shadow: 
-    8px 8px 24px rgba(0, 0, 0, 0.3),
-    -8px -8px 24px rgba(80, 80, 90, 0.05);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  /* Prevent card content from overflowing */
+  box-sizing: border-box;
 }
 
 .post-card:hover {
-  transform: translateY(-2px);
-  border: var(--hover-border);
-  box-shadow: 
-    10px 10px 30px rgba(0, 0, 0, 0.4),
-    -10px -10px 30px rgba(80, 80, 90, 0.08),
-    var(--neon-glow-hover);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .repost-header {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  color: var(--steel-gray);
+  color: var(--bright-white);
   font-size: var(--text-sm);
   margin-bottom: var(--space-md);
   padding-left: var(--space-xl);
@@ -733,6 +1041,7 @@ export default {
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
+  border: 2px solid var(--bright-white);
 }
 
 .author-avatar:hover {
@@ -790,12 +1099,12 @@ export default {
   top: 0;
   cursor: pointer;
   padding: var(--space-sm);
-  color: var(--steel-gray);
+  color: var(--skyOrange);
   transition: color 0.2s ease;
 }
 
 .post-options:hover {
-  color: var(--bright-white);
+  color: var(--mint-green);
 }
 
 .options-menu {
@@ -837,6 +1146,11 @@ export default {
 
 .post-content {
   cursor: pointer;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  /* Prevent content from overflowing post card */
+  box-sizing: border-box;
 }
 
 .post-text {
@@ -889,7 +1203,7 @@ export default {
 .quoted-avatar {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border: 2px solid var(--bright-white);
 }
 
 .quoted-name {
@@ -924,10 +1238,17 @@ export default {
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
   font-size: var(--text-sm);
+  transform: scale(1);
 }
 
 .engagement-btn span {
   color: var(--bright-white);
+  transition: color 0.3s ease;
+}
+
+.engagement-btn svg {
+  transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .engagement-btn:disabled {
@@ -935,37 +1256,177 @@ export default {
   cursor: not-allowed;
 }
 
-/* Like button hover - Pink */
-.post-card:hover .engagement-btn:nth-child(1) svg {
+/* Like button - Pink (default) */
+.engagement-btn:nth-child(1) svg {
   color: var(--neon-pink2);
-  filter: drop-shadow(0 0 8px var(--neon-pink2));
 }
 
-/* Comment button hover - Blue */
-.post-card:hover .engagement-btn:nth-child(2) svg {
+.engagement-btn:nth-child(1):hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.engagement-btn:nth-child(1):hover:not(:disabled) svg {
+  filter: drop-shadow(0 0 6px var(--neon-pink2));
+  transform: scale(1.1);
+}
+
+.engagement-btn:nth-child(1).active {
+  color: var(--neon-pink2);
+}
+
+.engagement-btn:nth-child(1).active svg {
+  color: var(--neon-pink2) !important;
+  fill: var(--neon-pink2) !important;
+}
+
+.engagement-btn:nth-child(1).active svg path {
+  fill: var(--neon-pink2) !important;
+}
+
+/* Comment button - Blue (default) */
+.engagement-btn:nth-child(2) svg {
   color: var(--electric-blue);
-  filter: drop-shadow(0 0 8px var(--electric-blue));
 }
 
-/* Repost button hover - Orange */
-.post-card:hover .engagement-btn:nth-child(3) svg {
+.engagement-btn:nth-child(2):hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.engagement-btn:nth-child(2):hover:not(:disabled) svg {
+  filter: drop-shadow(0 0 6px var(--electric-blue));
+  transform: scale(1.1);
+}
+
+.engagement-btn:nth-child(2).active {
+  color: var(--electric-blue);
+}
+
+.engagement-btn:nth-child(2).active svg {
+  color: var(--electric-blue) !important;
+  fill: var(--electric-blue) !important;
+}
+
+.engagement-btn:nth-child(2).active svg path {
+  fill: var(--electric-blue) !important;
+}
+
+/* Repost button - Orange (default) */
+.repost-container .engagement-btn svg {
   color: var(--sunset-orange);
-  filter: drop-shadow(0 0 8px var(--sunset-orange));
 }
 
-/* Bookmark button hover - Green */
-.post-card:hover .engagement-btn:nth-child(4) svg {
+.repost-container .engagement-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.repost-container .engagement-btn:hover:not(:disabled) svg {
+  filter: drop-shadow(0 0 6px var(--sunset-orange));
+  transform: scale(1.1);
+}
+
+.repost-container .engagement-btn.active {
+  color: var(--sunset-orange);
+}
+
+.repost-container .engagement-btn.active svg {
+  color: var(--sunset-orange) !important;
+  fill: var(--sunset-orange) !important;
+}
+
+.repost-container .engagement-btn.active svg path {
+  fill: var(--sunset-orange) !important;
+}
+
+/* Repost Container & Menu */
+.repost-container {
+  position: relative;
+}
+
+.repost-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: var(--space-sm);
+  background: var(--deep-black);
+  border: 1px solid var(--steel-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
+  z-index: 100;
+  min-width: 180px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.repost-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  color: var(--bright-white);
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+  font-size: var(--text-sm);
+}
+
+.repost-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.repost-menu-item svg {
+  color: var(--sunset-orange);
+  width: 16px;
+}
+
+.repost-menu-item:first-child svg {
+  color: var(--sunset-orange);
+}
+
+.repost-menu-item:last-child svg {
+  color: var(--electric-blue);
+}
+
+/* Bookmark button - Green (default) */
+.engagement-btn:nth-child(4) svg {
   color: var(--mint-green);
-  filter: drop-shadow(0 0 8px var(--mint-green));
 }
 
-.engagement-btn.active {
-  color: var(--neon-pink);
+.engagement-btn:nth-child(4):hover:not(:disabled) {
+  transform: scale(1.05);
 }
 
-.engagement-btn.active svg {
-  fill: currentColor;
-  filter: drop-shadow(0 0 4px rgba(255, 20, 147, 0.5));
+.engagement-btn:nth-child(4):hover:not(:disabled) svg {
+  filter: drop-shadow(0 0 6px var(--mint-green));
+  transform: scale(1.1);
+}
+
+.engagement-btn:nth-child(4).active {
+  color: var(--mint-green);
+}
+
+.engagement-btn:nth-child(4).active svg {
+  color: var(--mint-green) !important;
+  fill: var(--mint-green) !important;
+}
+
+.engagement-btn:nth-child(4).active svg path {
+  fill: var(--mint-green) !important;
 }
 
 .views-count {
@@ -1135,11 +1596,202 @@ export default {
 }
 
 .edit-save-btn:hover:not(:disabled) {
-  background: var(--neon-pink);
+  background: var(--neon-pink2);
   transform: translateY(-1px);
 }
 
 .edit-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Quote Modal Styles */
+.quote-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.quote-modal-content {
+  background: var(--dark-blue);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quote-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quote-modal-header h3 {
+  margin: 0;
+  color: var(--bright-white);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.quote-modal-close {
+  background: none;
+  border: none;
+  color: var(--steel-gray);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.quote-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--bright-white);
+}
+
+.quote-modal-body {
+  padding: var(--space-lg);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.quote-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  color: var(--bright-white);
+  font-size: var(--text-base);
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.quote-textarea:focus {
+  border-color: var(--skyOrange);
+}
+
+.quote-character-count {
+  text-align: right;
+  font-size: var(--text-sm);
+  color: var(--steel-gray);
+  transition: color 0.2s ease;
+}
+
+.quote-character-count.warning {
+  color: var(--skyOrange);
+}
+
+.quote-character-count.error {
+  color: var(--coral-red);
+}
+
+.quoted-post-preview {
+  border: 1px solid var(--steel-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background: rgba(0, 0, 0, 0.3);
+  margin-top: var(--space-sm);
+}
+
+.quoted-post-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.quoted-avatar-small {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--bright-white);
+  object-fit: cover;
+}
+
+.quoted-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quoted-author-name {
+  color: var(--bright-white);
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.quoted-author-username {
+  color: var(--steel-gray);
+  font-size: var(--text-xs);
+}
+
+.quoted-post-text {
+  color: var(--steel-gray);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.quote-modal-footer {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quote-cancel-btn,
+.quote-post-btn {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: var(--text-base);
+}
+
+.quote-cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--bright-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.quote-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.quote-post-btn {
+  background: var(--skyOrange);
+  color: var(--bright-white);
+}
+
+.quote-post-btn:hover:not(:disabled) {
+  background: var(--neon-pink2);
+  transform: translateY(-1px);
+}
+
+.quote-post-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
