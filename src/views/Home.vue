@@ -50,22 +50,22 @@ export default {
         // Fallback to static images if no images in database
         if (images.value.length === 0) {
           images.value = [
-            "/src/assets/images/HeaderImages/Bros.jpg",
-            "/src/assets/images/HeaderImages/draco.jpg",
-            "/src/assets/images/HeaderImages/LuciaPool.jpg",
-            "/src/assets/images/HeaderImages/RaulBoat.jpg",
-            "/src/assets/images/HeaderImages/Stripaz.jpg",
+            "/images/HeaderImages/Bros.jpg",
+            "/images/HeaderImages/draco.jpg",
+            "/images/HeaderImages/LuciaPool.jpg",
+            "/images/HeaderImages/RaulBoat.jpg",
+            "/images/HeaderImages/Stripaz.jpg",
           ];
         }
       } catch (error) {
         console.error("Error fetching carousel images:", error);
         // Fallback to static images on error
         images.value = [
-          "/src/assets/images/HeaderImages/Bros.jpg",
-          "/src/assets/images/HeaderImages/draco.jpg",
-          "/src/assets/images/HeaderImages/LuciaPool.jpg",
-          "/src/assets/images/HeaderImages/RaulBoat.jpg",
-          "/src/assets/images/HeaderImages/Stripaz.jpg",
+          "/images/HeaderImages/Bros.jpg",
+          "/images/HeaderImages/draco.jpg",
+          "/images/HeaderImages/LuciaPool.jpg",
+          "/images/HeaderImages/RaulBoat.jpg",
+          "/images/HeaderImages/Stripaz.jpg",
         ];
       } finally {
         carouselLoading.value = false;

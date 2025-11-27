@@ -18,7 +18,7 @@
         <img
           :src="
             actualPost.author.profile?.profilePicture ||
-            '/src/assets/images/user.png'
+            '/images/user.png'
           "
           :alt="actualPost.author.username"
           class="author-avatar"
@@ -97,7 +97,7 @@
             <img
               :src="
                 post.originalPost.author.profile?.profilePicture ||
-                '/src/assets/images/user.png'
+                '/images/user.png'
               "
               class="quoted-avatar"
             />
@@ -290,7 +290,7 @@
               <img
                 :src="
                   actualPost.author.profile?.profilePicture ||
-                  '/src/assets/images/user.png'
+                  '/images/user.png'
                 "
                 class="quoted-avatar-small"
               />

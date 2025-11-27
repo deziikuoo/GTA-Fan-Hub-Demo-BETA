@@ -5,7 +5,7 @@
       <img
         :src="
           actualPost.author.profile?.profilePicture ||
-          '/src/assets/images/user.png'
+          '/images/user.png'
         "
         :alt="actualPost.author.username"
         class="author-avatar"

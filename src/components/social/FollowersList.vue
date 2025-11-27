@@ -26,7 +26,7 @@
         >
           <img
             :src="
-              follower.profile?.profilePicture || '/src/assets/images/user.png'
+              follower.profile?.profilePicture || '/images/user.png'
             "
             :alt="`${follower.username}'s profile picture`"
             class="follower-avatar"
@@ -149,7 +149,7 @@ const truncateBio = (bio) => {
 };
 
 const handleImageError = (event) => {
-  event.target.src = "/src/assets/images/user.png";
+  event.target.src = "/images/user.png";
 };
 
 const loadFollowers = async () => {

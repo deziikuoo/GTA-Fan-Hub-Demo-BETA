@@ -249,7 +249,7 @@ export default {
       if (props.user.profile.profilePicture) {
         return props.user.profile.profilePicture;
       }
-      return "/src/assets/images/user.png";
+      return "/images/user.png";
     });
 
     // Handle header image with fallback to default
@@ -258,7 +258,7 @@ export default {
         return props.user.profile.headerImage;
       }
       // Use a default header image from the HeaderImages folder
-      return "/src/assets/images/HeaderImages/Bros.jpg";
+      return "/images/HeaderImages/Bros.jpg";
     });
 
     // Handle header image position (where to focus when cropping)
@@ -268,15 +268,15 @@ export default {
 
     const handleImageError = (event) => {
       // Fallback to default image if the current image fails to load
-      if (event.target.src !== "/src/assets/images/user.png") {
-        event.target.src = "/src/assets/images/user.png";
+      if (event.target.src !== "/images/user.png") {
+        event.target.src = "/images/user.png";
       }
     };
 
     const handleHeaderImageError = (event) => {
       // Fallback to default header if the current image fails to load
-      if (event.target.src !== "/src/assets/images/HeaderImages/Bros.jpg") {
-        event.target.src = "/src/assets/images/HeaderImages/Bros.jpg";
+      if (event.target.src !== "/images/HeaderImages/Bros.jpg") {
+        event.target.src = "/images/HeaderImages/Bros.jpg";
       }
     };
 

@@ -6,7 +6,7 @@
         <img
           :src="
             currentUser?.profile?.profilePicture ||
-            '/src/assets/images/user.png'
+            '/images/user.png'
           "
           :alt="currentUser?.username || 'User'"
           class="avatar-img"

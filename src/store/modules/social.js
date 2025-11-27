@@ -428,7 +428,7 @@ export default {
       if (window.Notification && Notification.permission === "granted") {
         new Notification("New Follower", {
           body: `${data.username} followed you`,
-          icon: data.profilePicture || "/src/assets/images/user.png",
+          icon: data.profilePicture || "/images/user.png",
         });
       }
     },

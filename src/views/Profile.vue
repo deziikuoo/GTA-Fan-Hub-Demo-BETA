@@ -191,8 +191,8 @@ export default {
           profileUser.value.profile = {
             displayName: profileUser.value.username,
             bio: "",
-            profilePicture: "/src/assets/images/user.png",
-            headerImage: "/src/assets/images/HeaderImages/Bros.jpg",
+            profilePicture: "/images/user.png",
+            headerImage: "/images/HeaderImages/Bros.jpg",
             verified: false,
             location: "",
             website: null,
@@ -274,8 +274,8 @@ export default {
             profile: currentDemoUser.profile || {
               displayName: username,
               bio: "",
-              profilePicture: "/src/assets/images/user.png",
-              headerImage: "/src/assets/images/HeaderImages/Bros.jpg",
+              profilePicture: "/images/user.png",
+              headerImage: "/images/HeaderImages/Bros.jpg",
               verified: false,
               location: "",
               website: null,
@@ -313,8 +313,8 @@ export default {
             profile: {
               displayName: "Demo User",
               bio: "",
-              profilePicture: "/src/assets/images/user.png",
-              headerImage: "/src/assets/images/HeaderImages/Bros.jpg",
+              profilePicture: "/images/user.png",
+              headerImage: "/images/HeaderImages/Bros.jpg",
               verified: false,
               location: "",
               website: null,

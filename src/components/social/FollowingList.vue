@@ -22,7 +22,7 @@
       >
         <router-link :to="`/profile/${user.username}`" class="following-info">
           <img
-            :src="user.profile?.profilePicture || '/src/assets/images/user.png'"
+            :src="user.profile?.profilePicture || '/images/user.png'"
             :alt="`${user.username}'s profile picture`"
             class="following-avatar"
             @error="handleImageError"
@@ -144,7 +144,7 @@ const truncateBio = (bio) => {
 };
 
 const handleImageError = (event) => {
-  event.target.src = "/src/assets/images/user.png";
+  event.target.src = "/images/user.png";
 };
 
 const loadFollowing = async () => {

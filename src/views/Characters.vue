@@ -10,7 +10,7 @@ export default {
           name: "Jason Duval",
           bio: `Age: Late 20s | Known Associates: Lucia Caminos
 A small-time crook with military training and big ambitions. Grew up hard, learned discipline in the service, and now applies it to high-stakes robberies. Jason is street-smart, loyal to his crew, and quick on the trigger when business gets messy. Don’t let the quiet demeanor fool you — he’s always calculating.`,
-          image: "./src/assets/images/CharacterImgs/JasonA.png",
+          image: "/images/CharacterImgs/JasonA.png",
           left: 45,
           zIndex: 30,
           height: "85%",
@@ -21,7 +21,7 @@ A small-time crook with military training and big ambitions. Grew up hard, learn
           name: "Raul",
           bio: `Age: 40s | Occupation: Career Criminal
 Raul’s been hitting banks since the early 2000s — a pro who thrives under pressure. Known for leading clean jobs and getting out without a trace. Stays off the radar, but when he’s in town, armored trucks start getting nervous. Old school, but never out of touch.`,
-          image: "./src/assets/images/CharacterImgs/RaulA.png",
+          image: "/images/CharacterImgs/RaulA.png",
           left: 56,
           zIndex: 29,
           height: "85%",
@@ -32,7 +32,7 @@ Raul’s been hitting banks since the early 2000s — a pro who thrives under pr
           name: "Boobie",
           bio: `Age: 30s | Occupation: Entrepreneur / Hustler
 From street legend to business mogul. Boobie owns clubs, real estate, and a music label, but never forgot his roots. Vice City’s elite respect him, the streets worship him, and his enemies? Well, they tend to vanish. Always one step ahead — and always watching.`,
-          image: "./src/assets/images/CharacterImgs/BoobieA.png",
+          image: "/images/CharacterImgs/BoobieA.png",
           left: 63.6,
           zIndex: 28,
           height: "85%",
@@ -43,7 +43,7 @@ From street legend to business mogul. Boobie owns clubs, real estate, and a musi
           name: "Cal",
           bio: `Age: Unknown | Status: Monitored
 Paranoid? Maybe. Wrong? Rarely. Cal's the go-to guy for surveillance, theories, and underground chatter. Used to work tech support — now hacks satellites in his pajamas. Has a theory for everything and a camera on everyone. If he messages you at 3 AM, don’t ignore it.`,
-          image: "./src/assets/images/CharacterImgs/CalA.png",
+          image: "/images/CharacterImgs/CalA.png",
           left: 80,
           zIndex: 27,
           height: "75%",
@@ -54,7 +54,7 @@ Paranoid? Maybe. Wrong? Rarely. Cal's the go-to guy for surveillance, theories, 
           name: "Lucia",
           bio: `Age: Mid 20s | Known Associates: Jason Duval
 Fresh out on parole and already making headlines. Lucia doesn’t wait for opportunity — she makes it. Raised in the chaos of Vice City's underbelly, she knows how to survive and isn’t afraid to break the rules (or bones) to get what she wants. Ride or die, but only if she’s in the driver's seat.`,
-          image: "./src/assets/images/CharacterImgs/LuciaA.png",
+          image: "/images/CharacterImgs/LuciaA.png",
           left: 30.5,
           zIndex: 29,
           height: "85%",
@@ -65,7 +65,7 @@ Fresh out on parole and already making headlines. Lucia doesn’t wait for oppor
           name: "Drequan",
           bio: `Age: 30 | Occupation: CEO, Only Raw Records
 Was slinging mixtapes — now he’s signing platinum artists. Drequan made his name on the block and his fortune in the booth. His studio’s got a bulletproof booth and a vault in the back. Keep it real, or get out of his face.`,
-          image: "./src/assets/images/CharacterImgs/Dre'quanA.png",
+          image: "/images/CharacterImgs/Dre'quanA.png",
           left: 21,
           zIndex: 28,
           height: "85%",
@@ -76,7 +76,7 @@ Was slinging mixtapes — now he’s signing platinum artists. Drequan made his 
           name: "Real (Bae-Luxe & Roxy)",
           bio: `Status: Artists under Only Raw Records
 Vice City's hottest rap duo — bold, brash, and always trending. Bae-Luxe brings the fire, Roxy brings the bars. Together they’re setting the streets (and charts) on fire. Expect glitter, gunplay, and gossip when they’re around.`,
-          image: "./src/assets/images/CharacterImgs/RealA.png",
+          image: "/images/CharacterImgs/RealA.png",
           left: 10,
           zIndex: 27,
           height: "85%",
@@ -87,7 +87,7 @@ Vice City's hottest rap duo — bold, brash, and always trending. Bae-Luxe bring
           name: "Brian",
           bio: `Age: 50s | Occupation: Property Owner / Narcotics Middleman
 Landlord by day, runner by night. Brian’s got hands in everything from coke shipments to rent collections. Keeps a clean shirt and a dirty schedule. He’s Jason’s landlord, supplier, and part-time headache. Cross him and you’ll be homeless and buried in the same week.`,
-          image: "./src/assets/images/CharacterImgs/BrianA.png",
+          image: "/images/CharacterImgs/BrianA.png",
           left: -15,
           zIndex: 26,
           height: "93%",

@@ -8,7 +8,7 @@
           <img
             :src="
               comment.author.profile?.profilePicture ||
-              '/src/assets/images/user.png'
+              '/images/user.png'
             "
             :alt="comment.author.username"
             class="avatar-img"

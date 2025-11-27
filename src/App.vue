@@ -281,14 +281,14 @@ const unreadCount = computed(() => store.getters["notifications/unreadCount"]);
 
 // Helper to get user avatar URL
 const getUserAvatarUrl = computed(() => {
-  if (!currentUser.value) return "/src/assets/images/user.png";
+  if (!currentUser.value) return "/images/user.png";
 
   const profilePicture =
     currentUser.value?.profile?.profilePicture ||
     currentUser.value?.profilePicture;
 
-  if (!profilePicture || profilePicture === "/src/assets/images/user.png") {
-    return "/src/assets/images/user.png";
+  if (!profilePicture || profilePicture === "/images/user.png") {
+    return "/images/user.png";
   }
 
   // If it's an upload path, return as-is (no backend in demo)
@@ -341,13 +341,13 @@ const showProfileSettings = ref(false);
 
 // Background image URL from API
 // Set background image directly to BG4.jpg for demo
-const backgroundImageUrl = ref("/src/assets/images/BG4.jpg");
+const backgroundImageUrl = ref("/images/BG4.jpg");
 const backgroundImageLoading = ref(false);
 
 // No need to fetch from API in demo mode
 const fetchBackgroundImage = async () => {
   // Background is set directly to BG4.jpg
-  backgroundImageUrl.value = "/src/assets/images/BG4.jpg";
+  backgroundImageUrl.value = "/images/BG4.jpg";
   backgroundImageLoading.value = false;
 };
 

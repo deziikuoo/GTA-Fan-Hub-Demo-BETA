@@ -257,7 +257,7 @@ export default {
           // No picture, use default
           formDataToSend.append(
             "profile.profilePicture",
-            "/src/assets/images/user.png"
+            "/images/user.png"
           );
         }
 

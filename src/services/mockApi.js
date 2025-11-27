@@ -79,8 +79,8 @@ function enrichUserData(user) {
     enriched.profile = {
       displayName: enriched.username || "User",
       bio: "",
-      profilePicture: "/src/assets/images/user.png",
-      headerImage: "/src/assets/images/HeaderImages/Bros.jpg",
+      profilePicture: "/images/user.png",
+      headerImage: "/images/HeaderImages/Bros.jpg",
       verified: false,
       location: "",
       website: null,
@@ -433,7 +433,7 @@ const mockApi = {
     if (url === "/api/assets/background-image/url") {
       return {
         data: {
-          url: "/src/assets/images/HeaderImages/Bros.jpg",
+          url: "/images/HeaderImages/Bros.jpg",
         },
       };
     }

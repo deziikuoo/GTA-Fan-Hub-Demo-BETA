@@ -35,8 +35,8 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/LuciaPool.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+        url: "/images/HeaderImages/LuciaPool.jpg",
+        thumbnail: "/images/HeaderImages/LuciaPool.jpg",
       },
     ],
     engagement: {
@@ -107,13 +107,13 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/draco.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+        url: "/images/HeaderImages/draco.jpg",
+        thumbnail: "/images/HeaderImages/draco.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/RaulBoat.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/RaulBoat.jpg",
+        url: "/images/HeaderImages/RaulBoat.jpg",
+        thumbnail: "/images/HeaderImages/RaulBoat.jpg",
       },
     ],
     engagement: {
@@ -144,8 +144,8 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Stripaz.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Stripaz.jpg",
+        url: "/images/HeaderImages/Stripaz.jpg",
+        thumbnail: "/images/HeaderImages/Stripaz.jpg",
       },
     ],
     engagement: {
@@ -203,18 +203,18 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/LuciaPool.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+        url: "/images/HeaderImages/LuciaPool.jpg",
+        thumbnail: "/images/HeaderImages/LuciaPool.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Bros.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Bros.jpg",
+        url: "/images/HeaderImages/Bros.jpg",
+        thumbnail: "/images/HeaderImages/Bros.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Stripaz.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Stripaz.jpg",
+        url: "/images/HeaderImages/Stripaz.jpg",
+        thumbnail: "/images/HeaderImages/Stripaz.jpg",
       },
     ],
     engagement: {
@@ -246,23 +246,23 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/draco.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+        url: "/images/HeaderImages/draco.jpg",
+        thumbnail: "/images/HeaderImages/draco.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/RaulBoat.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/RaulBoat.jpg",
+        url: "/images/HeaderImages/RaulBoat.jpg",
+        thumbnail: "/images/HeaderImages/RaulBoat.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Bros.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Bros.jpg",
+        url: "/images/HeaderImages/Bros.jpg",
+        thumbnail: "/images/HeaderImages/Bros.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/BikerGang.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/BikerGang.jpg",
+        url: "/images/HeaderImages/BikerGang.jpg",
+        thumbnail: "/images/HeaderImages/BikerGang.jpg",
       },
     ],
     engagement: {
@@ -295,7 +295,7 @@ export const mockPosts = [
       {
         type: "video",
         url: "/src/assets/mockuser_videos/GTA6Trailer1_OG.mp4",
-        thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+        thumbnail: "/images/HeaderImages/draco.jpg",
         metadata: {
           duration: 45,
           dimensions: { width: 1920, height: 1080 },
@@ -353,8 +353,8 @@ export const mockPosts = [
       media: [
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/LuciaPool.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+          url: "/images/HeaderImages/LuciaPool.jpg",
+          thumbnail: "/images/HeaderImages/LuciaPool.jpg",
         },
       ],
       engagement: {
@@ -402,7 +402,7 @@ export const mockPosts = [
         {
           type: "video",
           url: "/src/assets/mockuser_videos/gta6Trailer2_OG.mp4",
-          thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+          thumbnail: "/images/HeaderImages/draco.jpg",
           metadata: {
             duration: 45,
             dimensions: { width: 1920, height: 1080 },
@@ -453,23 +453,23 @@ export const mockPosts = [
       media: [
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/draco.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+          url: "/images/HeaderImages/draco.jpg",
+          thumbnail: "/images/HeaderImages/draco.jpg",
         },
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/RaulBoat.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/RaulBoat.jpg",
+          url: "/images/HeaderImages/RaulBoat.jpg",
+          thumbnail: "/images/HeaderImages/RaulBoat.jpg",
         },
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/Bros.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/Bros.jpg",
+          url: "/images/HeaderImages/Bros.jpg",
+          thumbnail: "/images/HeaderImages/Bros.jpg",
         },
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/BikerGang.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/BikerGang.jpg",
+          url: "/images/HeaderImages/BikerGang.jpg",
+          thumbnail: "/images/HeaderImages/BikerGang.jpg",
         },
       ],
       engagement: {
@@ -521,8 +521,8 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Stripaz.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Stripaz.jpg",
+        url: "/images/HeaderImages/Stripaz.jpg",
+        thumbnail: "/images/HeaderImages/Stripaz.jpg",
       },
     ],
     engagement: {
@@ -554,13 +554,13 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Bros.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Bros.jpg",
+        url: "/images/HeaderImages/Bros.jpg",
+        thumbnail: "/images/HeaderImages/Bros.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/RaulBoat.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/RaulBoat.jpg",
+        url: "/images/HeaderImages/RaulBoat.jpg",
+        thumbnail: "/images/HeaderImages/RaulBoat.jpg",
       },
     ],
     engagement: {
@@ -593,7 +593,7 @@ export const mockPosts = [
       {
         type: "video",
         url: "/src/assets/mockuser_videos/GTA6trailer1_Edited.mp4",
-        thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+        thumbnail: "/images/HeaderImages/LuciaPool.jpg",
         metadata: {
           duration: 30,
           dimensions: { width: 1920, height: 1080 },
@@ -651,18 +651,18 @@ export const mockPosts = [
       media: [
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/LuciaPool.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+          url: "/images/HeaderImages/LuciaPool.jpg",
+          thumbnail: "/images/HeaderImages/LuciaPool.jpg",
         },
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/Bros.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/Bros.jpg",
+          url: "/images/HeaderImages/Bros.jpg",
+          thumbnail: "/images/HeaderImages/Bros.jpg",
         },
         {
           type: "image",
-          url: "/src/assets/images/HeaderImages/Stripaz.jpg",
-          thumbnail: "/src/assets/images/HeaderImages/Stripaz.jpg",
+          url: "/images/HeaderImages/Stripaz.jpg",
+          thumbnail: "/images/HeaderImages/Stripaz.jpg",
         },
       ],
       engagement: {
@@ -737,7 +737,7 @@ export const mockPosts = [
         {
           type: "video",
           url: "/src/assets/mockuser_videos/GTA6trailer1_Edited.mp4",
-          thumbnail: "/src/assets/images/HeaderImages/LuciaPool.jpg",
+          thumbnail: "/images/HeaderImages/LuciaPool.jpg",
           metadata: {
             duration: 30,
             dimensions: { width: 1920, height: 1080 },
@@ -766,18 +766,18 @@ export const mockPosts = [
     media: [
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/BikerGang.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/BikerGang.jpg",
+        url: "/images/HeaderImages/BikerGang.jpg",
+        thumbnail: "/images/HeaderImages/BikerGang.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/draco.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/draco.jpg",
+        url: "/images/HeaderImages/draco.jpg",
+        thumbnail: "/images/HeaderImages/draco.jpg",
       },
       {
         type: "image",
-        url: "/src/assets/images/HeaderImages/Stripaz.jpg",
-        thumbnail: "/src/assets/images/HeaderImages/Stripaz.jpg",
+        url: "/images/HeaderImages/Stripaz.jpg",
+        thumbnail: "/images/HeaderImages/Stripaz.jpg",
       },
     ],
     engagement: {

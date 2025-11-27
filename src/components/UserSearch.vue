@@ -371,7 +371,7 @@ export default {
 
     // Get user avatar URL
     const getUserAvatar = (user) => {
-      return user.profile?.profilePicture || "/src/assets/images/user.png";
+      return user.profile?.profilePicture || "/images/user.png";
     };
 
     // Format follower count (e.g., 1.2K, 3.5M)
