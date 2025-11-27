@@ -32,7 +32,9 @@ export default {
 
       try {
         // Use Railway backend URL
-        const apiUrl = import.meta.env.VITE_API_URL || "https://gta-fan-hub-demo-production.up.railway.app";
+        const apiUrl =
+          import.meta.env.VITE_API_URL ||
+          "https://gta-fan-hub-demo-production.up.railway.app";
         const response = await fetch(`${apiUrl}/api/newsletter/subscribe`, {
           method: "POST",
           headers: {
