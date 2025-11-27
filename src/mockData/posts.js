@@ -294,7 +294,7 @@ export const mockPosts = [
     media: [
       {
         type: "video",
-        url: "/src/assets/mockuser_videos/GTA6Trailer1_OG.mp4",
+        url: "/mockuser_videos/GTA6Trailer1_OG.mp4",
         thumbnail: "/images/HeaderImages/draco.jpg",
         metadata: {
           duration: 45,
@@ -401,7 +401,7 @@ export const mockPosts = [
       media: [
         {
           type: "video",
-          url: "/src/assets/mockuser_videos/gta6Trailer2_OG.mp4",
+          url: "/mockuser_videos/gta6Trailer2_OG.mp4",
           thumbnail: "/images/HeaderImages/draco.jpg",
           metadata: {
             duration: 45,
@@ -592,7 +592,7 @@ export const mockPosts = [
     media: [
       {
         type: "video",
-        url: "/src/assets/mockuser_videos/GTA6trailer1_Edited.mp4",
+        url: "/mockuser_videos/GTA6trailer1_Edited.mp4",
         thumbnail: "/images/HeaderImages/LuciaPool.jpg",
         metadata: {
           duration: 30,
@@ -736,7 +736,7 @@ export const mockPosts = [
       media: [
         {
           type: "video",
-          url: "/src/assets/mockuser_videos/GTA6trailer1_Edited.mp4",
+          url: "/mockuser_videos/GTA6trailer1_Edited.mp4",
           thumbnail: "/images/HeaderImages/LuciaPool.jpg",
           metadata: {
             duration: 30,

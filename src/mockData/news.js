@@ -265,7 +265,7 @@ export const mockNewsArticles = [
     content: "The first official trailer for Grand Theft Auto 6 has broken YouTube records, becoming the most viewed video game trailer in the platform's history. The trailer reached over 100 million views in just 24 hours, demonstrating the massive anticipation for the game. Fans around the world have been analyzing every frame for clues about the game's story and features.",
     author: "Ryan Johnson",
     enclosure: {
-      url: "/src/assets/mockuser_videos/GTA6Trailer1_OG.mp4",
+      url: "/mockuser_videos/GTA6Trailer1_OG.mp4",
       type: "video/mp4",
     },
     link: "https://example.com/news20",
@@ -391,7 +391,7 @@ export const mockNewsArticles = [
     content: "In an exclusive interview, the developers at Rockstar Games discussed the challenges and triumphs of creating Grand Theft Auto 6. They shared insights into the development process, the technology behind the game, and their vision for the future of the series. The interview provides a fascinating look behind the scenes of one of the most anticipated games in history.",
     author: "Emma Thompson",
     enclosure: {
-      url: "/src/assets/mockuser_videos/GTA6trailer1_Edited.mp4",
+      url: "/mockuser_videos/GTA6trailer1_Edited.mp4",
       type: "video/mp4",
     },
     link: "https://example.com/news30",

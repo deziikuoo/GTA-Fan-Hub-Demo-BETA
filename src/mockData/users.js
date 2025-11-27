@@ -11,7 +11,7 @@ export const mockUsers = [
     profile: {
       displayName: "GTA 6 Fan",
       bio: "Huge fan of GTA series! Can't wait for GTA 6! 🎮",
-      profilePicture: "/src/assets/mockusers_avatar/mockusers_avatar1.jpg",
+      profilePicture: "/mockusers_avatar/mockusers_avatar1.jpg",
       headerImage: "/images/HeaderImages/Bros.jpg",
       verified: true,
       location: "Los Santos",
@@ -33,7 +33,7 @@ export const mockUsers = [
     profile: {
       displayName: "Lucia Fan",
       bio: "Team Lucia all the way! 🔥",
-      profilePicture: "/src/assets/mockusers_gifs/usergif.gif",
+      profilePicture: "/mockusers_gifs/usergif.gif",
       headerImage: "/images/HeaderImages/LuciaPool.jpg",
       verified: false,
       location: "Vice City",
@@ -55,7 +55,7 @@ export const mockUsers = [
     profile: {
       displayName: "Jason Enthusiast",
       bio: "Jason is the GOAT! 🐐",
-      profilePicture: "/src/assets/mockusers_avatar/mockusers_avatar2.jpg",
+      profilePicture: "/mockusers_avatar/mockusers_avatar2.jpg",
       headerImage: "/images/HeaderImages/draco.jpg",
       verified: true,
       location: "Miami",
@@ -77,7 +77,7 @@ export const mockUsers = [
     profile: {
       displayName: "GTA News Hub",
       bio: "Your source for all GTA 6 news and updates 📰",
-      profilePicture: "/src/assets/mockusers_avatar/mockusers_avatar3.jpg",
+      profilePicture: "/mockusers_avatar/mockusers_avatar3.jpg",
       headerImage: "/images/HeaderImages/RaulBoat.jpg",
       verified: true,
       location: "Global",
@@ -99,7 +99,7 @@ export const mockUsers = [
     profile: {
       displayName: "Vice City Vibes",
       bio: "Living that Vice City life 🌴",
-      profilePicture: "/src/assets/mockusers_avatar/mockusers_avatar4.jpg",
+      profilePicture: "/mockusers_avatar/mockusers_avatar4.jpg",
       headerImage: "/images/HeaderImages/Stripaz.jpg",
       verified: false,
       location: "Vice City",

@@ -36,7 +36,7 @@ function isCustomImage(imagePath) {
  */
 export function getRandomAvatar(index = null) {
   const avatarIndex = index || Math.floor(Math.random() * AVATAR_COUNT) + 1;
-  return `/src/assets/demouser_avatars/demouser_avatar${avatarIndex}.jpg`;
+  return `/demouser_avatars/demouser_avatar${avatarIndex}.jpg`;
 }
 
 /**
@@ -46,7 +46,7 @@ export function getRandomAvatar(index = null) {
  */
 export function getRandomHeader(index = null) {
   const headerIndex = index || Math.floor(Math.random() * HEADER_COUNT) + 1;
-  return `/src/assets/demouser_headers/demouser_header${headerIndex}.jpg`;
+  return `/demouser_headers/demouser_header${headerIndex}.jpg`;
 }
 
 /**
