@@ -7,7 +7,7 @@ import { validateEmail, sanitizeEmail, generateToken } from '../utils/validation
 // Rate limiting: Track subscription attempts per IP
 // In production, use Redis or similar for distributed rate limiting
 const rateLimitMap = new Map();
-const RATE_LIMIT_MAX = 3; // Max attempts per hour
+const RATE_LIMIT_MAX = 10; // Max attempts per hour (increased for testing)
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
 
 /**

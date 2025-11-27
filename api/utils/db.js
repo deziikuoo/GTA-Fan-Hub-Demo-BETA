@@ -33,11 +33,18 @@ export async function connectToDatabase() {
   }
 
   // Get connection string from environment variable
-  const uri = process.env.CONNECTION_STRING;
+  let uri = process.env.CONNECTION_STRING;
   
   if (!uri) {
     throw new Error('CONNECTION_STRING environment variable is not defined');
   }
+
+  // Ensure TLS is enabled in the connection string
+  if (!uri.includes('tls=') && !uri.includes('ssl=')) {
+    uri = uri.includes('?') ? `${uri}&tls=true` : `${uri}?tls=true`;
+  }
+
+  console.log('[MongoDB] Attempting connection with TLS enabled');
 
   // Create new MongoDB client with proper SSL/TLS configuration for Vercel serverless
   const client = new MongoClient(uri, {
