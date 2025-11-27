@@ -1,8 +1,14 @@
 // Email service using Resend API
 import { Resend } from 'resend';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend client (lazy initialization to ensure env vars are loaded)
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY environment variable is not set');
+  }
+  return new Resend(apiKey);
+}
 
 // Get base URL for links
 function getBaseUrl() {
@@ -27,6 +33,7 @@ export async function sendConfirmationEmail(email, token) {
   const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'GtaFanHub <onboarding@resend.dev>', // Change to your verified domain in production
       to: email,
@@ -174,6 +181,7 @@ export async function sendUnsubscribeConfirmation(email) {
   const resubscribeUrl = `${baseUrl}/About`;
 
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'GtaFanHub <onboarding@resend.dev>', // Change to your verified domain in production
       to: email,

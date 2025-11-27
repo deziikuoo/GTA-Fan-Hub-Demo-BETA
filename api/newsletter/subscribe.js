@@ -55,6 +55,18 @@ function cleanupRateLimits() {
 // Run cleanup every 10 minutes
 setInterval(cleanupRateLimits, 10 * 60 * 1000);
 
+// Helper function to parse JSON body
+async function getJsonBody(req) {
+  // Vercel automatically parses JSON bodies, but handle both cases
+  if (req.body) {
+    if (typeof req.body === 'string') {
+      return JSON.parse(req.body);
+    }
+    return req.body;
+  }
+  return {};
+}
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -100,12 +112,7 @@ export default async function handler(req, res) {
     // Parse request body
     let body;
     try {
-      // Handle both parsed and unparsed body
-      if (typeof req.body === 'string') {
-        body = JSON.parse(req.body);
-      } else {
-        body = req.body || {};
-      }
+      body = await getJsonBody(req);
     } catch (parseError) {
       console.error('[Subscribe] Error parsing request body:', parseError);
       return res.status(400).json({
@@ -136,7 +143,18 @@ export default async function handler(req, res) {
     const sanitizedEmail = sanitizeEmail(email);
 
     // Connect to database
-    const collection = await getSubscribersCollection();
+    let collection;
+    try {
+      collection = await getSubscribersCollection();
+      console.log('[Subscribe] Database connection successful');
+    } catch (dbError) {
+      console.error('[Subscribe] Database connection error:', dbError);
+      console.error('[Subscribe] Database error stack:', dbError.stack);
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection error. Please try again later.'
+      });
+    }
 
     // Check if email already exists
     const existing = await collection.findOne({ email: sanitizedEmail });
@@ -259,9 +277,19 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('[Subscribe] Error:', error);
-    console.error('[Subscribe] Error stack:', error.stack);
+    // Comprehensive error logging
+    console.error('[Subscribe] ========== ERROR START ==========');
+    console.error('[Subscribe] Error name:', error.name);
     console.error('[Subscribe] Error message:', error.message);
+    console.error('[Subscribe] Error stack:', error.stack);
+    console.error('[Subscribe] Error code:', error.code);
+    console.error('[Subscribe] Environment check:', {
+      hasConnectionString: !!process.env.CONNECTION_STRING,
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      nodeEnv: process.env.NODE_ENV,
+      vercelUrl: process.env.VERCEL_URL
+    });
+    console.error('[Subscribe] ========== ERROR END ==========');
     
     // Check for missing environment variables
     if (!process.env.CONNECTION_STRING) {
@@ -289,7 +317,7 @@ export default async function handler(req, res) {
     }
     
     // Handle MongoDB connection errors
-    if (error.message && error.message.includes('MongoServerError')) {
+    if (error.message && (error.message.includes('MongoServerError') || error.message.includes('MongoNetworkError') || error.message.includes('MongoTimeoutError'))) {
       console.error('[Subscribe] MongoDB error:', error.message);
       return res.status(500).json({
         success: false,
@@ -297,13 +325,23 @@ export default async function handler(req, res) {
       });
     }
     
+    // Handle Resend API errors
+    if (error.message && error.message.includes('Resend')) {
+      console.error('[Subscribe] Resend API error:', error.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Email service error. Please try again later.'
+      });
+    }
+    
     return res.status(500).json({
       success: false,
       message: 'An error occurred. Please try again later.',
-      // Include error details in development
-      ...(process.env.NODE_ENV === 'development' && { 
+      // Include error details in development or if VERCEL_ENV is preview/development
+      ...((process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview') && { 
         error: error.message,
-        details: error.stack 
+        errorName: error.name,
+        errorCode: error.code
       })
     });
   }
