@@ -46,7 +46,7 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
     environment: {
       hasConnectionString: !!process.env.CONNECTION_STRING,
-      hasResendKey: !!process.env.RESEND_API_KEY,
+      hasSendGridKey: !!process.env.SENDGRID_API_KEY,
       nodeEnv: process.env.NODE_ENV || "development",
     },
   });

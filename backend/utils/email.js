@@ -1,12 +1,13 @@
-// Email service using Resend API
-import { Resend } from 'resend';
+// Email service using SendGrid API
+import sgMail from '@sendgrid/mail';
 
-function getResendClient() {
-  const apiKey = process.env.RESEND_API_KEY;
+function getSendGridClient() {
+  const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
-    throw new Error('RESEND_API_KEY environment variable is not set');
+    throw new Error('SENDGRID_API_KEY environment variable is not set');
   }
-  return new Resend(apiKey);
+  sgMail.setApiKey(apiKey);
+  return sgMail;
 }
 
 function getBaseUrl() {
@@ -22,10 +23,18 @@ export async function sendConfirmationEmail(email, token) {
   const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
   try {
-    const resend = getResendClient();
-    const { data, error } = await resend.emails.send({
-      from: 'GtaFanHub <onboarding@resend.dev>',
+    const sgMail = getSendGridClient();
+    
+    // Get from address from env or use default
+    const fromAddress = process.env.SENDGRID_FROM_EMAIL || 'noreply@gtafanhub.com';
+    const fromName = process.env.SENDGRID_FROM_NAME || 'GtaFanHub';
+    
+    const msg = {
       to: email,
+      from: {
+        email: fromAddress,
+        name: fromName,
+      },
       subject: 'Confirm your GtaFanHub subscription',
       html: `
         <!DOCTYPE html>
@@ -128,17 +137,16 @@ If you didn't request this subscription, you can safely ignore this email.
 This confirmation link expires in 7 days.
 
 To unsubscribe: ${unsubscribeUrl}`,
-    });
+    };
 
-    if (error) {
-      console.error('[Resend] Error:', error);
-      return { success: false, error };
-    }
-
-    console.log('[Resend] Confirmation email sent to:', email);
-    return { success: true, data };
+    await sgMail.send(msg);
+    console.log('[SendGrid] Confirmation email sent to:', email);
+    return { success: true, data: { messageId: 'sent' } };
   } catch (error) {
-    console.error('[Resend] Exception:', error);
+    console.error('[SendGrid] Error sending confirmation email:', error);
+    if (error.response) {
+      console.error('[SendGrid] Error details:', error.response.body);
+    }
     return { success: false, error };
   }
 }
@@ -148,10 +156,18 @@ export async function sendUnsubscribeConfirmation(email) {
   const resubscribeUrl = `${baseUrl}/About`;
 
   try {
-    const resend = getResendClient();
-    const { data, error } = await resend.emails.send({
-      from: 'GtaFanHub <onboarding@resend.dev>',
+    const sgMail = getSendGridClient();
+    
+    // Get from address from env or use default
+    const fromAddress = process.env.SENDGRID_FROM_EMAIL || 'noreply@gtafanhub.com';
+    const fromName = process.env.SENDGRID_FROM_NAME || 'GtaFanHub';
+    
+    const msg = {
       to: email,
+      from: {
+        email: fromAddress,
+        name: fromName,
+      },
       subject: "You've been unsubscribed from GtaFanHub",
       html: `
         <!DOCTYPE html>
@@ -217,18 +233,16 @@ You won't receive any more emails from us unless you subscribe again.
 Changed your mind? Visit ${resubscribeUrl} to resubscribe.
 
 Thank you for being part of the GtaFanHub community.`,
-    });
+    };
 
-    if (error) {
-      console.error('[Resend] Error:', error);
-      return { success: false, error };
-    }
-
-    console.log('[Resend] Unsubscribe confirmation sent to:', email);
-    return { success: true, data };
+    await sgMail.send(msg);
+    console.log('[SendGrid] Unsubscribe confirmation sent to:', email);
+    return { success: true, data: { messageId: 'sent' } };
   } catch (error) {
-    console.error('[Resend] Exception:', error);
+    console.error('[SendGrid] Error sending unsubscribe confirmation:', error);
+    if (error.response) {
+      console.error('[SendGrid] Error details:', error.response.body);
+    }
     return { success: false, error };
   }
 }
-

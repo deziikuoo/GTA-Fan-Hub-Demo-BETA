@@ -2,6 +2,8 @@
 
 Express.js backend for newsletter subscription functionality, designed to run on Railway.
 
+Uses SendGrid for email delivery (free tier: 100 emails/day, no domain verification required).
+
 ## Setup Instructions
 
 ### 1. Deploy to Railway
@@ -17,7 +19,9 @@ In Railway dashboard, go to your project → **Variables** tab, add:
 
 ```
 CONNECTION_STRING=mongodb+srv://username:password@cluster.mongodb.net/GTAFanHub?retryWrites=true&w=majority
-RESEND_API_KEY=re_your_resend_api_key_here
+SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
+SENDGRID_FROM_EMAIL=noreply@gtafanhub.com
+SENDGRID_FROM_NAME=GtaFanHub
 FRONTEND_URL=https://gta-fan-hub-demo.vercel.app
 PORT=3000
 ```
@@ -50,7 +54,9 @@ npm run dev
 Create a `.env` file:
 ```
 CONNECTION_STRING=your_mongodb_connection_string
-RESEND_API_KEY=your_resend_api_key
+SENDGRID_API_KEY=your_sendgrid_api_key
+SENDGRID_FROM_EMAIL=noreply@gtafanhub.com
+SENDGRID_FROM_NAME=GtaFanHub
 FRONTEND_URL=http://localhost:5173
 PORT=3000
 ```
