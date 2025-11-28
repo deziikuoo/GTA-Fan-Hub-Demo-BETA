@@ -13,6 +13,7 @@ export default {
     const newsletterLoading = ref(false);
     const newsletterMessage = ref("");
     const newsletterMessageType = ref(""); // 'success' or 'error'
+    const successType = ref(""); // 'pending', 'confirmed', or 'unsubscribed'
 
     // Handle newsletter subscription
     const handleSubscribe = async () => {
@@ -51,6 +52,7 @@ export default {
         if (response.ok && data.success) {
           newsletterMessage.value = data.message;
           newsletterMessageType.value = "success";
+          successType.value = "pending"; // Show spam instructions
           newsletterFormEmail.value = ""; // Clear form
         } else {
           newsletterMessage.value =
@@ -75,12 +77,14 @@ export default {
         newsletterMessage.value =
           "🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.";
         newsletterMessageType.value = "success";
+        successType.value = "confirmed"; // Show confirmation message
         // Clean up URL
         router.replace({ path: route.path, query: {} });
       } else if (unsubscribed === "true") {
         newsletterMessage.value =
           "You have been unsubscribed. We're sorry to see you go!";
         newsletterMessageType.value = "success";
+        successType.value = "unsubscribed"; // Show unsubscribed message
         router.replace({ path: route.path, query: {} });
       } else if (error) {
         const errorMessages = {
@@ -240,6 +244,7 @@ export default {
       newsletterLoading,
       newsletterMessage,
       newsletterMessageType,
+      successType,
       handleSubscribe,
     };
   },
@@ -516,10 +521,13 @@ export default {
               "
             />
             <div class="newsletter-message-content">
+              <!-- Error messages -->
               <span v-if="newsletterMessageType !== 'success'">{{
                 newsletterMessage
               }}</span>
-              <div v-else class="success-message-text">
+              
+              <!-- Pending confirmation - show spam instructions -->
+              <div v-else-if="successType === 'pending'" class="success-message-text">
                 <p class="message-main">
                   Please check your email to confirm your subscription.
                 </p>
@@ -544,6 +552,29 @@ export default {
                   </div>
                 </div>
               </div>
+              
+              <!-- Confirmed subscription - show celebration -->
+              <div v-else-if="successType === 'confirmed'" class="confirmed-message-text">
+                <p class="message-main confirmed">
+                  🎉 Your subscription is confirmed!
+                </p>
+                <p class="message-sub">
+                  Welcome to the GtaFanHub community. You'll now receive updates on GTA 6 news, announcements, and exclusive content.
+                </p>
+              </div>
+              
+              <!-- Unsubscribed - show farewell -->
+              <div v-else-if="successType === 'unsubscribed'" class="unsubscribed-message-text">
+                <p class="message-main">
+                  You have been unsubscribed.
+                </p>
+                <p class="message-sub">
+                  We're sorry to see you go! You can always resubscribe if you change your mind.
+                </p>
+              </div>
+              
+              <!-- Fallback for other success messages -->
+              <span v-else>{{ newsletterMessage }}</span>
             </div>
           </div>
         </form>
@@ -1501,16 +1532,40 @@ export default {
 }
 
 .highlight-text strong {
-  color: #FFD700;
+  color: #ffd700;
   font-weight: 600;
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
 }
 
 .highlight-accent {
-  color: #FFD700;
+  color: #ffd700;
   font-weight: 700;
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
   padding: 2px 4px;
+}
+
+/* Confirmed subscription message styles */
+.confirmed-message-text,
+.unsubscribed-message-text {
+  text-align: center;
+  padding: var(--space-sm) 0;
+}
+
+.message-main.confirmed {
+  font-size: 1.2em;
+  margin-bottom: var(--space-sm);
+  background: linear-gradient(135deg, var(--mint-green) 0%, var(--electric-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.message-sub {
+  color: var(--soft-lavender);
+  font-size: 0.95em;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .newsletter-message.error {
