@@ -1501,21 +1501,15 @@ export default {
 }
 
 .highlight-text strong {
-  color: var(--neon-pink2);
+  color: #FFD700;
   font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
 }
 
 .highlight-accent {
-  color: var(--neon-blue);
-  background: linear-gradient(
-    135deg,
-    var(--neon-pink2) 0%,
-    var(--neon-blue) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFD700;
   font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
   padding: 2px 4px;
 }
 
