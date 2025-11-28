@@ -516,18 +516,32 @@ export default {
               "
             />
             <div class="newsletter-message-content">
-              <span v-if="newsletterMessageType !== 'success'">{{ newsletterMessage }}</span>
+              <span v-if="newsletterMessageType !== 'success'">{{
+                newsletterMessage
+              }}</span>
               <div v-else class="success-message-text">
-                <p class="message-main">Please check your email to confirm your subscription.</p>
+                <p class="message-main">
+                  Please check your email to confirm your subscription.
+                </p>
                 <div class="message-highlight-box">
-                  <font-awesome-icon icon="fas fa-exclamation-triangle" class="highlight-icon" />
+                  <font-awesome-icon
+                    icon="fas fa-exclamation-triangle"
+                    class="highlight-icon"
+                  />
                   <div class="highlight-content">
                     <p class="highlight-title">Important for Gmail Users:</p>
                     <p class="highlight-text">
-                      If you don't see the email, <strong>check your spam/junk folder</strong>.
+                      If you don't see the email,
+                      <strong>check your spam/junk folder</strong>.
                     </p>
                     <p class="highlight-text">
-                      If using <strong>Gmail mobile app</strong> and the email is in spam, tap <strong class="highlight-accent">"Report not spam"</strong> to move it to Primary - this will make the confirmation button clickable.
+                      If using <strong>Gmail mobile app</strong> and the email
+                      is in spam, tap
+                      <strong class="highlight-accent"
+                        >"Report not spam"</strong
+                      >
+                      to move it to Primary - this will make the confirmation
+                      button clickable.
                     </p>
                   </div>
                 </div>
@@ -1397,7 +1411,11 @@ export default {
 }
 
 .newsletter-message.success {
-  background: linear-gradient(135deg, rgba(152, 255, 152, 0.15) 0%, rgba(0, 191, 255, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(152, 255, 152, 0.15) 0%,
+    rgba(0, 191, 255, 0.1) 100%
+  );
   color: var(--mint-green);
   border: 1px solid var(--mint-green);
   flex-direction: column;
@@ -1420,7 +1438,11 @@ export default {
 }
 
 .message-highlight-box {
-  background: linear-gradient(135deg, rgba(255, 107, 157, 0.25) 0%, rgba(0, 191, 255, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 157, 0.25) 0%,
+    rgba(0, 191, 255, 0.2) 100%
+  );
   border: 2px solid var(--neon-pink2);
   border-left: 4px solid var(--neon-blue);
   border-radius: var(--radius-lg);
@@ -1429,16 +1451,20 @@ export default {
   display: flex;
   gap: var(--space-sm);
   align-items: flex-start;
-  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3),
+    0 0 10px rgba(0, 191, 255, 0.2);
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3),
+      0 0 10px rgba(0, 191, 255, 0.2);
   }
   50% {
-    box-shadow: 0 4px 25px rgba(255, 107, 157, 0.4), 0 0 15px rgba(0, 191, 255, 0.3);
+    box-shadow: 0 4px 25px rgba(255, 107, 157, 0.4),
+      0 0 15px rgba(0, 191, 255, 0.3);
   }
 }
 
@@ -1455,7 +1481,11 @@ export default {
 
 .highlight-title {
   margin: 0 0 var(--space-xs) 0;
-  background: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--neon-pink2) 0%,
+    var(--neon-blue) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1479,7 +1509,11 @@ export default {
 
 .highlight-accent {
   color: var(--neon-blue);
-  background: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--neon-pink2) 0%,
+    var(--neon-blue) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
