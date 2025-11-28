@@ -14,6 +14,11 @@ export default {
     const newsletterMessage = ref("");
     const newsletterMessageType = ref(""); // 'success' or 'error'
     const successType = ref(""); // 'pending', 'confirmed', or 'unsubscribed'
+    
+    // Toast notification state (for redirect confirmations)
+    const showToast = ref(false);
+    const toastMessage = ref("");
+    const toastType = ref(""); // 'success', 'error', or 'info'
 
     // Handle newsletter subscription
     const handleSubscribe = async () => {
@@ -69,22 +74,34 @@ export default {
       }
     };
 
+    // Show toast notification
+    const displayToast = (message, type = "success", duration = 6000) => {
+      toastMessage.value = message;
+      toastType.value = type;
+      showToast.value = true;
+      
+      // Auto-dismiss after duration
+      setTimeout(() => {
+        showToast.value = false;
+      }, duration);
+    };
+    
+    // Dismiss toast manually
+    const dismissToast = () => {
+      showToast.value = false;
+    };
+
     // Check for confirmation/unsubscribe query parameters
     const checkQueryParams = () => {
       const { subscribed, unsubscribed, error } = route.query;
 
       if (subscribed === "true") {
-        newsletterMessage.value =
-          "🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.";
-        newsletterMessageType.value = "success";
-        successType.value = "confirmed"; // Show confirmation message
+        // Show toast notification at top of page
+        displayToast("🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.", "success");
         // Clean up URL
         router.replace({ path: route.path, query: {} });
       } else if (unsubscribed === "true") {
-        newsletterMessage.value =
-          "You have been unsubscribed. We're sorry to see you go!";
-        newsletterMessageType.value = "success";
-        successType.value = "unsubscribed"; // Show unsubscribed message
+        displayToast("You have been unsubscribed. We're sorry to see you go!", "info");
         router.replace({ path: route.path, query: {} });
       } else if (error) {
         const errorMessages = {
@@ -98,9 +115,7 @@ export default {
           not_subscribed: "Email not found in our subscription list.",
           unsubscribe_failed: "Failed to unsubscribe. Please try again.",
         };
-        newsletterMessage.value =
-          errorMessages[error] || "An error occurred. Please try again.";
-        newsletterMessageType.value = "error";
+        displayToast(errorMessages[error] || "An error occurred. Please try again.", "error", 8000);
         router.replace({ path: route.path, query: {} });
       }
     };
@@ -246,6 +261,11 @@ export default {
       newsletterMessageType,
       successType,
       handleSubscribe,
+      // Toast notifications
+      showToast,
+      toastMessage,
+      toastType,
+      dismissToast,
     };
   },
 };
@@ -253,6 +273,28 @@ export default {
 
 <template>
   <div class="about-page">
+    <!-- Toast Notification -->
+    <Transition name="toast">
+      <div v-if="showToast" class="toast-notification" :class="toastType">
+        <div class="toast-content">
+          <font-awesome-icon
+            :icon="
+              toastType === 'success'
+                ? 'fas fa-check-circle'
+                : toastType === 'error'
+                ? 'fas fa-exclamation-circle'
+                : 'fas fa-info-circle'
+            "
+            class="toast-icon"
+          />
+          <span class="toast-message">{{ toastMessage }}</span>
+        </div>
+        <button class="toast-dismiss" @click="dismissToast">
+          <font-awesome-icon icon="fas fa-times" />
+        </button>
+      </div>
+    </Transition>
+
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
@@ -683,6 +725,153 @@ export default {
   width: 80% !important;
   margin-left: 15%;
   backdrop-filter: blur(50px);
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  max-width: 90%;
+  width: auto;
+  min-width: 300px;
+}
+
+.toast-notification.success {
+  background: linear-gradient(135deg, rgba(198, 232, 125, 0.95) 0%, rgba(152, 232, 152, 0.95) 100%);
+  border: 2px solid var(--mint-green);
+  color: #1a1a2e;
+}
+
+.toast-notification.error {
+  background: linear-gradient(135deg, rgba(226, 113, 207, 0.95) 0%, rgba(255, 107, 157, 0.95) 100%);
+  border: 2px solid var(--neon-pink2);
+  color: #ffffff;
+}
+
+.toast-notification.info {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.95) 0%, rgba(84, 123, 152, 0.95) 100%);
+  border: 2px solid var(--electric-blue);
+  color: #ffffff;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.toast-icon {
+  font-size: 1.4em;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.toast-dismiss {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toast-dismiss:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Toast animation */
+.toast-enter-active {
+  animation: toast-slide-in 0.4s ease-out;
+}
+
+.toast-leave-active {
+  animation: toast-slide-out 0.3s ease-in;
+}
+
+@keyframes toast-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes toast-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+  }
+}
+
+/* Mobile toast adjustments */
+@media (max-width: 768px) {
+  .toast-notification {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    max-width: none;
+    width: auto;
+    min-width: auto;
+  }
+  
+  .toast-enter-active {
+    animation: toast-slide-in-mobile 0.4s ease-out;
+  }
+  
+  .toast-leave-active {
+    animation: toast-slide-out-mobile 0.3s ease-in;
+  }
+  
+  @keyframes toast-slide-in-mobile {
+    0% {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes toast-slide-out-mobile {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+  }
 }
 
 /* Beta Badge */
