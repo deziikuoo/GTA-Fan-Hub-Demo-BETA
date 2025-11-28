@@ -529,19 +529,17 @@ export default {
                     class="highlight-icon"
                   />
                   <div class="highlight-content">
-                    <p class="highlight-title">Important for Gmail Users:</p>
+                    <p class="highlight-title">Important:</p>
                     <p class="highlight-text">
                       If you don't see the email,
                       <strong>check your spam/junk folder</strong>.
                     </p>
                     <p class="highlight-text">
-                      If using <strong>Gmail mobile app</strong> and the email
-                      is in spam, tap
+                      If the email is in spam, tap
                       <strong class="highlight-accent"
                         >"Report not spam"</strong
                       >
-                      to move it to Primary - this will make the confirmation
-                      button clickable.
+                      to move it to your inbox.
                     </p>
                   </div>
                 </div>
