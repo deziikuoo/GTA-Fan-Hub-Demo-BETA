@@ -169,7 +169,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
 
         return res.status(200).json({
           success: true,
-          message: "Confirmation email resent. Please check your inbox.",
+          message: "Please check your email to confirm your subscription. If you don't see it, check your spam/junk folder.",
         });
       }
 
@@ -205,8 +205,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
 
         return res.status(200).json({
           success: true,
-          message:
-            "Welcome back! Please check your email to confirm your subscription.",
+          message: "Please check your email to confirm your subscription. If you don't see it, check your spam/junk folder.",
         });
       }
     }
@@ -238,7 +237,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Please check your email to confirm your subscription.",
+      message: "Please check your email to confirm your subscription. If you don't see it, check your spam/junk folder.",
     });
   } catch (error) {
     console.error("[Subscribe] Error:", error);
