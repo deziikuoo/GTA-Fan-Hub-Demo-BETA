@@ -522,8 +522,10 @@ export default {
       </div>
     </section>
 
-    <!-- Version & Update Info Section -->
-    <section class="version-section">
+    <!-- Version & Newsletter Container -->
+    <div class="version-newsletter-container">
+      <!-- Version Section -->
+      <section class="version-section">
       <div class="version-container">
         <h2 class="section-title">Version Information</h2>
         <div class="version-info">
