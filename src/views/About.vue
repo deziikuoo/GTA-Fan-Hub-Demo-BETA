@@ -1420,15 +1420,26 @@ export default {
 }
 
 .message-highlight-box {
-  background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(0, 191, 255, 0.15) 100%);
-  border: 2px solid;
-  border-image: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%) 1;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.25) 0%, rgba(0, 191, 255, 0.2) 100%);
+  border: 2px solid var(--neon-pink2);
+  border-left: 4px solid var(--neon-blue);
   border-radius: var(--radius-lg);
   padding: var(--space-md);
   margin-top: var(--space-sm);
   display: flex;
   gap: var(--space-sm);
   align-items: flex-start;
+  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(255, 107, 157, 0.4), 0 0 15px rgba(0, 191, 255, 0.3);
+  }
 }
 
 .highlight-icon {
@@ -1444,11 +1455,14 @@ export default {
 
 .highlight-title {
   margin: 0 0 var(--space-xs) 0;
-  color: var(--neon-blue);
-  font-weight: 600;
-  font-size: 0.95em;
+  background: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 1em;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .highlight-text {
