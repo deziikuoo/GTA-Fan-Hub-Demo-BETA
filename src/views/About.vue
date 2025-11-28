@@ -1,7 +1,6 @@
 <script>
 import { ref, onMounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import bmcQRCode from "@/assets/BuyMeCoffeeQR/bmc_qr.png";
 
 export default {
   name: "About",
@@ -709,12 +708,26 @@ export default {
               <a :href="support.url" target="_blank" class="support-link">
                 Support via {{ support.name }}
               </a>
-              <img
-                v-if="support.showQRCode"
-                :src="bmcQRCode"
-                alt="Buy Me a Coffee QR Code"
-                class="support-qr-code"
-              />
+              <!-- Buy Me a Coffee QR Code -->
+              <div v-if="support.showQRCode" class="qr-code-container">
+                <img
+                  src="/BuyMeCoffeeQR/bmc_qr.png"
+                  alt="Buy Me a Coffee QR Code"
+                  class="support-qr-code"
+                />
+                <p class="qr-code-url">buymeacoffee.com/deziikuoo</p>
+              </div>
+              <!-- GitHub Sponsors Card -->
+              <div v-if="support.name === 'GitHub Sponsors'" class="github-sponsors-container">
+                <iframe
+                  src="https://github.com/sponsors/deziikuoo/card"
+                  title="Sponsor deziikuoo"
+                  height="225"
+                  width="600"
+                  style="border: 0;"
+                  class="github-sponsors-iframe"
+                ></iframe>
+              </div>
             </div>
           </div>
         </div>
@@ -1933,6 +1946,13 @@ export default {
   box-shadow: 0 4px 15px rgba(226, 113, 207, 0.4);
 }
 
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .support-qr-code {
   width: 150px;
   height: 150px;
@@ -1941,6 +1961,28 @@ export default {
   padding: var(--space-xs);
   background: var(--bright-white);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.qr-code-url {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--mint-green);
+  font-weight: 600;
+  text-align: center;
+}
+
+.github-sponsors-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-md);
+}
+
+.github-sponsors-iframe {
+  max-width: 100%;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .support-note {
@@ -2153,6 +2195,13 @@ export default {
   .support-card {
     width: 100%;
     max-width: 300px;
+  }
+
+  .github-sponsors-iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 200px;
   }
 
   .cta-buttons {
