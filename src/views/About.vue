@@ -772,9 +772,9 @@ export default {
 /* Toast Notification */
 .toast-notification {
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
-  z-index: 99999;
+  z-index: 100000 !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -907,7 +907,7 @@ export default {
 /* Mobile toast adjustments */
 @media (max-width: 768px) {
   .toast-notification {
-    top: 10px;
+    top: 64px;
     right: 10px;
     left: 10px;
     max-width: none;
