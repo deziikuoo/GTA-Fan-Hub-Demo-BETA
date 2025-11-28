@@ -139,15 +139,19 @@ This confirmation link expires in 7 days.
 To unsubscribe: ${unsubscribeUrl}`,
     };
 
-    await sgMail.send(msg);
-    console.log('[SendGrid] Confirmation email sent to:', email);
-    return { success: true, data: { messageId: 'sent' } };
+    const result = await sgMail.send(msg);
+    console.log('[SendGrid] Confirmation email sent successfully to:', email);
+    console.log('[SendGrid] Response status:', result[0]?.statusCode);
+    console.log('[SendGrid] Response headers:', result[0]?.headers);
+    return { success: true, data: { messageId: result[0]?.headers?.['x-message-id'] || 'sent' } };
   } catch (error) {
     console.error('[SendGrid] Error sending confirmation email:', error);
+    console.error('[SendGrid] Error message:', error.message);
     if (error.response) {
-      console.error('[SendGrid] Error details:', error.response.body);
+      console.error('[SendGrid] Error status code:', error.response.code);
+      console.error('[SendGrid] Error response body:', JSON.stringify(error.response.body, null, 2));
     }
-    return { success: false, error };
+    return { success: false, error: error.message || error };
   }
 }
 
@@ -235,14 +239,16 @@ Changed your mind? Visit ${resubscribeUrl} to resubscribe.
 Thank you for being part of the GtaFanHub community.`,
     };
 
-    await sgMail.send(msg);
-    console.log('[SendGrid] Unsubscribe confirmation sent to:', email);
-    return { success: true, data: { messageId: 'sent' } };
+    const result = await sgMail.send(msg);
+    console.log('[SendGrid] Unsubscribe confirmation sent successfully to:', email);
+    return { success: true, data: { messageId: result[0]?.headers?.['x-message-id'] || 'sent' } };
   } catch (error) {
     console.error('[SendGrid] Error sending unsubscribe confirmation:', error);
+    console.error('[SendGrid] Error message:', error.message);
     if (error.response) {
-      console.error('[SendGrid] Error details:', error.response.body);
+      console.error('[SendGrid] Error status code:', error.response.code);
+      console.error('[SendGrid] Error response body:', JSON.stringify(error.response.body, null, 2));
     }
-    return { success: false, error };
+    return { success: false, error: error.message || error };
   }
 }
