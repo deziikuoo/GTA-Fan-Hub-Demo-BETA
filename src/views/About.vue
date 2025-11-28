@@ -1,6 +1,7 @@
 <script>
 import { ref, onMounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import bmcQRCode from "@/assets/BuyMeCoffeeQR/bmc_qr.png";
 
 export default {
   name: "About",
@@ -245,14 +246,15 @@ export default {
       {
         name: "Buy Me a Coffee",
         icon: ["fas", "mug-hot"],
-        url: "#",
-        comingSoon: true,
+        url: "https://buymeacoffee.com/deziikuoo",
+        comingSoon: false,
+        showQRCode: true,
       },
       {
         name: "GitHub Sponsors",
         icon: ["fab", "github"],
-        url: "#",
-        comingSoon: true,
+        url: "https://github.com/sponsors/deziikuoo",
+        comingSoon: false,
       },
     ]);
 
@@ -703,15 +705,22 @@ export default {
             <span v-if="support.comingSoon" class="coming-soon-badge"
               >Coming Soon</span
             >
-            <a v-else :href="support.url" target="_blank" class="support-link">
-              Support via {{ support.name }}
-            </a>
+            <div v-else class="support-card-content">
+              <a :href="support.url" target="_blank" class="support-link">
+                Support via {{ support.name }}
+              </a>
+              <img
+                v-if="support.showQRCode"
+                :src="bmcQRCode"
+                alt="Buy Me a Coffee QR Code"
+                class="support-qr-code"
+              />
+            </div>
           </div>
         </div>
         <p class="support-note">
-          For now, the best way to support us is to
-          <a :href="githubRepoUrl" target="_blank">⭐ star the repo</a> on
-          GitHub!
+          Your support helps me build better projects and collaborate with awesome developers!
+          You can also <a :href="githubRepoUrl" target="_blank">⭐ star the repo</a> on GitHub.
         </p>
       </div>
     </section>
@@ -1899,6 +1908,39 @@ export default {
   font-weight: 600;
   margin-bottom: var(--space-md);
   color: var(--bright-white);
+}
+
+.support-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.support-link {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  transition: var(--transition-normal);
+}
+
+.support-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(226, 113, 207, 0.4);
+}
+
+.support-qr-code {
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--mint-green);
+  padding: var(--space-xs);
+  background: var(--bright-white);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .support-note {
