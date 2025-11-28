@@ -683,6 +683,7 @@ export default {
         </p>
       </div>
     </section>
+    </div>
 
     <!-- Support the Project Section -->
     <section class="support-section">
@@ -738,26 +739,6 @@ export default {
       </div>
     </section>
 
-    <!-- Credits Section -->
-    <section class="credits-section">
-      <div class="credits-container">
-        <h2 class="section-title">Credits & Acknowledgments</h2>
-        <div class="credits-content">
-          <p class="credits-text">
-            <!-- Credits will be added as the project grows -->
-            Special thanks to the GTA community for the inspiration and support.
-          </p>
-          <div class="credits-disclaimer">
-            <p>
-              <strong>Disclaimer:</strong> GtaFanHub is a fan-made project and
-              is not affiliated with, endorsed by, or connected to Rockstar
-              Games or Take-Two Interactive.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA Section -->
     <section class="cta-section">
       <div class="cta-container">
@@ -775,6 +756,26 @@ export default {
             <font-awesome-icon icon="fas fa-newspaper" />
             Read Latest News
           </router-link>
+        </div>
+      </div>
+    </section>
+
+        <!-- Credits Section -->
+    <section class="credits-section">
+      <div class="credits-container">
+        <h2 class="section-title">Credits & Acknowledgments</h2>
+        <div class="credits-content">
+          <p class="credits-text">
+            <!-- Credits will be added as the project grows -->
+            Special thanks to the GTA community for the inspiration and support.
+          </p>
+          <div class="credits-disclaimer">
+            <p>
+              <strong>Disclaimer:</strong> GtaFanHub is a fan-made project and
+              is not affiliated with, endorsed by, or connected to Rockstar
+              Games or Take-Two Interactive.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -1523,6 +1524,14 @@ export default {
   font-weight: 600;
 }
 
+/* Version & Newsletter Container */
+.version-newsletter-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  margin-bottom: var(--space-4xl);
+}
+
 /* Version Section */
 .version-section {
   padding: var(--space-4xl) var(--space-lg);
@@ -1531,7 +1540,7 @@ export default {
 }
 
 .version-container {
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
   text-align: center;
 }
@@ -1582,6 +1591,7 @@ export default {
 /* Newsletter Section */
 .newsletter-section {
   padding: var(--space-4xl) var(--space-lg);
+  background-color: var(--glass-morphism-bg);
   border-radius: var(--radius-2xl);
 }
 
@@ -2043,6 +2053,7 @@ export default {
 
 /* CTA Section */
 .cta-section {
+  margin-top: var(--space-2xl);
   padding: var(--space-4xl) var(--space-lg);
   background: var(--glass-morphism-bg);
   border-radius: var(--radius-2xl);
@@ -2190,6 +2201,11 @@ export default {
   .support-links {
     flex-direction: column;
     align-items: center;
+  }
+
+  .version-newsletter-container {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
   }
 
   .support-card {
