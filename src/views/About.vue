@@ -306,27 +306,29 @@ export default {
 
 <template>
   <div class="about-page">
-    <!-- Toast Notification -->
-    <Transition name="toast">
-      <div v-if="showToast" class="toast-notification" :class="toastType">
-        <div class="toast-content">
-          <font-awesome-icon
-            :icon="
-              toastType === 'success'
-                ? 'fas fa-check-circle'
-                : toastType === 'error'
-                ? 'fas fa-exclamation-circle'
-                : 'fas fa-info-circle'
-            "
-            class="toast-icon"
-          />
-          <span class="toast-message">{{ toastMessage }}</span>
+    <!-- Toast Notification - Teleported to body to appear above everything -->
+    <Teleport to="body">
+      <Transition name="toast">
+        <div v-if="showToast" class="toast-notification" :class="toastType">
+          <div class="toast-content">
+            <font-awesome-icon
+              :icon="
+                toastType === 'success'
+                  ? 'fas fa-check-circle'
+                  : toastType === 'error'
+                  ? 'fas fa-exclamation-circle'
+                  : 'fas fa-info-circle'
+              "
+              class="toast-icon"
+            />
+            <span class="toast-message">{{ toastMessage }}</span>
+          </div>
+          <button class="toast-dismiss" @click="dismissToast">
+            <font-awesome-icon icon="fas fa-times" />
+          </button>
         </div>
-        <button class="toast-dismiss" @click="dismissToast">
-          <font-awesome-icon icon="fas fa-times" />
-        </button>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
 
     <!-- Hero Section -->
     <section class="hero-section">
