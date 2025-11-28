@@ -515,7 +515,24 @@ export default {
                   : 'fas fa-exclamation-circle'
               "
             />
-            <span>{{ newsletterMessage }}</span>
+            <div class="newsletter-message-content">
+              <span v-if="newsletterMessageType !== 'success'">{{ newsletterMessage }}</span>
+              <div v-else class="success-message-text">
+                <p class="message-main">Please check your email to confirm your subscription.</p>
+                <div class="message-highlight-box">
+                  <font-awesome-icon icon="fas fa-exclamation-triangle" class="highlight-icon" />
+                  <div class="highlight-content">
+                    <p class="highlight-title">Important for Gmail Users:</p>
+                    <p class="highlight-text">
+                      If you don't see the email, <strong>check your spam/junk folder</strong>.
+                    </p>
+                    <p class="highlight-text">
+                      If using <strong>Gmail mobile app</strong> and the email is in spam, tap <strong class="highlight-accent">"Report not spam"</strong> to move it to Primary - this will make the confirmation button clickable.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
 
@@ -1380,9 +1397,80 @@ export default {
 }
 
 .newsletter-message.success {
-  background-color: rgba(152, 255, 152, 0.15);
+  background: linear-gradient(135deg, rgba(152, 255, 152, 0.15) 0%, rgba(0, 191, 255, 0.1) 100%);
   color: var(--mint-green);
   border: 1px solid var(--mint-green);
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.newsletter-message-content {
+  width: 100%;
+}
+
+.success-message-text {
+  width: 100%;
+}
+
+.message-main {
+  margin: 0 0 var(--space-md) 0;
+  color: var(--mint-green);
+  font-weight: 500;
+}
+
+.message-highlight-box {
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(0, 191, 255, 0.15) 100%);
+  border: 2px solid;
+  border-image: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%) 1;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.highlight-icon {
+  color: var(--neon-pink2);
+  font-size: 1.2em;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.highlight-content {
+  flex: 1;
+}
+
+.highlight-title {
+  margin: 0 0 var(--space-xs) 0;
+  color: var(--neon-blue);
+  font-weight: 600;
+  font-size: 0.95em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.highlight-text {
+  margin: var(--space-xs) 0;
+  color: var(--text-primary);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.highlight-text strong {
+  color: var(--neon-pink2);
+  font-weight: 600;
+}
+
+.highlight-accent {
+  color: var(--neon-blue);
+  background: linear-gradient(135deg, var(--neon-pink2) 0%, var(--neon-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  padding: 2px 4px;
 }
 
 .newsletter-message.error {
