@@ -358,7 +358,7 @@ export default {
       <div class="mission-container">
         <h2 class="section-title">Our Mission</h2>
         <p class="mission-text">
-          GtaFanHub was created for passionate GTA fans. We're dedicated to
+          GtaFanHub was created for passionate GTA fans.<br></br>We're dedicated to
           providing the most comprehensive, up-to-date information about the
           Grand Theft Auto series, building a vibrant community of players, and
           celebrating everything that makes GTA legendary.
@@ -456,7 +456,7 @@ export default {
         <h2 class="section-title">Beta Feedback</h2>
         <p class="feedback-text">
           Help us improve! Report bugs, suggest features, or share your
-          thoughts. Your feedback shapes the future of GtaFanHub.
+          thoughts.<br></br>Your feedback shapes the future of GtaFanHub.
         </p>
         <div class="feedback-links">
           <a
@@ -732,7 +732,7 @@ export default {
           </div>
         </div>
         <p class="support-note">
-          Your support helps me build better projects and collaborate with awesome developers!
+          Your support helps me build better projects and collaborate with awesome developers!<br></br>
           You can also <a :href="githubRepoUrl" target="_blank">⭐ star the repo</a> on GitHub.
         </p>
       </div>
@@ -1003,13 +1003,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: var(--space-xl);
+  margin-top: var(--space-4xl);
   border-radius: var(--radius-2xl);
 }
 
 .hero-content {
   text-align: center;
-  max-width: 800px;
+  max-width: 950px;
   padding: var(--space-xl);
   width: 100%;
   flex-direction: column;
@@ -1595,7 +1595,7 @@ export default {
   color: var(--soft-lavender);
   margin-bottom: var(--space-2xl);
   opacity: 0.9;
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
 }
 
 .newsletter-actions {
@@ -2062,7 +2062,7 @@ export default {
 }
 
 .cta-subtitle {
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   color: var(--soft-lavender);
   margin-bottom: var(--space-2xl);
   line-height: var(--leading-relaxed);
