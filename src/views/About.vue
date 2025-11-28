@@ -14,7 +14,7 @@ export default {
     const newsletterMessage = ref("");
     const newsletterMessageType = ref(""); // 'success' or 'error'
     const successType = ref(""); // 'pending', 'confirmed', or 'unsubscribed'
-    
+
     // Toast notification state (for redirect confirmations)
     const showToast = ref(false);
     const toastMessage = ref("");
@@ -79,13 +79,13 @@ export default {
       toastMessage.value = message;
       toastType.value = type;
       showToast.value = true;
-      
+
       // Auto-dismiss after duration
       setTimeout(() => {
         showToast.value = false;
       }, duration);
     };
-    
+
     // Dismiss toast manually
     const dismissToast = () => {
       showToast.value = false;
@@ -97,23 +97,29 @@ export default {
       let subscribed = route.query.subscribed;
       let unsubscribed = route.query.unsubscribed;
       let error = route.query.error;
-      
+
       // Fallback: parse from window.location if route.query is empty
       if (!subscribed && !unsubscribed && !error) {
         const urlParams = new URLSearchParams(window.location.search);
-        subscribed = urlParams.get('subscribed');
-        unsubscribed = urlParams.get('unsubscribed');
-        error = urlParams.get('error');
+        subscribed = urlParams.get("subscribed");
+        unsubscribed = urlParams.get("unsubscribed");
+        error = urlParams.get("error");
       }
 
       if (subscribed === "true") {
         // Show toast notification at top of page
-        displayToast("🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.", "success");
+        displayToast(
+          "🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.",
+          "success"
+        );
         // Clean up URL
-        window.history.replaceState({}, '', window.location.pathname);
+        window.history.replaceState({}, "", window.location.pathname);
       } else if (unsubscribed === "true") {
-        displayToast("You have been unsubscribed. We're sorry to see you go!", "info");
-        window.history.replaceState({}, '', window.location.pathname);
+        displayToast(
+          "You have been unsubscribed. We're sorry to see you go!",
+          "info"
+        );
+        window.history.replaceState({}, "", window.location.pathname);
       } else if (error) {
         const errorMessages = {
           invalid_token:
@@ -126,8 +132,12 @@ export default {
           not_subscribed: "Email not found in our subscription list.",
           unsubscribe_failed: "Failed to unsubscribe. Please try again.",
         };
-        displayToast(errorMessages[error] || "An error occurred. Please try again.", "error", 8000);
-        window.history.replaceState({}, '', window.location.pathname);
+        displayToast(
+          errorMessages[error] || "An error occurred. Please try again.",
+          "error",
+          8000
+        );
+        window.history.replaceState({}, "", window.location.pathname);
       }
     };
     const stats = ref([
@@ -256,7 +266,7 @@ export default {
         checkQueryParams();
       });
     });
-    
+
     // Also watch for route changes (backup for SPA navigation)
     watch(
       () => route.query,
@@ -590,9 +600,12 @@ export default {
               <span v-if="newsletterMessageType !== 'success'">{{
                 newsletterMessage
               }}</span>
-              
+
               <!-- Pending confirmation - show spam instructions -->
-              <div v-else-if="successType === 'pending'" class="success-message-text">
+              <div
+                v-else-if="successType === 'pending'"
+                class="success-message-text"
+              >
                 <p class="message-main">
                   Please check your email to confirm your subscription.
                 </p>
@@ -617,27 +630,33 @@ export default {
                   </div>
                 </div>
               </div>
-              
+
               <!-- Confirmed subscription - show celebration -->
-              <div v-else-if="successType === 'confirmed'" class="confirmed-message-text">
+              <div
+                v-else-if="successType === 'confirmed'"
+                class="confirmed-message-text"
+              >
                 <p class="message-main confirmed">
                   🎉 Your subscription is confirmed!
                 </p>
                 <p class="message-sub">
-                  Welcome to the GtaFanHub community. You'll now receive updates on GTA 6 news, announcements, and exclusive content.
+                  Welcome to the GtaFanHub community. You'll now receive updates
+                  on GTA 6 news, announcements, and exclusive content.
                 </p>
               </div>
-              
+
               <!-- Unsubscribed - show farewell -->
-              <div v-else-if="successType === 'unsubscribed'" class="unsubscribed-message-text">
-                <p class="message-main">
-                  You have been unsubscribed.
-                </p>
+              <div
+                v-else-if="successType === 'unsubscribed'"
+                class="unsubscribed-message-text"
+              >
+                <p class="message-main">You have been unsubscribed.</p>
                 <p class="message-sub">
-                  We're sorry to see you go! You can always resubscribe if you change your mind.
+                  We're sorry to see you go! You can always resubscribe if you
+                  change your mind.
                 </p>
               </div>
-              
+
               <!-- Fallback for other success messages -->
               <span v-else>{{ newsletterMessage }}</span>
             </div>
@@ -754,36 +773,47 @@ export default {
 .toast-notification {
   position: fixed;
   top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
+  right: 20px;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-xl);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
-  max-width: 90%;
+  max-width: 500px;
   width: auto;
   min-width: 300px;
 }
 
 .toast-notification.success {
-  background: linear-gradient(135deg, rgba(198, 232, 125, 0.95) 0%, rgba(152, 232, 152, 0.95) 100%);
-  border: 2px solid var(--mint-green);
-  color: #1a1a2e;
+  background: linear-gradient(
+    135deg,
+    rgba(152, 255, 152, 0.15) 0%,
+    rgba(0, 191, 255, 0.1) 100%
+  );
+  border: 1px solid var(--mint-green);
+  color: var(--mint-green);
 }
 
 .toast-notification.error {
-  background: linear-gradient(135deg, rgba(226, 113, 207, 0.95) 0%, rgba(255, 107, 157, 0.95) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(226, 113, 207, 0.95) 0%,
+    rgba(255, 107, 157, 0.95) 100%
+  );
   border: 2px solid var(--neon-pink2);
   color: #ffffff;
 }
 
 .toast-notification.info {
-  background: linear-gradient(135deg, rgba(0, 191, 255, 0.95) 0%, rgba(84, 123, 152, 0.95) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 191, 255, 0.95) 0%,
+    rgba(84, 123, 152, 0.95) 100%
+  );
   border: 2px solid var(--electric-blue);
   color: #ffffff;
 }
@@ -792,21 +822,35 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  flex: 1;
 }
 
 .toast-icon {
-  font-size: 1.4em;
+  font-size: 1.2em;
   flex-shrink: 0;
+  color: var(--mint-green);
+}
+
+.toast-notification.success .toast-icon {
+  color: var(--mint-green);
+}
+
+.toast-notification.error .toast-icon {
+  color: var(--neon-pink2);
+}
+
+.toast-notification.info .toast-icon {
+  color: var(--electric-blue);
 }
 
 .toast-message {
-  font-size: var(--text-base);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 500;
   line-height: 1.4;
 }
 
 .toast-dismiss {
-  background: rgba(0, 0, 0, 0.2);
+  background: transparent;
   border: none;
   color: inherit;
   cursor: pointer;
@@ -815,12 +859,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: opacity 0.2s ease;
   flex-shrink: 0;
+  opacity: 0.7;
+  font-size: 0.9em;
 }
 
 .toast-dismiss:hover {
-  background: rgba(0, 0, 0, 0.3);
+  opacity: 1;
+}
+
+.toast-notification.success .toast-dismiss {
+  color: var(--mint-green);
 }
 
 /* Toast animation */
@@ -835,22 +885,22 @@ export default {
 @keyframes toast-slide-in {
   0% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-100%);
+    transform: translateX(100%);
   }
   100% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes toast-slide-out {
   0% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(0);
   }
   100% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-100%);
+    transform: translateX(100%);
   }
 }
 
@@ -858,41 +908,40 @@ export default {
 @media (max-width: 768px) {
   .toast-notification {
     top: 10px;
-    left: 10px;
     right: 10px;
-    transform: none;
+    left: 10px;
     max-width: none;
     width: auto;
     min-width: auto;
   }
-  
+
   .toast-enter-active {
     animation: toast-slide-in-mobile 0.4s ease-out;
   }
-  
+
   .toast-leave-active {
     animation: toast-slide-out-mobile 0.3s ease-in;
   }
-  
+
   @keyframes toast-slide-in-mobile {
     0% {
       opacity: 0;
-      transform: translateY(-100%);
+      transform: translateX(100%);
     }
     100% {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
   }
-  
+
   @keyframes toast-slide-out-mobile {
     0% {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
     100% {
       opacity: 0;
-      transform: translateY(-100%);
+      transform: translateX(100%);
     }
   }
 }
@@ -1766,7 +1815,11 @@ export default {
 .message-main.confirmed {
   font-size: 1.2em;
   margin-bottom: var(--space-sm);
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--electric-blue) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--mint-green) 0%,
+    var(--electric-blue) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
