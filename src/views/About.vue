@@ -1,5 +1,5 @@
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export default {
@@ -93,16 +93,27 @@ export default {
 
     // Check for confirmation/unsubscribe query parameters
     const checkQueryParams = () => {
-      const { subscribed, unsubscribed, error } = route.query;
+      // Try route.query first, fallback to window.location for external redirects
+      let subscribed = route.query.subscribed;
+      let unsubscribed = route.query.unsubscribed;
+      let error = route.query.error;
+      
+      // Fallback: parse from window.location if route.query is empty
+      if (!subscribed && !unsubscribed && !error) {
+        const urlParams = new URLSearchParams(window.location.search);
+        subscribed = urlParams.get('subscribed');
+        unsubscribed = urlParams.get('unsubscribed');
+        error = urlParams.get('error');
+      }
 
       if (subscribed === "true") {
         // Show toast notification at top of page
         displayToast("🎉 Your subscription is confirmed! Welcome to the GtaFanHub community.", "success");
         // Clean up URL
-        router.replace({ path: route.path, query: {} });
+        window.history.replaceState({}, '', window.location.pathname);
       } else if (unsubscribed === "true") {
         displayToast("You have been unsubscribed. We're sorry to see you go!", "info");
-        router.replace({ path: route.path, query: {} });
+        window.history.replaceState({}, '', window.location.pathname);
       } else if (error) {
         const errorMessages = {
           invalid_token:
@@ -116,7 +127,7 @@ export default {
           unsubscribe_failed: "Failed to unsubscribe. Please try again.",
         };
         displayToast(errorMessages[error] || "An error occurred. Please try again.", "error", 8000);
-        router.replace({ path: route.path, query: {} });
+        window.history.replaceState({}, '', window.location.pathname);
       }
     };
     const stats = ref([
@@ -240,8 +251,20 @@ export default {
 
     onMounted(() => {
       // Check for query params from confirmation/unsubscribe redirects
-      checkQueryParams();
+      // Use nextTick to ensure DOM is ready after external redirect
+      nextTick(() => {
+        checkQueryParams();
+      });
     });
+    
+    // Also watch for route changes (backup for SPA navigation)
+    watch(
+      () => route.query,
+      () => {
+        checkQueryParams();
+      },
+      { immediate: false }
+    );
 
     return {
       stats,
