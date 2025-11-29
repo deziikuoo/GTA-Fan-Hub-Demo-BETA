@@ -194,10 +194,16 @@ We're building GTA Fan Hub **for the community, by the community**. Your partici
 
 ### How to Get Involved
 
-1. **Try the Demo**: Experience the platform at our [live demo site](https://gta-fan-hub-demo.vercel.app/)
-2. **Share Feedback**: Report bugs, request features, or share ideas via [GitHub Issues](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
-3. **Stay Updated**: Watch this repository for updates and announcements
-4. **Spread the Word**: Share GTA Fan Hub with fellow GTA enthusiasts!
+1. **Subscribe to Updates**: Stay informed about GTA Fan Hub development, new features, and community news
+
+   <a href="https://gta-fan-hub-demo.vercel.app/about#subscribe" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #4FC08D 0%, #44A08D 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(79, 192, 141, 0.3);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(79, 192, 141, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(79, 192, 141, 0.3)';">
+      📧 Subscribe to Newsletter
+   </a>
+
+2. **Try the Demo**: Experience the platform at our [live demo site](https://gta-fan-hub-demo.vercel.app/)
+3. **Share Feedback**: Report bugs, request features, or share ideas via [GitHub Issues](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
+4. **Stay Updated**: Watch this repository for updates and announcements
+5. **Spread the Word**: Share GTA Fan Hub with fellow GTA enthusiasts!
 
 ### What We're Looking For
 
