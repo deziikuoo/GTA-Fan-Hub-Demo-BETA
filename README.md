@@ -10,7 +10,7 @@
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-<a href="https://gta-fan-hub-demo.up.railway.app/" target="_blank" rel="noopener noreferrer">🚀 Try Live Demo</a> • [Report Bug](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues) • [Request Feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
+<a href="https://gta-fan-hub-demo.vercel.app/" target="_blank" rel="noopener noreferrer">🚀 Try Live Demo</a> • [Report Bug](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues) • [Request Feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
 
 </div>
 
@@ -31,7 +31,7 @@
 - 📝 What you see here represents our vision, but the final product may differ
 - 💡 Your feedback helps shape the future of GTA Fan Hub!
 
-**Want to see it in action?** Check out our [live demo](https://gta-fan-hub-demo.up.railway.app/) hosted on Railway!
+**Want to see it in action?** Check out our [live demo](https://gta-fan-hub-demo.vercel.app/) hosted on Railway!
 
 </div>
 
@@ -196,11 +196,11 @@ We're building GTA Fan Hub **for the community, by the community**. Your partici
 
 1. **Subscribe to Updates**: Stay informed about GTA Fan Hub development, new features, and community news
 
-   <a href="https://gta-fan-hub-demo.up.railway.app/about#subscribe" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #4FC08D 0%, #44A08D 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(79, 192, 141, 0.3);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(79, 192, 141, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(79, 192, 141, 0.3)';">
+   <a href="https://gta-fan-hub-demo.vercel.app/about#subscribe" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #4FC08D 0%, #44A08D 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(79, 192, 141, 0.3);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(79, 192, 141, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(79, 192, 141, 0.3)';">
       📧 Subscribe to Newsletter
    </a>
 
-2. **Try the Demo**: Experience the platform at our [live demo site](https://gta-fan-hub-demo.up.railway.app/)
+2. **Try the Demo**: Experience the platform at our [live demo site](https://gta-fan-hub-demo.vercel.app/)
 3. **Share Feedback**: Report bugs, request features, or share ideas via [GitHub Issues](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
 4. **Stay Updated**: Watch this repository for updates and announcements
 5. **Spread the Word**: Share GTA Fan Hub with fellow GTA enthusiasts!
@@ -315,7 +315,7 @@ This repository currently serves as **documentation and preview materials**. The
 ## 📞 Contact & Support
 
 - **GitHub Issues**: [Report a bug or request a feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
-- **Live Demo**: [Try the demo](https://gta-fan-hub-demo.up.railway.app/)
+- **Live Demo**: [Try the demo](https://gta-fan-hub-demo.vercel.app/)
 - **Community**: Join the conversation and help shape GTA Fan Hub!
 
 ---
