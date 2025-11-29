@@ -10,7 +10,7 @@
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
-[Live Demo](https://gta-fan-hub-demo.vercel.app/) • [Report Bug](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues) • [Request Feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
+<a href="https://gta-fan-hub-demo.vercel.app/" target="_blank" rel="noopener noreferrer">Live Demo</a> • [Report Bug](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues) • [Request Feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
 
 </div>
 
@@ -338,7 +338,7 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 ## 📞 Contact & Support
 
 - **GitHub Issues**: [Report a bug or request a feature](https://github.com/deziikuoo/GTA-Fan-Hub-Demo/issues)
-- **Demo Site**: [gta-fan-hub-demo.vercel.app](https://gta-fan-hub-demo.vercel.app/)
+- **Demo Site**: <a href="https://gta-fan-hub-demo.vercel.app/" target="_blank" rel="noopener noreferrer">gta-fan-hub-demo.vercel.app</a>
 
 ---
 
