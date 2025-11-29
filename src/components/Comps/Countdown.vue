@@ -47,8 +47,9 @@ export default {
     },
 
     async fetchCountdown() {
-      // Use hardcoded release date for demo: November 19, 2026
-      const targetDate = new Date("2026-11-19T00:00:00Z");
+      // Use hardcoded release date: November 19, 2026 at midnight EST
+      // November 19, 2026 00:00:00 EST (UTC-5)
+      const targetDate = new Date("2026-11-19T00:00:00-05:00");
       
       // Store target date
       this.targetDate = targetDate;

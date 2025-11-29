@@ -28,7 +28,7 @@
         </div>
 
         <!-- Notifications list -->
-        <div v-else class="notifications-list">
+        <div v-else class="notifications-list main-backdrop-filter">
           <NotificationItem
             v-for="notification in recentNotifications"
             :key="notification._id"
@@ -211,7 +211,7 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #1da1f2;
+  border-top-color: var(--neon-pink2);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 12px;
@@ -237,6 +237,8 @@ onUnmounted(() => {
 
 .notifications-list {
   /* No additional styling needed, NotificationItem handles its own */
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown-footer {

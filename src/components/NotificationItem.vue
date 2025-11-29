@@ -171,7 +171,7 @@ const handleDelete = async () => {
 }
 
 .notification-item.unread {
-  background-color: rgba(29, 161, 242, 0.1);
+  background-color: rgba(226, 113, 207, 0.25);
 }
 
 .notification-icon {
@@ -229,7 +229,8 @@ const handleDelete = async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #1da1f2;
+  background-color: var(--neon-pink2);
+  box-shadow: 0 0 8px rgba(226, 113, 207, 0.6);
 }
 
 .delete-btn {

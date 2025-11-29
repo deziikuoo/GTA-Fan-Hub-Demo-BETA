@@ -734,6 +734,14 @@ onUnmounted(() => {
             <font-awesome-icon :icon="['fas', 'users']" />
             <span class="nav-label">Characters</span>
           </router-link>
+          <router-link
+            to="/About"
+            class="nav-item"
+            :class="{ active: route.name === 'About' }"
+          >
+            <font-awesome-icon :icon="['fas', 'circle-info']" />
+            <span class="nav-label">About</span>
+          </router-link>
         </nav>
 
         <div class="home-nav-right">

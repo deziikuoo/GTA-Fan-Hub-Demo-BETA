@@ -2,9 +2,7 @@
 
 <div align="center">
 
-![GTA Fan Hub Logo](https://via.placeholder.com/800x200/1a1a2e/ffffff?text=GTA+Fan+Hub+Demo)
-
-<!-- TODO: Replace with actual logo image -->
+![GTA Fan Hub Logo](./docs/images/homepage.png)
 
 **The Ultimate Grand Theft Auto 6 Community Platform**
 
@@ -20,13 +18,11 @@
 
 ## 🌟 Overview
 
-**GTA Fan Hub** is a cutting-edge social platform designed exclusively for Grand Theft Auto enthusiasts. Experience a vibrant community where fans connect, share content, track release dates, and dive deep into the world of Vice City and Leonida.
+**GTA Fan Hub** is a cutting-edge social platform designed exclusively for Grand Theft Auto enthusiasts. Experience a vibrant community where fans connect, share content, track release dates, and dive deep into the GTA Universe.
 
 > ⚠️ **This is a frontend-only demo version.** All features are powered by mock data and static JSON files. Real-time functionality, backend services, and production features are disabled in this demo.
 
-![Homepage Screenshot](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Homepage+Screenshot)
-
-<!-- TODO: Add actual homepage screenshot showing the neon-lit cityscape background and main interface -->
+![Homepage Screenshot](./docs/images/homepage.png)
 
 ---
 
@@ -34,15 +30,13 @@
 
 ### 🏠 **Home Dashboard**
 
-- **Live Countdown Timer**: Real-time countdown to GTA 6 release (demo mode: 365 days from current date)
+- **Live Countdown Timer**: Real-time countdown to GTA 6 release (November 19, 2026)
 - **News Carousel**: Latest GTA 6 news, trailers, and announcements
 - **Trending Social Feed**: See what the community is talking about
 - **Reddit Integration**: Curated posts from GTA 6 subreddits
 - **Interactive UI**: Neon-lit, Vice City-inspired design
 
-![Home Dashboard](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Home+Dashboard+Preview)
-
-<!-- TODO: Add screenshot of the home dashboard with countdown timer and feed -->
+![Home Dashboard](./docs/images/homepagefeature%20gif.gif)
 
 ### 👤 **User Profiles**
 
@@ -52,9 +46,7 @@
 - **Activity Feed**: View user posts, achievements, and activity
 - **Profile Tabs**: Posts, About, Achievements, Followers, Following
 
-![Profile Page](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Profile+Page+Preview)
-
-<!-- TODO: Add screenshot of a user profile page -->
+![Profile Page](./docs/images/profile.png)
 
 ### 📱 **Social Features**
 
@@ -64,9 +56,15 @@
 - **Notifications**: Real-time notifications for interactions (disabled in demo)
 - **Feed Filtering**: Filter posts by trending, recent, or following
 
-![Social Feed](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Social+Feed+Preview)
+![Social Feed](./docs/images/social1.png)
 
-<!-- TODO: Add screenshot of the social feed with posts -->
+<details>
+<summary>More Social Feed Screenshots</summary>
+
+![Social Feed 2](./docs/images/social2.png)
+![Social Feed 3](./docs/images/social3.png)
+
+</details>
 
 ### 📰 **News & Content**
 
@@ -75,9 +73,15 @@
 - **RSS Integration**: Automatic news updates (disabled in demo)
 - **Article Carousel**: Featured articles on the homepage
 
-![News Page](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=News+Page+Preview)
+![News Page](./docs/images/news1.png)
 
-<!-- TODO: Add screenshot of the news page -->
+<details>
+<summary>More News Page Screenshots</summary>
+
+![News Page 2](./docs/images/news2.png)
+![News Page 3](./docs/images/news3.png)
+
+</details>
 
 ### 🎯 **Game Content Pages**
 
@@ -85,12 +89,10 @@
 - **Missions**: Mission guides and walkthroughs
 - **Story**: Deep dive into the game's narrative
 - **Lore**: Comprehensive GTA universe lore
-- **City Guide**: Interactive map of Vice City and Leonida
+- **City Guide**: Interactive maps of each city in The GTA Series
 - **Events**: Community events and game-related activities
 
-![Content Pages](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Content+Pages+Preview)
-
-<!-- TODO: Add screenshot showing one of the content pages -->
+![Characters Page](./docs/images/characterspage%20gif.gif)
 
 ### 🔔 **Notifications**
 
@@ -99,9 +101,7 @@
 - **Toast Notifications**: Non-intrusive popup notifications
 - **Unread Count**: Track unread notifications
 
-![Notifications](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Notifications+Preview)
-
-<!-- TODO: Add screenshot of the notification center -->
+![Notifications](./docs/images/notifications.png)
 
 ### 🎨 **Design & UX**
 
@@ -111,9 +111,7 @@
 - **Smooth Animations**: Polished transitions and interactions
 - **Accessibility**: WCAG-compliant design patterns
 
-![Design Showcase](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Design+Showcase)
-
-<!-- TODO: Add screenshot showcasing the design aesthetic -->
+![Design Showcase](./docs/images/homepagefeature%20gif.gif)
 
 ---
 
@@ -195,7 +193,6 @@ This is a **frontend-only demo** with the following limitations:
 - **Social Interactions**: Follow, like, comment actions don't persist
 - **News Aggregation**: News is loaded from static JSON files
 - **User Search**: Search functionality uses mock data
-- **Real Countdown**: Timer uses a demo target date (365 days from now)
 
 ### ✅ Working Features
 
@@ -205,6 +202,7 @@ This is a **frontend-only demo** with the following limitations:
 - **Responsive Design**: Works on all screen sizes
 - **Animations**: All transitions and animations function
 - **Mock Data**: Comprehensive demo data for testing
+- **Countdown Timer**: Live countdown to GTA 6 release (November 19, 2026) - fully functional with real-time updates
 
 ---
 
@@ -296,9 +294,7 @@ GTA Fan Hub embraces the **Vice City aesthetic** with:
 - **Smooth Animations**: Polished transitions
 - **Gaming Aesthetic**: Bold, vibrant, and engaging
 
-![Design Philosophy](https://via.placeholder.com/1200x400/1a1a2e/ffffff?text=Design+Philosophy+Showcase)
-
-<!-- TODO: Add collage of design elements showing the aesthetic -->
+![Design Philosophy](./docs/images/homepage.png)
 
 ---
 
@@ -347,41 +343,9 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🗺️ Roadmap
-
-### Phase 1: Backend Integration ✅ (In Progress)
-
-- [ ] Connect to production API
-- [ ] Enable real-time Socket.io connections
-- [ ] Implement database integration
-- [ ] Enable file uploads
-
-### Phase 2: Enhanced Features
-
-- [ ] Advanced search functionality
-- [ ] User recommendations
-- [ ] Content moderation tools
-- [ ] Analytics dashboard
-
-### Phase 3: Gaming Integration
-
-- [ ] Game session tracking
-- [ ] Achievement system
-- [ ] Leaderboards
-- [ ] In-game event integration
-
-### Phase 4: Community Features
-
-- [ ] Live chat
-- [ ] Voice/video calls
-- [ ] Community events
-- [ ] User groups/clans
-
----
-
 <div align="center">
 
-**Built with ❤️ for the GTA 6 Community**
+**Built with ❤️ for the GTA Community**
 
 ⭐ Star this repo if you're excited for GTA 6!
 

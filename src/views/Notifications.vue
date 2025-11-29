@@ -52,7 +52,7 @@
         </div>
 
         <!-- Notifications list -->
-        <div v-else class="notifications-list">
+        <div v-else class="notifications-list main-backdrop-filter">
           <NotificationItem
             v-for="notification in filteredNotifications"
             :key="notification._id"
@@ -212,23 +212,26 @@ onMounted(async () => {
 }
 
 .mark-all-btn {
-  padding: 10px 16px;
-  background: rgba(29, 161, 242, 0.1);
-  border: 1px solid rgba(29, 161, 242, 0.3);
+  padding: 12px 20px;
+  background: rgba(226, 113, 207, 0.25);
+  border: 2px solid var(--neon-pink2);
   border-radius: 8px;
   cursor: pointer;
-  color: #1da1f2;
+  color: var(--bright-white);
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 0 10px rgba(226, 113, 207, 0.3);
 }
 
 .mark-all-btn:hover {
-  background: rgba(29, 161, 242, 0.2);
-  border-color: rgba(29, 161, 242, 0.5);
+  background: rgba(226, 113, 207, 0.25);
+  border-color: var(--neon-pink2);
+  box-shadow: 0 0 15px rgba(226, 113, 207, 0.5);
+  transform: translateY(-1px);
 }
 
 .filter-tabs {
@@ -246,38 +249,47 @@ onMounted(async () => {
 
 .filter-tab {
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  min-height: 44px;
 }
 
 .filter-tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: rgba(226, 113, 207, 0.15);
+  border-color: rgba(226, 113, 207, 0.4);
+  color: var(--bright-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(226, 113, 207, 0.2);
 }
 
 .filter-tab.active {
-  background: rgba(29, 161, 242, 0.2);
-  border-color: #1da1f2;
-  color: #1da1f2;
+  background: rgba(226, 113, 207, 0.25);
+  border-color: var(--neon-pink2);
+  color: var(--bright-white);
+  box-shadow: 0 0 15px rgba(226, 113, 207, 0.4);
+  font-weight: 500;
 }
 
 .count-badge {
-  background: #1da1f2;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
+  background: var(--neon-pink2);
+  color: var(--bright-white);
+  padding: 4px 8px;
+  border-radius: 12px;
   font-size: 11px;
   font-weight: bold;
+  box-shadow: 0 0 8px rgba(226, 113, 207, 0.6);
+  min-width: 20px;
+  text-align: center;
 }
 
 .notifications-content {
@@ -301,10 +313,11 @@ onMounted(async () => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #1da1f2;
+  border-top-color: var(--neon-pink2);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
+  box-shadow: 0 0 10px rgba(226, 113, 207, 0.3);
 }
 
 @keyframes spin {
@@ -334,6 +347,8 @@ onMounted(async () => {
 
 .notifications-list {
   /* NotificationItem handles its own styling */
+  display: flex;
+  flex-direction: column;
 }
 
 .load-more-container {
@@ -343,26 +358,31 @@ onMounted(async () => {
 }
 
 .load-more-btn {
-  padding: 12px 24px;
-  background: rgba(29, 161, 242, 0.1);
-  border: 1px solid rgba(29, 161, 242, 0.3);
+  padding: 14px 28px;
+  background: rgba(226, 113, 207, 0.15);
+  border: 2px solid var(--bright-white);
   border-radius: 8px;
   cursor: pointer;
-  color: #1da1f2;
+  color: var(--bright-white);
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.2s ease;
-  min-width: 120px;
+  transition: all 0.3s ease;
+  min-width: 140px;
 }
 
 .load-more-btn:hover:not(:disabled) {
-  background: rgba(29, 161, 242, 0.2);
-  border-color: rgba(29, 161, 242, 0.5);
+  background: rgba(226, 113, 207, 0.25);
+  border-color: var(--neon-pink2);
+
+  transform: translateY(-2px);
+  color: var(--bright-white);
 }
 
 .load-more-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  border-color: rgba(226, 113, 207, 0.3);
+  box-shadow: none;
 }
 
 .loading-dots .dots::after {

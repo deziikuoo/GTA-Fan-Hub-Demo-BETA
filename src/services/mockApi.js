@@ -7,6 +7,7 @@ import { mockNotifications, getUnreadCount, markAsRead, markAllAsRead } from "@/
 import { getNewsArticles, getNewsArticleById, mockNewsArticles } from "@/mockData/news.js";
 import { getFeed, getUserPosts } from "@/mockData/feed.js";
 import { getCarouselImages } from "@/mockData/carousel.js";
+import { mockRedditPosts } from "@/mockData/reddit.js";
 
 // Simulate network delay
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -381,8 +382,11 @@ const mockApi = {
     }
     
     // Reddit endpoint (mock)
-    if (url === "/api/reddit/trending") {
-      return { data: { posts: [] } };
+    if (url.startsWith("/api/reddit/trending")) {
+      const limit = params.limit ? parseInt(params.limit) : 20;
+      const posts = mockRedditPosts.slice(0, limit);
+      console.log("[mockApi] Returning Reddit posts:", posts.length);
+      return { data: { posts } };
     }
     
     // Notification endpoints

@@ -399,30 +399,40 @@ export default {
         </div>
       </div>
     </section>
-
-    <!-- Developer/GitHub Section -->
-    <section class="developer-section">
-      <div class="developer-container">
-        <h2 class="section-title">Developer & Source Code</h2>
-        <div class="developer-content">
-          <a :href="githubRepoUrl" target="_blank" class="github-link">
-            <font-awesome-icon :icon="['fab', 'github']" class="github-icon" />
-            <span>View on GitHub</span>
-            <font-awesome-icon
-              icon="fas fa-external-link-alt"
-              class="external-icon"
-            />
-          </a>
-          <p class="developer-text">
-            This is an open-source frontend demo built by
-            <a :href="githubUrl" target="_blank" class="dev-link"
-              >@{{ githubUsername }}</a
-            >. Star the repository to show your support!
-          </p>
+ <!-- Roadmap Section -->
+    <section class="roadmap-section">
+      <div class="roadmap-container">
+        <h2 class="section-title">Roadmap & Coming Soon</h2>
+        <p class="section-subtitle">
+          What we're working on for the full release
+        </p>
+        <div class="roadmap-list">
+          <div
+            v-for="(item, index) in roadmapItems"
+            :key="index"
+            class="roadmap-item"
+          >
+            <div class="roadmap-content">
+              <h3>{{ item.feature }}</h3>
+              <p class="roadmap-description">{{ item.description }}</p>
+            </div>
+            <div class="progress-container">
+              <span class="roadmap-status" :class="item.status">
+                {{ item.status === "in-progress" ? "In Progress" : "Planned" }}
+              </span>
+              <div v-if="item.progress > 0" class="progress-wrapper">
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :style="{ width: item.progress + '%' }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-
     <!-- Social/Community Links Section -->
     <section class="social-section">
       <div class="social-container">
@@ -446,106 +456,6 @@ export default {
               Join {{ social.name }}
             </a>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Beta Feedback Section -->
-    <section class="feedback-section">
-      <div class="feedback-container">
-        <h2 class="section-title">Beta Feedback</h2>
-        <p class="feedback-text">
-          Help us improve! Report bugs, suggest features, or share your
-          thoughts.<br></br>Your feedback shapes the future of GtaFanHub.
-        </p>
-        <div class="feedback-links">
-          <a
-            :href="`${githubRepoUrl}/issues`"
-            target="_blank"
-            class="feedback-btn bug"
-          >
-            <font-awesome-icon icon="fas fa-bug" />
-            Report a Bug
-          </a>
-          <a
-            :href="`${githubRepoUrl}/issues/new`"
-            target="_blank"
-            class="feedback-btn feature"
-          >
-            <font-awesome-icon icon="fas fa-lightbulb" />
-            Suggest a Feature
-          </a>
-          <a
-            :href="`mailto:${newsletterEmail}?subject=GtaFanHub Beta Feedback`"
-            class="feedback-btn email"
-          >
-            <font-awesome-icon icon="fas fa-envelope" />
-            Send Feedback
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Roadmap Section -->
-    <section class="roadmap-section">
-      <div class="roadmap-container">
-        <h2 class="section-title">Roadmap & Coming Soon</h2>
-        <p class="section-subtitle">
-          What we're working on for the full release
-        </p>
-        <div class="roadmap-list">
-          <div
-            v-for="(item, index) in roadmapItems"
-            :key="index"
-            class="roadmap-item"
-          >
-            <div class="roadmap-header">
-              <div class="roadmap-info">
-                <h3>{{ item.feature }}</h3>
-                <p class="roadmap-description">{{ item.description }}</p>
-              </div>
-              <span class="roadmap-status" :class="item.status">
-                {{ item.status === "in-progress" ? "In Progress" : "Planned" }}
-              </span>
-            </div>
-            <div v-if="item.progress > 0" class="progress-container">
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  :style="{ width: item.progress + '%' }"
-                ></div>
-                <span class="progress-text">{{ item.progress }}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Version & Newsletter Container -->
-    <div class="version-newsletter-container">
-      <!-- Version Section -->
-      <section class="version-section">
-      <div class="version-container">
-        <h2 class="section-title">Version Information</h2>
-        <div class="version-info">
-          <div class="version-badge">{{ versionInfo.version }}</div>
-          <div class="version-details">
-            <p class="version-text">
-              <strong>Status:</strong> {{ versionInfo.status }}
-            </p>
-            <p class="version-text">
-              <strong>Last Updated:</strong> {{ versionInfo.lastUpdated }}
-            </p>
-          </div>
-          <a
-            :href="`${githubRepoUrl}/releases`"
-            target="_blank"
-            class="changelog-link"
-          >
-            <font-awesome-icon icon="fas fa-code-branch" />
-            View Changelog on GitHub
-          </a>
         </div>
       </div>
     </section>
@@ -683,10 +593,67 @@ export default {
           <a :href="githubRepoUrl" target="_blank">GitHub repository</a> to get
           notified of all updates
         </p>
+        
+        <!-- Version Information -->
+        <div class="version-info-inline">
+          <h3 class="version-title-inline">Version Information</h3>
+          <div class="version-info-content">
+            <div class="version-badge-inline">{{ versionInfo.version }}</div>
+            <div class="version-details-inline">
+              <p class="version-text-inline">
+                <strong>Status:</strong> {{ versionInfo.status }}
+              </p>
+              <p class="version-text-inline">
+                <strong>Last Updated:</strong> {{ versionInfo.lastUpdated }}
+              </p>
+            </div>
+            <a
+              :href="`${githubRepoUrl}/releases`"
+              target="_blank"
+              class="changelog-link-inline"
+            >
+              <font-awesome-icon icon="fas fa-code-branch" />
+              View Changelog on GitHub
+            </a>
+          </div>
+        </div>
       </div>
     </section>
-    </div>
-
+    <!-- Beta Feedback Section -->
+    <section class="feedback-section">
+      <div class="feedback-container">
+        <h2 class="section-title">Beta Feedback</h2>
+        <p class="feedback-text">
+          Help us improve! Report bugs, suggest features, or share your
+          thoughts.<br></br>Your feedback shapes the future of GtaFanHub.
+        </p>
+        <div class="feedback-links">
+          <a
+            :href="`${githubRepoUrl}/issues`"
+            target="_blank"
+            class="feedback-btn bug"
+          >
+            <font-awesome-icon icon="fas fa-bug" />
+            Report a Bug
+          </a>
+          <a
+            :href="`${githubRepoUrl}/issues/new`"
+            target="_blank"
+            class="feedback-btn feature"
+          >
+            <font-awesome-icon icon="fas fa-lightbulb" />
+            Suggest a Feature
+          </a>
+          <a
+            :href="`mailto:${newsletterEmail}?subject=GtaFanHub Beta Feedback`"
+            class="feedback-btn email"
+          >
+            <font-awesome-icon icon="fas fa-envelope" />
+            Send Feedback
+          </a>
+        </div>
+      </div>
+    </section>
     <!-- Support the Project Section -->
     <section class="support-section">
       <div class="support-container">
@@ -761,22 +728,39 @@ export default {
         </div>
       </div>
     </section>
-
-        <!-- Credits Section -->
-    <section class="credits-section">
-      <div class="credits-container">
-        <h2 class="section-title">Credits & Acknowledgments</h2>
-        <div class="credits-content">
-          <p class="credits-text">
-            <!-- Credits will be added as the project grows -->
-            Special thanks to the GTA community for the inspiration and support.
+    <!-- Developer/GitHub Section -->
+    <section class="developer-section">
+      <div class="developer-container">
+        <h2 class="section-title">Developer & Source Code</h2>
+        <div class="developer-content">
+          <a :href="githubRepoUrl" target="_blank" class="github-link">
+            <font-awesome-icon :icon="['fab', 'github']" class="github-icon" />
+            <span>View on GitHub</span>
+            <font-awesome-icon
+              icon="fas fa-external-link-alt"
+              class="external-icon"
+            />
+          </a>
+          <p class="developer-text">
+            This is an open-source frontend demo built by
+            <a :href="githubUrl" target="_blank" class="dev-link"
+              >@{{ githubUsername }}</a
+            >. Star the repository to show your support!
           </p>
-          <div class="credits-disclaimer">
-            <p>
-              <strong>Disclaimer:</strong> GtaFanHub is a fan-made project and
-              is not affiliated with, endorsed by, or connected to Rockstar
-              Games or Take-Two Interactive.
+          
+          <!-- Credits & Acknowledgments -->
+          <div class="credits-content-inline">
+            <h3 class="credits-title-inline">Credits & Acknowledgments</h3>
+            <p class="credits-text-inline">
+              Special thanks to the GTA community for the inspiration and support.
             </p>
+            <div class="credits-disclaimer-inline">
+              <p>
+                <strong>Disclaimer:</strong> GtaFanHub is a fan-made project and
+                is not affiliated with, endorsed by, or connected to Rockstar
+                Games or Take-Two Interactive.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -1056,6 +1040,7 @@ export default {
   padding: var(--space-3xl) var(--space-lg);
   width: 100%;
   border-radius: var(--radius-2xl);
+
 }
 
 .stats-container {
@@ -1097,12 +1082,8 @@ export default {
 /* Mission Section */
 .mission-section {
   padding: var(--space-4xl) var(--space-lg);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 20, 147, 0.05),
-    rgba(0, 191, 255, 0.05)
-  );
   border-radius: var(--radius-2xl);
+
 }
 
 .mission-container {
@@ -1152,8 +1133,10 @@ export default {
 
 /* Features Section */
 .features-section {
-  padding: var(--space-4xl) var(--space-lg);
+  padding: 0px var(--space-lg);
+  margin-bottom: var(--space-4xl);
   border-radius: var(--radius-2xl);
+
 }
 
 .features-container {
@@ -1212,9 +1195,10 @@ export default {
 
 /* Developer/GitHub Section */
 .developer-section {
-  padding: var(--space-2xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
+  margin-bottom: var(--space-4xl);
+  padding: 0px var(--space-lg);
   border-radius: var(--radius-2xl);
+
 }
 
 .developer-container {
@@ -1275,10 +1259,55 @@ export default {
   text-decoration: underline;
 }
 
+/* Credits within Developer Section */
+.credits-content-inline {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.credits-title-inline {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--bright-white);
+  margin-bottom: var(--space-sm);
+  opacity: 0.9;
+}
+
+.credits-text-inline {
+  color: var(--soft-lavender);
+  opacity: 0.8;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-md);
+}
+
+.credits-disclaimer-inline {
+  padding: var(--space-md);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--neon-pink2);
+}
+
+.credits-disclaimer-inline p {
+  color: var(--soft-lavender);
+  font-size: var(--text-xs);
+  margin: 0;
+  text-align: left;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.credits-disclaimer-inline strong {
+  color: var(--bright-white);
+  opacity: 0.9;
+}
+
 /* Social/Community Section */
 .social-section {
-  padding: var(--space-4xl) var(--space-lg);
+  padding: 0px var(--space-lg);
+  margin-bottom: var(--space-4xl);
   border-radius: var(--radius-2xl);
+
 }
 
 .social-container {
@@ -1347,9 +1376,10 @@ export default {
 
 /* Feedback Section */
 .feedback-section {
-  padding: var(--space-4xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
+  margin-bottom: var(--space-4xl);
+  padding: 0px var(--space-lg);
   border-radius: var(--radius-2xl);
+
 }
 
 .feedback-container {
@@ -1405,8 +1435,10 @@ export default {
 
 /* Roadmap Section */
 .roadmap-section {
-  padding: var(--space-4xl) var(--space-lg);
+  padding: 0px var(--space-lg);
+  margin-bottom: var(--space-5xl);
   border-radius: var(--radius-2xl);
+ 
 }
 
 .roadmap-container {
@@ -1424,16 +1456,44 @@ export default {
 }
 
 .roadmap-item {
-  background-color: var(--glass-morphism-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-xl);
-  padding: var(--space-lg);
-  transition: var(--transition-normal);
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 200px;
+  gap: var(--space-md);
   box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  background-color: var(--glass-morphism-bg);
+  transition: border-color var(--transition-normal);
+}
+
+.roadmap-item:hover {
+  border-color: var(--bright-white);
+}
+
+.roadmap-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  align-items: center;
+  text-align: center;
+}
+
+.roadmap-content h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--bright-white);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.roadmap-description {
+  font-size: var(--text-sm);
+  color: var(--soft-lavender);
+  opacity: 0.8;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {
@@ -1448,37 +1508,6 @@ export default {
   }
 }
 
-.roadmap-item:hover {
-  border-color: var(--neon-pink2);
-}
-
-.roadmap-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-md);
-  flex: 1;
-}
-
-.progress-container {
-  margin-top: var(--space-md);
-  width: 100%;
-}
-
-.roadmap-info h3 {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--bright-white);
-  margin: 0 0 var(--space-xs) 0;
-}
-
-.roadmap-description {
-  font-size: var(--text-sm);
-  color: var(--soft-lavender);
-  opacity: 0.8;
-  margin: 0;
-}
-
 .roadmap-status {
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-full);
@@ -1487,6 +1516,7 @@ export default {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .roadmap-status.planned {
@@ -1501,8 +1531,32 @@ export default {
   border: 1px solid var(--electric-blue);
 }
 
-.progress-bar {
+.progress-container {
+  padding: var(--space-md) var(--space-lg);
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.progress-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.progress-label {
+  font-size: var(--text-xs);
+  color: var(--electric-blue);
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.progress-bar {
+  flex: 1;
   height: 8px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-full);
@@ -1517,27 +1571,10 @@ export default {
   border-radius: var(--radius-full);
 }
 
-.progress-text {
-  position: absolute;
-  right: 0;
-  top: -20px;
-  font-size: var(--text-xs);
-  color: var(--electric-blue);
-  font-weight: 600;
-}
-
-/* Version & Newsletter Container */
-.version-newsletter-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3xl);
-  margin-bottom: var(--space-4xl);
-}
 
 /* Version Section */
 .version-section {
   padding: var(--space-4xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
   border-radius: var(--radius-2xl);
 }
 
@@ -1592,8 +1629,8 @@ export default {
 
 /* Newsletter Section */
 .newsletter-section {
-  padding: var(--space-4xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
+  padding: 0px var(--space-lg);
+  margin-bottom: var(--space-5xl);
   border-radius: var(--radius-2xl);
 }
 
@@ -1875,11 +1912,78 @@ export default {
   border: 1px solid var(--neon-pink2);
 }
 
+/* Version Info within Newsletter Section */
+.version-info-inline {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.version-title-inline {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--bright-white);
+  margin-bottom: var(--space-sm);
+  opacity: 0.9;
+}
+
+.version-info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.version-badge-inline {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-lg);
+  background: linear-gradient(135deg, var(--neon-pink2), var(--electric-blue));
+  color: var(--bright-white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.version-details-inline {
+  margin-bottom: var(--space-sm);
+}
+
+.version-text-inline {
+  color: var(--soft-lavender);
+  margin: var(--space-xs) 0;
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.version-text-inline strong {
+  color: var(--bright-white);
+  opacity: 0.9;
+}
+
+.changelog-link-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--electric-blue);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: var(--text-xs);
+  transition: var(--transition-normal);
+  opacity: 0.9;
+}
+
+.changelog-link-inline:hover {
+  text-decoration: underline;
+  opacity: 1;
+}
+
 /* Support Section */
 .support-section {
-  padding: var(--space-4xl) var(--space-lg);
-  background-color: var(--glass-morphism-bg);
+  margin-bottom: var(--space-6xl);
+  padding: 0px var(--space-lg);
   border-radius: var(--radius-2xl);
+
 }
 
 .support-container {
@@ -1904,7 +2008,7 @@ export default {
 }
 
 .support-card {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--glass-morphism-bg);
   border: 1px solid var(--bright-white);
   border-radius: var(--radius-2xl);
   padding: var(--space-xl);
@@ -2014,8 +2118,10 @@ export default {
 
 /* Credits Section */
 .credits-section {
-  padding: var(--space-4xl) var(--space-lg);
+  margin-bottom: var(--space-6xl);
+  padding: 0px var(--space-lg);
   border-radius: var(--radius-2xl);
+
 }
 
 .credits-container {
@@ -2055,10 +2161,10 @@ export default {
 
 /* CTA Section */
 .cta-section {
-  margin-top: var(--space-2xl);
-  padding: var(--space-4xl) var(--space-lg);
-  background: var(--glass-morphism-bg);
+  margin-bottom: var(--space-5xl);
+  padding: 0px var(--space-lg);
   border-radius: var(--radius-2xl);
+
 }
 
 .cta-container {
@@ -2167,12 +2273,12 @@ export default {
     justify-content: center;
   }
 
-  .roadmap-header {
-    flex-direction: column;
+  .progress-container {
+    flex-wrap: wrap;
   }
 
   .roadmap-status {
-    align-self: flex-start;
+    flex-shrink: 0;
   }
 
   .newsletter-actions {
@@ -2203,11 +2309,6 @@ export default {
   .support-links {
     flex-direction: column;
     align-items: center;
-  }
-
-  .version-newsletter-container {
-    grid-template-columns: 1fr;
-    gap: var(--space-2xl);
   }
 
   .support-card {

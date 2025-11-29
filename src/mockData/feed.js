@@ -1,5 +1,6 @@
 // Mock feed data for demo
-import { mockPosts } from "./posts.js";
+import { mockPosts, demoUserPosts } from "./posts.js";
+import { getCurrentDemoUser } from "./users.js";
 
 // Get user-created posts from sessionStorage
 function getUserCreatedPosts() {
@@ -125,7 +126,21 @@ export function getFeed(feedType = "for-you", page = 1, limit = 10) {
 // Helper to get user posts (for profile pages)
 export function getUserPosts(userId, page = 1, limit = 10) {
   const sessionUserPosts = getUserCreatedPosts();
-  const allUserPosts = [...sessionUserPosts, ...mockPosts].filter((post) => post.author._id === userId);
+  let allUserPosts = [...sessionUserPosts, ...mockPosts];
+  
+  // Add demo user posts if requesting demo user's posts
+  if (userId === "demo_user") {
+    const demoUser = getCurrentDemoUser();
+    // Enrich demo user posts with full user object
+    const enrichedDemoPosts = demoUserPosts.map(post => ({
+      ...post,
+      author: demoUser,
+    }));
+    allUserPosts = [...allUserPosts, ...enrichedDemoPosts];
+  }
+  
+  // Filter by user ID
+  allUserPosts = allUserPosts.filter((post) => post.author && post.author._id === userId);
   
   // Sort by date (newest first)
   allUserPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

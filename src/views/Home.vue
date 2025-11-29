@@ -608,11 +608,18 @@ export default {
             </div>
           </div>
           <div class="Recent-Articles">
-            <div class="recentArticleCarousel">
-              <div v-if="loading">Loading...</div>
-              <div v-else-if="errorMessage">{{ errorMessage }}</div>
-              <div v-else class="carousel-wrapper">
-                <div class="carousel-content">
+            <div class="articleCarousel">
+              <div v-if="loading" class="article-loading">
+                Loading articles...
+              </div>
+              <div
+                v-else-if="recentArticles.length === 0"
+                class="no-articles"
+              >
+                No articles available
+              </div>
+              <div v-else class="article-carousel-wrapper">
+                <div class="article-carousel-content">
                   <div
                     class="article-slide"
                     v-for="(article, index) in recentArticles"
@@ -625,31 +632,74 @@ export default {
                       @click="openArticleDetails(article._id)"
                       class="article-link"
                     >
-                      <img
-                        v-if="
-                          article.enclosure &&
-                          article.enclosure.url &&
-                          article.enclosure.type.startsWith('image/')
-                        "
-                        :src="article.enclosure.url"
-                        alt="Article Image"
-                        class="article-image"
-                      />
-                      <h3>{{ article.title }}</h3>
-                      <p>{{ article.description.slice(0, 100) }}...</p>
+                      <div
+                        class="article-background"
+                        :style="{
+                          backgroundImage: article.enclosure?.url
+                            ? `url(${article.enclosure.url})`
+                            : 'none',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                        }"
+                      >
+                        <div class="article-overlay">
+                          <div class="article-header">
+                            <div class="article-source-section">
+                              <div class="article-source-info">
+                                <font-awesome-icon
+                                  :icon="['fas', 'newspaper']"
+                                  class="article-source-icon"
+                                />
+                                <span class="article-source">{{
+                                  article.source || "GTA Fan Hub"
+                                }}</span>
+                              </div>
+                              <div class="article-stats">
+                                <span class="article-views">
+                                  <font-awesome-icon :icon="['fas', 'eye']" />
+                                  {{ Math.floor(Math.random() * 5000) + 1000 }}
+                                </span>
+                              </div>
+                            </div>
+                            <div class="article-author-section">
+                              <div class="article-author-info">
+                                <font-awesome-icon
+                                  :icon="['fas', 'user']"
+                                  class="article-author-icon"
+                                />
+                                <span class="article-author">{{
+                                  article.author || "Unknown Author"
+                                }}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="article-content">
+                            <h3 class="article-title">{{ article.title }}</h3>
+                            <div class="article-footer">
+                              <span class="article-time">{{
+                                getRelativeTime(article.pubDate)
+                              }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="CarouselButtons-Container">
+                <div
+                  class="ArticleCarouselButtons-Container"
+                  v-if="recentArticles.length > 1"
+                >
                   <button
-                    class="carousel-btn prev-btn"
+                    class="article-carousel-btn article-prev-btn"
                     @click="prevArticle"
                     aria-label="Previous article"
                   >
                     <font-awesome-icon :icon="['fas', 'arrow-left']" />
                   </button>
                   <button
-                    class="carousel-btn pause-btn"
+                    class="article-carousel-btn article-pause-btn"
                     @click="togglePause"
                     :aria-label="
                       isPaused ? 'Resume carousel' : 'Pause carousel'
@@ -660,22 +710,12 @@ export default {
                     />
                   </button>
                   <button
-                    class="carousel-btn next-btn"
+                    class="article-carousel-btn article-next-btn"
                     @click="nextArticle"
                     aria-label="Next article"
                   >
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </button>
-                </div>
-                <div class="carousel-dots">
-                  <button
-                    v-for="(article, index) in recentArticles"
-                    :key="index"
-                    class="carousel-dot"
-                    :class="{ active: index === currentArticleIndex }"
-                    @click="dotClicked(index)"
-                    :aria-label="`Go to article ${index + 1}`"
-                  ></button>
                 </div>
               </div>
             </div>
@@ -1485,25 +1525,24 @@ export default {
   box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4),
     -10px -10px 30px rgba(80, 80, 90, 0.08), var(--neon-glow-hover);
 }
-.recentArticle {
-  height: 100%;
-  width: 100%;
-  background-color: transparent;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bolder;
-}
-.recentArticleCarousel {
+
+/* Article Carousel styles for Recent-Articles (GTA Fan Hub themed) */
+.articleCarousel {
   height: 100%;
   width: 100%;
   position: relative;
   overflow: hidden;
 }
 
-.carousel-wrapper {
+.article-loading,
+.no-articles {
+  color: var(--soft-lavender);
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9em;
+}
+
+.article-carousel-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1511,7 +1550,7 @@ export default {
   position: relative;
 }
 
-.carousel-content {
+.article-carousel-content {
   display: flex;
   width: 100%;
   height: 100%;
@@ -1519,163 +1558,192 @@ export default {
 }
 
 .article-slide {
-  flex: 0 0 100%;
+  min-width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  padding: 10px;
-  box-sizing: border-box;
+  position: relative;
 }
 
 .article-link {
-  text-decoration: none;
-  color: var(--bright-white);
-  width: 100%;
+  display: block;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-decoration: none;
+  color: inherit;
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
-.article-link:hover {
-  transform: scale(1.02);
-}
-
-.article-link h3:hover {
-  color: var(--mint-green);
-  text-shadow: 0 0 10px rgba(152, 255, 152, 0.8),
-    0 0 20px rgba(152, 255, 152, 0.6);
-}
-
-.article-image {
+.article-background {
+  height: 100%;
   width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.article-image:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(152, 255, 152, 0.3);
-}
-
-.article-slide h3 {
-  font-size: 1.2em;
-  text-align: center;
-  margin: 10px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.article-slide p {
-  font-size: 0.9em;
-  text-align: center;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-.CarouselButtons-Container {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: auto;
-  bottom: 5%;
-}
-.carousel-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
-  bottom: 0%;
   border-radius: 8px;
-  padding: 10px;
-  cursor: pointer;
-  color: var(--deep-black2);
-  z-index: 20;
-  box-shadow: 0 0 15px -5px inset var(--bright-white);
-  opacity: 0.7;
-  border: 1px solid var(--bright-white);
-  backdrop-filter: blur(2.2px);
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: all 0.25s ease-in-out;
-}
-.Recent-Articles:hover .carousel-btn {
-  opacity: 1;
-  transition: all 0.25s ease-in-out;
-  background-color: var(--glass-morphism-bg);
+  overflow: hidden;
+  border: 2px solid var(--neon-pink2);
+  box-shadow: 0 0 20px rgba(226, 113, 207, 0.3);
 }
 
-.carousel-btn:hover {
-  backdrop-filter: blur(4.2px) !important;
-  background-color: var(--bright-white) !important;
-  opacity: 1 !important;
-  border: 1px solid var(--bright-white) !important;
-}
-
-.prev-btn,
-.next-btn {
-  height: 30px;
-  min-height: 15px;
-  max-height: 30px;
-  width: 30px;
-}
-
-.pause-btn {
-  height: 40px;
-  min-height: 20px;
-  max-height: 40px;
-  width: 40px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid var(--bright-white);
-}
-.carousel-dots {
+.article-overlay {
   position: absolute;
-  bottom: -30px;
+  top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.article-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.article-author-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.article-author-info {
+  display: flex;
+  align-items: center;
   gap: 8px;
-  padding: 10px 0;
 }
 
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--steel-gray);
-  border-radius: 50%;
+.article-author-icon {
+  color: var(--neon-pink2);
+  font-size: 0.9em;
+}
+
+.article-author {
+  color: var(--bright-white);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(226, 113, 207, 0.8);
+}
+
+.article-source-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.article-source-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-source-icon {
+  color: var(--mint-green);
+  font-size: 1.2em;
+}
+
+.article-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-source {
+  color: var(--bright-white);
+  font-size: 0.9em;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(198, 232, 125, 0.8);
+}
+
+.article-views {
+  color: var(--mint-green);
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-left: auto;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-shadow: 0 0 8px var(--mint-green), 0 0 16px var(--mint-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.article-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 50%;
+  overflow: hidden;
+}
+
+.article-title {
+  color: var(--bright-white);
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  hyphens: auto;
+  max-height: calc(1.3em * 4);
+}
+
+.article-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.article-time {
+  color: var(--soft-lavender);
+  font-size: 0.8em;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Article Carousel Buttons */
+.ArticleCarouselButtons-Container {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.article-carousel-btn {
+  background: rgba(226, 113, 207, 0.8);
   border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 0.8em;
 }
 
-.carousel-dot.active {
-  background-color: var(--neon-pink2);
+.article-carousel-btn:hover {
+  background: rgba(226, 113, 207, 1);
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(226, 113, 207, 0.6);
 }
 
-.carousel-dot:hover {
-  background-color: var(--bright-white);
+.article-pause-btn {
+  width: 40px;
+  height: 40px;
 }
 .Limit-Container {
   display: flex;
@@ -1997,13 +2065,15 @@ export default {
 
 /* Smallest screens - max-width: 480px */
 @media (max-width: 480px) {
-  .reddit-title {
+  .reddit-title,
+  .article-title {
     font-size: 0.9em;
     -webkit-line-clamp: 2; /* Only 2 lines on very small screens */
     max-height: calc(1.3em * 2);
   }
 
-  .reddit-content {
+  .reddit-content,
+  .article-content {
     max-height: 40%; /* Even less space on very small screens */
   }
 
@@ -2012,26 +2082,31 @@ export default {
     height: 18px;
   }
 
-  .reddit-subreddit-icon {
+  .reddit-subreddit-icon,
+  .article-source-icon {
     width: 16px;
     height: 16px;
   }
 
-  .reddit-author {
+  .reddit-author,
+  .article-author {
     font-size: 0.65em;
   }
 
-  .reddit-header {
+  .reddit-header,
+  .article-header {
     gap: 8px;
   }
 
-  .reddit-subreddit-section {
+  .reddit-subreddit-section,
+  .article-source-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
   }
 
-  .reddit-stats {
+  .reddit-stats,
+  .article-stats {
     align-self: flex-end;
   }
 }
